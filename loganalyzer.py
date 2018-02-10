@@ -44,6 +44,10 @@ def searchRange(term, lines, lower, higher):
 
     return res
 
+def checkDual(lines):
+    if(len(search('Warning: OBS is already running!',lines))>0):
+        messages.append([3, "TWO INSTANCES", "Two instances of OBS are running. They will likely interfere with each other and consume exessive ressources. Stop one of them. Check task manager for stray OBS processes if you can't find the other one."])
+
 def checkAutoconfig(lines):
     if(len(search('Auto-config wizard', lines))>0):
         messages.append([3, "AUTOCONFIG WIZARD","The log contains an Auto-config wizard run. Results of this analysis are therefore inaccurate. Please post a link to a clean log file. To make a clean log file, first restart OBS, then start your stream/recording for ~30 seconds and stop it again. Make sure you replicate any issues as best you can, which means having any games/apps open and captured, etc. When you're done select Help > Log Files > Upload Current Log File. Copy the URL and paste it here."])
@@ -72,6 +76,9 @@ def checkKiller(lines):
     if(len(search('Interface: Killer',lines))>0):
         messages.append([1, "KILLER NIC", "Killer's Firewall is known for it's poor performance and issues when trying to stream. Please download the driver pack from http://www.killernetworking.com/driver-downloads/category/other-downloads , completely uninstall all Killer NIC items and install their Driver only package."])
 
+def checkWifi(lines):
+    if(len(search('802.11',lines))>0):
+        messages.append([2, "WIFI STREAMING", "In many cases, wireless connections can cause issues because of their unstable nature. Streaming really requires a stable connection. Often wireless connections are fine, but if you have problems, then we are going to be very unlikely to be able to help you diagnose it if you're on a wireless just because it adds yet another variable. We recommend streaming on wired connections."])
 
 def checkAdmin(lines):
     l = search('Running as administrator', lines)
@@ -285,11 +292,13 @@ def main():
     print(gistObject['description'])
     logLines=getLines(gistObject)
 
+    checkDual(logLines)
     checkAutoconfig(logLines)
     checkCPU(logLines)
     checkGPU(logLines)
     checkNVENC(logLines)
     checkKiller(logLines)
+    checkWifi(logLines)
     checkAdmin(logLines)
     checkAttempt(logLines)
     checkMP4(logLines)
