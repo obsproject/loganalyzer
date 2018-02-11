@@ -4,59 +4,76 @@ from loganalyzer import *
 from wsgiref.simple_server import *
 import cgi
 
-html = """
-<html>
-<body>
-    <form method="post" action="">
-    <h1>Input</h1>
-    <p>
-        Log URL: <input type="text" name="url" value="{url_input}">
-    </p>
-    <p>
-        <input type="submit" value="Submit">
-    </p>
-    <h1>Output</h1>
-    <p>
-        {results_field}
-    </p>
+html=""
+with open("template.html","r") as f:
+    html=f.read()
 
-</body>
-</html>
-"""
+detail=""
+with open("detail.html","r") as f:
+    detail=f.read()
+
 
 def getSummaryHTML(messages):
     critical = ""
     warning = ""
     info = ""
-    score = 0
     for i in messages:
         if(i[0]==3):
-            critical = critical + i[1] +", "
+            critical = critical + "<li>" + i[1] + "</li>"
         elif(i[0]==2):
-            warning = warning + i[1] +", "
+            warning = warning + "<li>"+ i[1] + "</li>"
         elif(i[0]==1):
-            info = info + i[1] +", "
-        score = score + i[0]
-    summary="""<p>Log Score {} </p>\n""".format(score)
-    summary+="""<p class="text-danger">Critical:{}</p>\n""".format(critical)
-    summary+="""<p class="text-warning">Warning:{}</p>\n""".format(warning)
-    summary+="""<p class="text-info">Info: {}\n""".format(info)
-    return summary
+            info = info + "<li>" + i[1] + "</li>"
+    return critical,warning,info
+
+def getDetailsHTML(messages):
+    res=""
+    for i in messages:
+        if(i[0]==3):
+            res = res + detail.format(sev='danger',
+                    severity='Critical',
+                    title=i[1],
+                    text=i[2])
+    for i in messages:
+        if(i[0]==2):
+            res = res + detail.format(sev='warning',
+                    severity='Warning',
+                    title=i[1],
+                    text=i[2])
+    for i in messages:
+        if(i[0]==1):
+            res= res + detail.format(sev='info',
+                    severity='Info',
+                    title=i[1],
+                    text=i[2])
+
+    return res
+
 
 def application(environ, start_response):
     response_body=html
-    
-    if environ['REQUEST_METHOD'] == 'POST':
+    if(environ['REQUEST_METHOD'] == 'POST'):
         post_env = environ.copy()
         post_env['QUERY_STRING'] = ''
         post = cgi.FieldStorage(fp=environ['wsgi.input'],environ=post_env,
             keep_blank_values=True)
-
         post['url'].value
+        msgs=[]
         msgs = doAnalysis(post['url'].value)
-        results = getResults(msgs)
- 
-        response_body = html.format(url_input=post['url'].value,results_field=results)
+        crit,warn,info = getSummaryHTML(msgs)
+        details = getDetailsHTML(msgs)
+        response_body = html.format(url_input=post['url'].value,
+                summary_critical=crit,
+                summary_warning=warn,
+                summary_info=info,
+                details=details)
+    else:
+        response_body = html.format(url_input="Paste log url here",
+                summary_critical="Please analyse log",
+                summary_warning="<li>none</li>",
+                summary_info="<li>none</li>",
+                details="""<p class="text-warning">Please analyze log first.</p>""")
+
 
     status = '200 OK'
     response_headers = [
@@ -67,7 +84,13 @@ def application(environ, start_response):
     start_response(status, response_headers)
     return [response_body.encode()]
 
-httpd = make_server('localhost', 8051, application)
-httpd.serve_forever()
 
+if __name__ == '__main__':
+    try:
+        from wsgiref.simple_server import make_server
+        httpd = make_server('', 8080, application)
+        print('Serving on port 8080...')
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print('Goodbye.')
 
