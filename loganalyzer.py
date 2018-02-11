@@ -45,6 +45,14 @@ def searchRange(term, lines, lower, higher):
 
     return res
 
+def checkClassic(lines):
+    if(len(search('Open Broadcaster Software', lines))>0):
+        messages.append([3,"OBS CLASSIC","You are still using OBS Classic, please note that this version is no longer supported. While we cannot and will not do anything to prevent you from using it, we cannot help with any issues that may come up. It is recommended that you update to OBS Studio. Further information on why you should update (and how): https://obsproject.com/forum/threads/how-to-easily-switch-to-obs-studio.55820/"])
+        return True
+    else:
+        return False
+
+
 def checkDual(lines):
     if(len(search('Warning: OBS is already running!',lines))>0):
         messages.append([3, "TWO INSTANCES", "Two instances of OBS are running. They will likely interfere with each other and consume exessive ressources. Stop one of them. Check task manager for stray OBS processes if you can't find the other one."])
@@ -65,8 +73,9 @@ def checkGPU(lines):
     except IndexError:
         pass
     d3dAdapter = search('Loading up D3D11', lines)
-    if(len(adapters)==2 and ('Intel' in d3dAdapter[0])):
-        messages.append([3, "WRONG GPU", "Your Laptop has two GPUs. OBS is running on the weak integrated Intel GPU. For better rerformance as well as game capture being available you should run OBS on the dedicated GPU. Check the laptop trpubleshooting guide here: https://obsproject.com/wiki/Laptop-Performance-Issues"])
+    if(len(d3dAdapter)>0):
+        if(len(adapters)==2 and ('Intel' in d3dAdapter[0])):
+            messages.append([3, "WRONG GPU", "Your Laptop has two GPUs. OBS is running on the weak integrated Intel GPU. For better rerformance as well as game capture being available you should run OBS on the dedicated GPU. Check the laptop trpubleshooting guide here: https://obsproject.com/wiki/Laptop-Performance-Issues"])
 
 def checkNVENC(lines):
     #TODO wait for kurufu
@@ -291,24 +300,25 @@ def getResults(messages):
 def doAnalysis(url):
     gistObject = getGist(url)
     logLines=getLines(gistObject)
-    checkDual(logLines)
-    checkAutoconfig(logLines)
-    checkCPU(logLines)
-    checkGPU(logLines)
-    checkNVENC(logLines)
-    checkKiller(logLines)
-    checkWifi(logLines)
-    checkAdmin(logLines)
-    checkAttempt(logLines)
-    checkMP4(logLines)
-    checkPreset(logLines)
-    checkDrop(logLines)
-    checkRendering(logLines)
-    checkEncoding(logLines)
-    checkMulti(logLines)
-    checkStreamSettingsX264(logLines)
-    checkStreamSettingsNVENC(logLines)
-    parseScenes(logLines)
+    if(not checkClassic(logLines)):
+        checkDual(logLines)
+        checkAutoconfig(logLines)
+        checkCPU(logLines)
+        checkGPU(logLines)
+        checkNVENC(logLines)
+        checkKiller(logLines)
+        checkWifi(logLines)
+        checkAdmin(logLines)
+        checkAttempt(logLines)
+        checkMP4(logLines)
+        checkPreset(logLines)
+        checkDrop(logLines)
+        checkRendering(logLines)
+        checkEncoding(logLines)
+        checkMulti(logLines)
+        checkStreamSettingsX264(logLines)
+        checkStreamSettingsNVENC(logLines)
+        parseScenes(logLines)
     return(messages)
 
 
