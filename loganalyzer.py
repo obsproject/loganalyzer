@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 import requests
 import json
 import argparse
@@ -62,7 +63,7 @@ def checkGPU(lines):
     try:
         adapters.append(search('Adapter 2', lines)[0])
     except IndexError:
-        print("only one gpu")
+        pass
     d3dAdapter = search('Loading up D3D11', lines)
     if(len(adapters)==2 and ('Intel' in d3dAdapter[0])):
         messages.append([3, "WRONG GPU", "Your Laptop has two GPUs. OBS is running on the weak integrated Intel GPU. For better rerformance as well as game capture being available you should run OBS on the dedicated GPU. Check the laptop trpubleshooting guide here: https://obsproject.com/wiki/Laptop-Performance-Issues"])
@@ -239,10 +240,10 @@ def parseScenes(lines):
 
 def textOutput(string):
     dedented_text = textwrap.dedent(string).strip()
-    print(textwrap.fill(dedented_text,initial_indent=' ' * 4, subsequent_indent=' ' * 4, width=80, ))
+    return textwrap.fill(dedented_text,initial_indent=' ' * 4, subsequent_indent=' ' * 4, width=80, )
 
 
-def printResults(messages):
+def getSummary(messages):
     critical = ""
     warning = ""
     info = ""
@@ -255,43 +256,41 @@ def printResults(messages):
         elif(i[0]==1):
             info = info + i[1] +", "
         score = score + i[0]
+    summary="Log Score {} \n".format(score)
+    summary+="{}Critical: {}\n".format(RED,critical)
+    summary+="{}Warning:  {}\n".format(YELLOW,warning)
+    summary+="{}Info:     {}\n".format(CYAN,info)
+    return summary
 
-    print("Log Score {} ".format(score))
-    print("{}Critical: {} ".format(RED,critical))
-    print("{}Warning:  {} ".format(YELLOW,warning))
-    print("{}Info   :  {} ".format(CYAN,info))
-    print("{}--------------------------------------".format(RESET))
-    print(" ")
-    print("Details")
-    print("Critical:")
+def getResults(messages):
+    results = ""
+    results += "{}--------------------------------------\n".format(RESET)
+    results += " \n"
+    results += "Details\n"
+    results += "\nCritical:"
     for i in messages:
         if(i[0]==3):
-            print("{}{}".format(RED,i[1]))
-            textOutput(i[2])
+            results += "\n{}{}\n".format(RED,i[1])
+            results += textOutput(i[2])
 
-    print("{} ".format(RESET))
-    print("Warning:")
+    results += "{} \n".format(RESET)
+    results += "\nWarning:"
     for i in messages:
         if(i[0]==2):
-            print("{}{}".format(YELLOW,i[1]))
-            textOutput(i[2])
+            results += "\n{}{}\n".format(YELLOW,i[1])
+            results += textOutput(i[2])
 
-    print("{} ".format(RESET))
-    print("Info:")
+    results += "{} \n".format(RESET)
+    results += "\nInfo:"
     for i in messages:
         if(i[0]==1):
-            print("{}{}".format(CYAN,i[1]))
-            textOutput(i[2])
+            results += "\n{}{}\n".format(CYAN,i[1])
+            results += textOutput(i[2])
+    return results
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--url",'-u',dest='url',
-            default="", help="url of gist", required=True)
-    flags = parser.parse_args()
-    gistObject = getGist(flags.url)
-    print(gistObject['description'])
+def doAnalysis(url):
+    gistObject = getGist(url)
     logLines=getLines(gistObject)
-
     checkDual(logLines)
     checkAutoconfig(logLines)
     checkCPU(logLines)
@@ -310,7 +309,21 @@ def main():
     checkStreamSettingsX264(logLines)
     checkStreamSettingsNVENC(logLines)
     parseScenes(logLines)
-    printResults(messages)
+    return(messages)
+
+
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--url",'-u',dest='url',
+            default="", help="url of gist", required=True)
+    flags = parser.parse_args()
+   
+    msgs = doAnalysis(flags.url)
+    print(getSummary(msgs))
+    print(getResults(msgs))
+    
 
 if __name__ == "__main__":
     main()
