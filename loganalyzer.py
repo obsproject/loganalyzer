@@ -330,8 +330,9 @@ def doAnalysis(url):
             messages.append(checkStreamSettingsNVENC(logLines))
             m=parseScenes(logLines)
             for sublist in m:
-                for item in sublist:
-                    messages.append(item)
+                if(sublist != None):
+                    for item in sublist:
+                        messages.append(item)
     else:
         messages.append([3,"NO LOG", "URL contains no Github Gist link."])
     ret = [i for i in messages if i is not None]
