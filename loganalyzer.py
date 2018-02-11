@@ -230,14 +230,15 @@ def checkSources(lower, higher, lines):
     game = searchRange('game_capture', lines, lower, higher)
     if(len(monitor)>0 and len(game)>0):
         res=[]
-        res.append([1,"SOURCES NOT OPTIMIZED", "Monitor and Game Capture Sources interfere with each other. Never put them in the same scene"])
+        res.append([1,"CAPTURE INTERFERENCE", "Monitor and Game Capture Sources interfere with each other. Never put them in the same scene"])
     if(len(game)>1):
         if(res is None):
             res=[]
-        res.append([1,"SOURCES NOT OPTIMIZED", "Multiple Game Capture sources are usually not needed, and can sometimes interfere with each other. You can use the same Game Capture for all your games! If you change games often, try out the hotkey mode, which lets you press a key to select your active game. If you play games in fullscreen, use 'Capture any fullscreen application' mode."])
+        res.append([1,"MULTIPLEGAMECAPTURE", "Multiple Game Capture sources are usually not needed, and can sometimes interfere with each other. You can use the same Game Capture for all your games! If you change games often, try out the hotkey mode, which lets you press a key to select your active game. If you play games in fullscreen, use 'Capture any fullscreen application' mode."])
     return res
 
 def parseScenes(lines):
+    ret=[]
     sceneLines = getScenes(lines)
     if(len(sceneLines)>0):
         sections = getSections(lines)
@@ -247,9 +248,10 @@ def parseScenes(lines):
                 higher = getNextPos(s, sceneLines)-1
             else:
                 higher = getNextPos(s,sections)-1
-            return checkSources(s, higher, lines)
+            ret.append(checkSources(s, higher, lines))
     else:
-        return [1,"NO SCENES/SOURCES","There are neither scenes nor sources added to OBS. You won't be able to record anything but a black screen without adding soueces to your scenes. If you're new to OBS Studio, the community has created some resources for you to use. Check out our Overview Guide at https://goo.gl/zyMvr1 and Nerd or Die's video guide at http://goo.gl/dGcPZ3"]
+        ret.append([1,"NO SCENES/SOURCES","There are neither scenes nor sources added to OBS. You won't be able to record anything but a black screen without adding soueces to your scenes. If you're new to OBS Studio, the community has created some resources for you to use. Check out our Overview Guide at https://goo.gl/zyMvr1 and Nerd or Die's video guide at http://goo.gl/dGcPZ3"])
+    return ret
 
 def textOutput(string):
     dedented_text = textwrap.dedent(string).strip()
@@ -257,10 +259,10 @@ def textOutput(string):
 
 
 def getSummary(messages):
+    summary=""
     critical = ""
     warning = ""
     info = ""
-    score = 0
     for i in messages:
         if(i[0]==3):
             critical = critical + i[1] +", "
@@ -268,8 +270,6 @@ def getSummary(messages):
             warning = warning + i[1] +", "
         elif(i[0]==1):
             info = info + i[1] +", "
-        score = score + i[0]
-    summary="Log Score {} \n".format(score)
     summary+="{}Critical: {}\n".format(RED,critical)
     summary+="{}Warning:  {}\n".format(YELLOW,warning)
     summary+="{}Info:     {}\n".format(CYAN,info)
@@ -311,28 +311,30 @@ def doAnalysis(url):
         classic, m = checkClassic(logLines)
         messages.append(m)
         if(not classic):
-           messages.append(checkDual(logLines))
-           messages.append(checkAutoconfig(logLines))
-           messages.append(checkCPU(logLines))
-           messages.append(checkGPU(logLines))
-           messages.append(checkNVENC(logLines))
-           messages.append(checkKiller(logLines))
-           messages.append(checkWifi(logLines))
-           messages.append(checkAdmin(logLines))
-           messages.append(checkAttempt(logLines))
-           messages.append(checkMP4(logLines))
-           messages.append(checkPreset(logLines))
-           messages.append(checkDrop(logLines))
-           messages.append(checkRendering(logLines))
-           messages.append(checkEncoding(logLines))
-           messages.append(checkMulti(logLines))
-           messages.append(checkStreamSettingsX264(logLines))
-           messages.append(checkStreamSettingsNVENC(logLines))
-           messages.append(parseScenes(logLines))
+            messages.append(checkDual(logLines))
+            messages.append(checkAutoconfig(logLines))
+            messages.append(checkCPU(logLines))
+            messages.append(checkGPU(logLines))
+            messages.append(checkNVENC(logLines))
+            messages.append(checkKiller(logLines))
+            messages.append(checkWifi(logLines))
+            messages.append(checkAdmin(logLines))
+            messages.append(checkAttempt(logLines))
+            messages.append(checkMP4(logLines))
+            messages.append(checkPreset(logLines))
+            messages.append(checkDrop(logLines))
+            messages.append(checkRendering(logLines))
+            messages.append(checkEncoding(logLines))
+            messages.append(checkMulti(logLines))
+            messages.append(checkStreamSettingsX264(logLines))
+            messages.append(checkStreamSettingsNVENC(logLines))
+            m=parseScenes(logLines)
+            for sublist in m:
+                for item in sublist:
+                    messages.append(item)
     else:
         messages.append([3,"NO LOG", "URL contains no Github Gist link."])
     ret = [i for i in messages if i is not None]
-    print(ret)
     return(ret)
 
 
