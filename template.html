@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://bootswatch.com/4/cyborg/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+		<div class="page-header" id="banner">
+			<div class="row">
+				<div class="col-lg-8 col-md-7 col-sm-6">
+					<h1>OBS Log Analyzer</h1>
+					<p class="lead">Oh so much crappy python.</p>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col">
+				<form method="post" action="">
+					<fieldset>
+						<div class="form-group">
+							<div class="row">
+								<div class="col-2">
+									<legend>Log URL Input</legend>
+								</div>
+								<div class="col-8">
+									<input class="form-control" id="logUrlInput" aria-describedby="urlHelp" placeholder="https://gist.github.com/aaaaaaaaaaaaaaaaaaa" name="url" type="text">
+									<small id="urlHelp" class="form-text text-muted">In OBS select Help &gt; Log Files &gt; Upload last Log File. Copy the URL and paste it here.</small>
+								</div>
+								<div class="col-2">
+									<button type="submit" class="btn btn-primary">Submit</button>
+								</div>
+							</div>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="page-header">
+					<h2 id="output">Summary</h2>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col">
+				<div class="card text-white bg-danger mb-3" style="max-width: 20rem;">
+					<div class="card-header">Critical</div>
+					<div class="card-body">
+						<ul>{summary_critical}</ul>
+					 </div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card text-white bg-warning mb-3" style="max-width: 20rem;">
+					<div class="card-header">Warning</div>
+					<div class="card-body">
+						<ul>{summary_warning}</ul>
+					 </div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card text-white bg-info mb-3" style="max-width: 20rem;">
+					<div class="card-header">Info</div>
+					<div class="card-body">
+						<ul>{summary_info}</ul>
+					 </div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="page-header">
+					<h2 id="output">Details</h2>
+				</div>
+			</div>
+		</div>
+
+		<div class="card border-warning">
+			<div class="card-header">Warning</div>
+			<div class="card-body">
+				<h4 class="card-title">Light card title</h4>
+				<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+			</div>
+		</div>
+    </div>
+</body>
+</html>
