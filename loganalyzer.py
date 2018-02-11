@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-
+import re
 import requests
 import json
 import argparse
@@ -27,7 +27,8 @@ API_URL = "https://api.github.com"
 messages =[]
 
 def getGist(inputUrl):
-    gistId=inputUrl.rsplit('/', 1)[-1]
+    #gistId=inputUrl.rsplit('/', 1)[-1]
+    gistId=inputUrl
     return requests.get('{0}/gists/{1}'.format(API_URL,gistId)).json()
 
 def getLines(gistObject):
@@ -271,6 +272,7 @@ def getSummary(messages):
     summary+="{}Info:     {}\n".format(CYAN,info)
     return summary
 
+
 def getResults(messages):
     results = ""
     results += "{}--------------------------------------\n".format(RESET)
@@ -298,27 +300,31 @@ def getResults(messages):
     return results
 
 def doAnalysis(url):
-    gistObject = getGist(url)
-    logLines=getLines(gistObject)
-    if(not checkClassic(logLines)):
-        checkDual(logLines)
-        checkAutoconfig(logLines)
-        checkCPU(logLines)
-        checkGPU(logLines)
-        checkNVENC(logLines)
-        checkKiller(logLines)
-        checkWifi(logLines)
-        checkAdmin(logLines)
-        checkAttempt(logLines)
-        checkMP4(logLines)
-        checkPreset(logLines)
-        checkDrop(logLines)
-        checkRendering(logLines)
-        checkEncoding(logLines)
-        checkMulti(logLines)
-        checkStreamSettingsX264(logLines)
-        checkStreamSettingsNVENC(logLines)
-        parseScenes(logLines)
+    match = re.match(r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)([a-z0-9]{32}))",url)
+    if(match):
+        gistObject = getGist(match.groups()[1])
+        logLines=getLines(gistObject)
+        if(not checkClassic(logLines)):
+            checkDual(logLines)
+            checkAutoconfig(logLines)
+            checkCPU(logLines)
+            checkGPU(logLines)
+            checkNVENC(logLines)
+            checkKiller(logLines)
+            checkWifi(logLines)
+            checkAdmin(logLines)
+            checkAttempt(logLines)
+            checkMP4(logLines)
+            checkPreset(logLines)
+            checkDrop(logLines)
+            checkRendering(logLines)
+            checkEncoding(logLines)
+            checkMulti(logLines)
+            checkStreamSettingsX264(logLines)
+            checkStreamSettingsNVENC(logLines)
+            parseScenes(logLines)
+    else:
+        messages.append([3,"NO LOG", "URL contains no Guthub Gist link."])
     return(messages)
 
 
