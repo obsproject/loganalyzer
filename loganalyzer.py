@@ -340,7 +340,7 @@ def doAnalysis(url):
     else:
         messages.append([3,"NO LOG", "URL contains no Github Gist link."])
     ret = [i for i in messages if i is not None]
-    print(ret)
+    #print(ret)
     return(ret)
 
 
