@@ -38,7 +38,7 @@ def search(term, lines):
 
 def searchRange(term, lines, lower, higher):
     res = []
-    for i in range(lower, higher+1):
+    for i in range(lower, higher):
         if term in lines[i]:
             res.append(lines[i])
 
@@ -114,7 +114,7 @@ def checkPreset(lines):
     presets = search('preset: ',lines)
     sensiblePreset=True
     for l in presets:
-        if (not ('veryfast' in l) or ('superfast' in l) or ('ultrafast' in l)):
+        if (not (('veryfast' in l) or ('superfast' in l) or ('ultrafast' in l))):
             sensiblePreset=False
 
     if((len(encoderLines) >0)and (not sensiblePreset)):
@@ -229,6 +229,7 @@ def getNextPos(old, lst):
 
 def checkSources(lower, higher, lines):
     res=None
+    violation=False
     monitor = searchRange('monitor_capture', lines, lower, higher)
     game = searchRange('game_capture', lines, lower, higher)
     if(len(monitor)>0 and len(game)>0):
@@ -237,11 +238,13 @@ def checkSources(lower, higher, lines):
     if(len(game)>1):
         if(res is None):
             res=[]
-        res.append([1,"MULTIPLEGAMECAPTURE", "Multiple Game Capture sources are usually not needed, and can sometimes interfere with each other. You can use the same Game Capture for all your games! If you change games often, try out the hotkey mode, which lets you press a key to select your active game. If you play games in fullscreen, use 'Capture any fullscreen application' mode."])
-    return res
+        violation=True
+        res.append([1,"MULTIPLE GAMECAPTURE", "Multiple Game Capture sources are usually not needed, and can sometimes interfere with each other. You can use the same Game Capture for all your games! If you change games often, try out the hotkey mode, which lets you press a key to select your active game. If you play games in fullscreen, use 'Capture any fullscreen application' mode."])
+    return res,violation
 
 def parseScenes(lines):
     ret=[]
+    hit=False
     sceneLines = getScenes(lines)
     if(len(sceneLines)>0):
         sections = getSections(lines)
@@ -251,7 +254,10 @@ def parseScenes(lines):
                 higher = getNextPos(s, sceneLines)-1
             else:
                 higher = getNextPos(s,sections)-1
-            ret.append(checkSources(s, higher, lines))
+            m,h = checkSources(s, higher, lines)
+            if(not hit):
+                ret.append(m)
+                hit=h
     else:
         ret.append([[1,"NO SCENES/SOURCES","There are neither scenes nor sources added to OBS. You won't be able to record anything but a black screen without adding soueces to your scenes. If you're new to OBS Studio, the community has created some resources for you to use. Check out our Overview Guide at https://goo.gl/zyMvr1 and Nerd or Die's video guide at http://goo.gl/dGcPZ3"]])
     return ret
@@ -339,6 +345,7 @@ def doAnalysis(url):
                         messages.append(item)
     else:
         messages.append([3,"NO LOG", "URL contains no Github Gist link."])
+    #print(messages)
     ret = [i for i in messages if i is not None]
     #print(ret)
     return(ret)
