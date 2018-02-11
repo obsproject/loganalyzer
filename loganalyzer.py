@@ -26,7 +26,6 @@ REVERSE = "\033[;7m"
 API_URL = "https://api.github.com"
 
 def getGist(inputUrl):
-    #gistId=inputUrl.rsplit('/', 1)[-1]
     gistId=inputUrl
     return requests.get('{0}/gists/{1}'.format(API_URL,gistId)).json()
 
@@ -304,9 +303,9 @@ def getResults(messages):
 
 def doAnalysis(url):
     messages=[]
-    match = re.match(r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)([a-z0-9]{32}))",url)
+    match = re.match(r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))",url)
     if(match):
-        gistObject = getGist(match.groups()[1])
+        gistObject = getGist(match.groups()[-1])
         logLines=getLines(gistObject)
         classic, m = checkClassic(logLines)
         messages.append(m)
