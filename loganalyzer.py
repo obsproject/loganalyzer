@@ -80,6 +80,10 @@ def checkNVENC(lines):
     if(1==0):
         return [2, "NVIDIA DRIVERS", "NVENC fails to start up because your GPU drivers are out of date. You can perform a clean driver installation for your GPU by following the instructions at http://obsproject.com/forum/resources/performing-a-clean-gpu-driver-installation.65/"]
 
+def checkInit(lines):
+    if(len(search('Failed to initialize video', lines))>0):
+        return [3, "INITIALIZE FAILED", "Failed to initialize video. Your GPU may not be supported, or your graphics drivers may need to be updated."]
+
 def checkKiller(lines):
     if(len(search('Interface: Killer',lines))>0):
         return [1, "KILLER NIC", "Killer's Firewall is known for it's poor performance and issues when trying to stream. Please download the driver pack from http://www.killernetworking.com/driver-downloads/category/other-downloads , completely uninstall all Killer NIC items and install their Driver only package."]
@@ -249,7 +253,7 @@ def parseScenes(lines):
                 higher = getNextPos(s,sections)-1
             ret.append(checkSources(s, higher, lines))
     else:
-        ret.append([1,"NO SCENES/SOURCES","There are neither scenes nor sources added to OBS. You won't be able to record anything but a black screen without adding soueces to your scenes. If you're new to OBS Studio, the community has created some resources for you to use. Check out our Overview Guide at https://goo.gl/zyMvr1 and Nerd or Die's video guide at http://goo.gl/dGcPZ3"])
+        ret.append([[1,"NO SCENES/SOURCES","There are neither scenes nor sources added to OBS. You won't be able to record anything but a black screen without adding soueces to your scenes. If you're new to OBS Studio, the community has created some resources for you to use. Check out our Overview Guide at https://goo.gl/zyMvr1 and Nerd or Die's video guide at http://goo.gl/dGcPZ3"]])
     return ret
 
 def textOutput(string):
@@ -314,6 +318,7 @@ def doAnalysis(url):
             messages.append(checkAutoconfig(logLines))
             messages.append(checkCPU(logLines))
             messages.append(checkGPU(logLines))
+            messages.append(checkInit(logLines))
             messages.append(checkNVENC(logLines))
             messages.append(checkKiller(logLines))
             messages.append(checkWifi(logLines))
@@ -335,6 +340,7 @@ def doAnalysis(url):
     else:
         messages.append([3,"NO LOG", "URL contains no Github Gist link."])
     ret = [i for i in messages if i is not None]
+    print(ret)
     return(ret)
 
 
