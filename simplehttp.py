@@ -19,30 +19,33 @@ def getSummaryHTML(messages):
     info = ""
     for i in messages:
         if(i[0]==3):
-            critical = critical + "<li>" + i[1] + "</li>"
+            critical = critical + """<p><a href="#"""+ i[1] +""""><button type="button" class="btn btn-danger">""" + i[1] + "</button></a></p>\n"
         elif(i[0]==2):
-            warning = warning + "<li>"+ i[1] + "</li>"
+            warning = warning + """<p><a href="#"""+ i[1] +""""><button type="button" class="btn btn-warning">""" + i[1] + "</button></a></p>\n"
         elif(i[0]==1):
-            info = info + "<li>" + i[1] + "</li>"
+            info = info + """<p><a href="#"""+ i[1] +""""><button type="button" class="btn btn-info">""" + i[1] + "</button></a></p>\n"
     return critical,warning,info
 
 def getDetailsHTML(messages):
     res=""
     for i in messages:
         if(i[0]==3):
-            res = res + detail.format(sev='danger',
+            res = res + detail.format(anchor=i[1],
+                    sev='danger',
                     severity='Critical',
                     title=i[1],
                     text=i[2])
     for i in messages:
         if(i[0]==2):
-            res = res + detail.format(sev='warning',
+            res = res + detail.format(anchor=i[1],
+                    sev='warning',
                     severity='Warning',
                     title=i[1],
                     text=i[2])
     for i in messages:
         if(i[0]==1):
-            res= res + detail.format(sev='info',
+            res= res + detail.format(anchor=i[1],
+                    sev='info',
                     severity='Info',
                     title=i[1],
                     text=i[2])
@@ -52,24 +55,21 @@ def getDetailsHTML(messages):
 
 def application(environ, start_response):
     response_body=html
-    if(environ['REQUEST_METHOD'] == 'POST'):
-        post_env = environ.copy()
-        post_env['QUERY_STRING'] = ''
-        post = cgi.FieldStorage(fp=environ['wsgi.input'],environ=post_env,
-            keep_blank_values=True)
-        post['url'].value
+    form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
+    if 'url' in form:
+        url = form['url'].value
         msgs=[]
-        msgs = doAnalysis(post['url'].value)
+        msgs = doAnalysis(url)
         crit,warn,info = getSummaryHTML(msgs)
         details = getDetailsHTML(msgs)
-        response_body = html.format(url_input=post['url'].value,
+        response_body = html.format(ph=url,
                 summary_critical=crit,
                 summary_warning=warn,
                 summary_info=info,
                 details=details)
     else:
-        response_body = html.format(url_input="Paste log url here",
-                summary_critical="Please analyse log",
+        response_body = html.format(ph="Paste log url here",
+                summary_critical="Please analyze log",
                 summary_warning="<li>none</li>",
                 summary_info="<li>none</li>",
                 details="""<p class="text-warning">Please analyze log first.</p>""")

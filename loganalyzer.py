@@ -46,7 +46,7 @@ def searchRange(term, lines, lower, higher):
 
 def checkClassic(lines):
     if(len(search('Open Broadcaster Software', lines))>0):
-        return True, [3,"OBS CLASSIC","You are still using OBS Classic, please note that this version is no longer supported. While we cannot and will not do anything to prevent you from using it, we cannot help with any issues that may come up. It is recommended that you update to OBS Studio. Further information on why you should update (and how): https://obsproject.com/forum/threads/how-to-easily-switch-to-obs-studio.55820/"]
+        return True, [3,"OBS CLASSIC","""You are still using OBS Classic, please note that this version is no longer supported. While we cannot and will not do anything to prevent you from using it, we cannot help with any issues that may come up. It is recommended that you update to OBS Studio. Further information on why you should update (and how): <a href="https://obsproject.com/forum/threads/how-to-easily-switch-to-obs-studio.55820/">OBS Classic to OBS Studio</a>"""]
     else:
         return False, [4,"OBS Studio", "Nothing to say"]
 
@@ -73,12 +73,12 @@ def checkGPU(lines):
     d3dAdapter = search('Loading up D3D11', lines)
     if(len(d3dAdapter)>0):
         if(len(adapters)==2 and ('Intel' in d3dAdapter[0])):
-            return [3, "WRONG GPU", "Your Laptop has two GPUs. OBS is running on the weak integrated Intel GPU. For better rerformance as well as game capture being available you should run OBS on the dedicated GPU. Check the laptop trpubleshooting guide here: https://obsproject.com/wiki/Laptop-Performance-Issues"]
+            return [3, "WRONG GPU", """Your Laptop has two GPUs. OBS is running on the weak integrated Intel GPU. For better rerformance as well as game capture being available you should run OBS on the dedicated GPU. Check the laptop trpubleshooting guide here: <a href="https://obsproject.com/wiki/Laptop-Performance-Issues">Laptop Performance Issues</a>"""]
 
 def checkNVENC(lines):
     #TODO wait for kurufu
     if(1==0):
-        return [2, "NVIDIA DRIVERS", "NVENC fails to start up because your GPU drivers are out of date. You can perform a clean driver installation for your GPU by following the instructions at http://obsproject.com/forum/resources/performing-a-clean-gpu-driver-installation.65/"]
+        return [2, "NVIDIA DRIVERS", """NVENC fails to start up because your GPU drivers are out of date. You can perform a clean driver installation for your GPU by following the instructions at <a href="http://obsproject.com/forum/resources/performing-a-clean-gpu-driver-installation.65/"> Clan GPU driver installation</a>"""]
 
 def checkInit(lines):
     if(len(search('Failed to initialize video', lines))>0):
@@ -128,6 +128,7 @@ def checkMulti(lines):
 def checkDrop(lines):
     drops = search('insufficient bandwidth', lines)
     val = 0
+    severity = 0
     for drop in drops:
         v = float(drop[drop.find("(")+1:drop.find(")")].strip('%'))
         if(v > val):
@@ -139,11 +140,12 @@ def checkDrop(lines):
             severity=2
         else:
             severity=1
-        return [severity, "FRAMEDROPS","Your log contains streaming sessions with dropped frames. This can only be caused by a failure in your internet connection or your networking hardware. It is not caused by OBS. Follow the troubleshooting steps at: https://obsproject.com/wiki/Dropped-Frames-and-General-Connection-Issues"]
+    return [severity, "{}% FRAMEDROPS".format(val),"""Your log contains streaming sessions with dropped frames. This can only be caused by a failure in your internet connection or your networking hardware. It is not caused by OBS. Follow the troubleshooting steps at: <a href="https://obsproject.com/wiki/Dropped-Frames-and-General-Connection-Issues">Dropped Frames and General Connection Issues</a>"""]
 
 def checkRendering(lines):
     drops = search('rendering lag', lines)
     val = 0
+    severity = 0
     for drop in drops:
         v = float(drop[drop.find("(")+1:drop.find(")")].strip('%'))
         if(v > val):
@@ -155,11 +157,12 @@ def checkRendering(lines):
             severity=2
         else:
             severity=1
-        return [severity, "RENDERING LAG", "Your GPU is maxed out and OBS can't render scenes fast enough. Running a game without vertical sync or a frame rate limiter will frequently cause performance issues with OBS because your GPU will be maxed out. Enable vsync or set a reasonable frame rate limit that your GPU can handle without hitting 100% usage. If that's not enough you may also need to turn down some of the video quality options in the game."]
+        return [severity, "{}% RENDERING LAG".format(val), "Your GPU is maxed out and OBS can't render scenes fast enough. Running a game without vertical sync or a frame rate limiter will frequently cause performance issues with OBS because your GPU will be maxed out. Enable vsync or set a reasonable frame rate limit that your GPU can handle without hitting 100% usage. If that's not enough you may also need to turn down some of the video quality options in the game."]
 
 def checkEncoding(lines):
     drops = search('skipped frames', lines)
     val = 0
+    severity = 0
     for drop in drops:
         v = float(drop[drop.find("(")+1:drop.find(")")].strip('%'))
         if(v > val):
@@ -171,7 +174,7 @@ def checkEncoding(lines):
             severity=2
         else:
             severity=1
-        return [severity, "CPU OVERLOAD","The encoder is skipping frames because of CPU overload. Read https://obsproject.com/wiki/General-Performance-and-Encoding-Issues"]
+        return [severity, "{}% CPU OVERLOAD".format(val),"The encoder is skipping frames because of CPU overload. Read https://obsproject.com/wiki/General-Performance-and-Encoding-Issues"]
 
 def checkStreamSettingsX264(lines):
     streamingSessions = []
