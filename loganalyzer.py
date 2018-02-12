@@ -86,7 +86,7 @@ def checkInit(lines):
 
 def checkKiller(lines):
     if(len(search('Interface: Killer',lines))>0):
-        return [1, "KILLER NIC", "Killer's Firewall is known for it's poor performance and issues when trying to stream. Please download the driver pack from http://www.killernetworking.com/driver-downloads/category/other-downloads , completely uninstall all Killer NIC items and install their Driver only package."]
+        return [1, "KILLER NIC", """Killer's Firewall is known for it's poor performance and issues when trying to stream. Please download the driver pack from <a href="http://www.killernetworking.com/driver-downloads/category/other-downloads">the vendor's page</a> , completely uninstall all Killer NIC items and install their Driver only package."""]
 
 def checkWifi(lines):
     if(len(search('802.11',lines))>0):
@@ -102,6 +102,12 @@ def checkMP4(lines):
     mp4 = search('.mp4', writtenFiles)
     if(len(mp4)>0):
         return [3, "MP4 RECORDING","If you record to MP4 and the recording is interrupted, the file will be corrupted and unrecoverable. If you require MP4 files for some other purpose like editing, remux them afterwards by selecting File > Remux Recordings in the main OBS Studio window."]
+
+def checkMov(lines):
+    writtenFiles = search('Writing file ', lines)
+    mp4 = search('.mov', writtenFiles)
+    if(len(mp4)>0):
+        return [3, "MOV RECORDING","If you record to MP4 and the recording is interrupted, the file will be corrupted and unrecoverable. If you require MP4 files for some other purpose like editing, remux them afterwards by selecting File > Remux Recordings in the main OBS Studio window."]
 
 def checkAttempt(lines):
     recordingStarts = search('== Recording Start ==', lines)
@@ -174,7 +180,7 @@ def checkEncoding(lines):
             severity=2
         else:
             severity=1
-        return [severity, "{}% CPU OVERLOAD".format(val),"The encoder is skipping frames because of CPU overload. Read https://obsproject.com/wiki/General-Performance-and-Encoding-Issues"]
+        return [severity, "{}% CPU OVERLOAD".format(val),"""The encoder is skipping frames because of CPU overload. Read about <a href="https://obsproject.com/wiki/General-Performance-and-Encoding-Issues">General Performance and Encoding Issues</a>"""]
 
 def checkStreamSettingsX264(lines):
     streamingSessions = []
@@ -334,6 +340,7 @@ def doAnalysis(url):
             messages.append(checkAdmin(logLines))
             messages.append(checkAttempt(logLines))
             messages.append(checkMP4(logLines))
+            messages.append(checkMov(logLines))
             messages.append(checkPreset(logLines))
             messages.append(checkDrop(logLines))
             messages.append(checkRendering(logLines))
