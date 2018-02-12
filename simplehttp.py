@@ -68,10 +68,10 @@ def application(environ, start_response):
                 summary_info=info,
                 details=details)
     else:
-        response_body = html.format(ph="Paste log url here",
-                summary_critical="Please analyze log",
-                summary_warning="<li>none</li>",
-                summary_info="<li>none</li>",
+        response_body = html.format(ph="Paste log url here.",
+                summary_critical="Please analyze log first.",
+                summary_warning="Please analyze log first.",
+                summary_info="Please analyze log first.",
                 details="""<p class="text-warning">Please analyze log first.</p>""")
 
 

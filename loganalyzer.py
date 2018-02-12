@@ -94,7 +94,7 @@ def checkWifi(lines):
 
 def checkAdmin(lines):
     l = search('Running as administrator', lines)
-    if(l[0].split()[-1]=='false'):
+    if((len(l)>0) and (l[0].split()[-1]=='false')):
         return [1, "NOT ADMIN", "OBS is not running as administrator. This can lead to obs not being able to gamecapture certain games"]
 
 def checkMP4(lines):
