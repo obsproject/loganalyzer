@@ -73,12 +73,12 @@ def checkGPU(lines):
     d3dAdapter = search('Loading up D3D11', lines)
     if(len(d3dAdapter)>0):
         if(len(adapters)==2 and ('Intel' in d3dAdapter[0])):
-            return [3, "WRONG GPU", """Your Laptop has two GPUs. OBS is running on the weak integrated Intel GPU. For better rerformance as well as game capture being available you should run OBS on the dedicated GPU. Check the laptop trpubleshooting guide here: <a href="https://obsproject.com/wiki/Laptop-Performance-Issues">Laptop Performance Issues</a>"""]
+            return [3, "WRONG GPU", """Your Laptop has two GPUs. OBS is running on the weak integrated Intel GPU. For better rerformance as well as game capture being available you should run OBS on the dedicated GPU. Check the <a href="https://obsproject.com/wiki/Laptop-Performance-Issues">Laptop Troubleshooting Guide</a>."""]
 
 def checkNVENC(lines):
     #TODO wait for kurufu
     if(1==0):
-        return [2, "NVIDIA DRIVERS", """NVENC fails to start up because your GPU drivers are out of date. You can perform a clean driver installation for your GPU by following the instructions at <a href="http://obsproject.com/forum/resources/performing-a-clean-gpu-driver-installation.65/"> Clan GPU driver installation</a>"""]
+        return [2, "NVIDIA DRIVERS", """NVENC fails to start up because your GPU drivers are out of date. You can perform a clean driver installation for your GPU by following the instructions at <a href="http://obsproject.com/forum/resources/performing-a-clean-gpu-driver-installation.65/"> Clean GPU driver installation</a>"""]
 
 def checkInit(lines):
     if(len(search('Failed to initialize video', lines))>0):
@@ -268,7 +268,7 @@ def parseScenes(lines):
                 ret.append(m)
                 hit=h
     else:
-        ret.append([[1,"NO SCENES/SOURCES","There are neither scenes nor sources added to OBS. You won't be able to record anything but a black screen without adding soueces to your scenes. If you're new to OBS Studio, the community has created some resources for you to use. Check out our Overview Guide at https://goo.gl/zyMvr1 and Nerd or Die's video guide at http://goo.gl/dGcPZ3"]])
+        ret.append([[1,"NO SCENES/SOURCES","""There are neither scenes nor sources added to OBS. You won't be able to record anything but a black screen without adding soueces to your scenes. If you're new to OBS Studio, the community has created some resources for you to use. Check out our Overview Guide at <a href="https://goo.gl/zyMvr1">https://goo.gl/zyMvr1</a> and Nerd or Die's video guide at <a href="http://goo.gl/dGcPZ3">http://goo.gl/dGcPZ3</a>"""]])
     return ret
 
 def textOutput(string):
