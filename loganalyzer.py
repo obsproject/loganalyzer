@@ -142,7 +142,7 @@ def checkMulti(lines):
 def checkDrop(lines):
     drops = search('insufficient bandwidth', lines)
     val = 0
-    severity = 0
+    severity = 9000
     for drop in drops:
         v = float(drop[drop.find("(")+1:drop.find(")")].strip('%'))
         if(v > val):
@@ -159,7 +159,7 @@ def checkDrop(lines):
 def checkRendering(lines):
     drops = search('rendering lag', lines)
     val = 0
-    severity = 0
+    severity = 9000
     for drop in drops:
         v = float(drop[drop.find("(")+1:drop.find(")")].strip('%'))
         if(v > val):
@@ -176,7 +176,7 @@ def checkRendering(lines):
 def checkEncoding(lines):
     drops = search('skipped frames', lines)
     val = 0
-    severity = 0
+    severity = 9000
     for drop in drops:
         v = float(drop[drop.find("(")+1:drop.find(")")].strip('%'))
         if(v > val):
