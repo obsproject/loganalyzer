@@ -18,30 +18,34 @@
 		</div>
 		<div class="row">
 			<div class="col">
-				<form method="get" action="">
-					<fieldset>
-						<div class="form-group">
-							<div class="row">
-								<div class="col-2">
-									<legend>Log URL Input</legend>
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<form method="get" action="">
+							<fieldset>
+								<div class="form-group">
+									<div class="row">
+										<div class="col-2">
+											<legend>Log URL Input</legend>
+										</div>
+										<div class="col-8">
+											<input class="form-control" id="logUrlInput" aria-describedby="urlHelp" placeholder="{ph}" name="url" type="text">
+											<small id="urlHelp" class="form-text text-muted">In OBS select Help &gt; Log Files &gt; Upload last Log File. Copy the URL and paste it here.</small>
+										</div>
+										<div class="col-2">
+											<button type="submit" class="btn btn-primary">Analyze</button>
+										</div>
+									</div>
 								</div>
-								<div class="col-8">
-									<input class="form-control" id="logUrlInput" aria-describedby="urlHelp" placeholder="{ph}" name="url" type="text">
-									<small id="urlHelp" class="form-text text-muted">In OBS select Help &gt; Log Files &gt; Upload last Log File. Copy the URL and paste it here.</small>
-								</div>
-								<div class="col-2">
-									<button type="submit" class="btn btn-primary">Analyze</button>
-								</div>
-							</div>
-						</div>
-					</fieldset>
-				</form>
+							</fieldset>
+						</form>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-lg-12">
 				<div class="page-header">
-					<h2 id="output">Log Analysis</h2>
+					<h2 id="output">Log Analysis <small class="text-muted">of log "{description}"</small></h2>
 				</div>
 			</div>
 		</div>

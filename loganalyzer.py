@@ -33,6 +33,9 @@ def getLines(gistObject):
     files = [(v,k) for (k,v) in gistObject['files'].items()]
     return files[0][0]['content'].split('\n')
 
+def getDescription(gistObject):
+    return [0,"DESCRIPTION",gistObject['description']]
+
 def search(term, lines):
     return [ s for s in lines if term in s ]
 
@@ -332,6 +335,7 @@ def doAnalysis(url):
     if(match):
         gistObject = getGist(match.groups()[-1])
         logLines=getLines(gistObject)
+        messages.append(getDescription(gistObject))
         classic, m = checkClassic(logLines)
         messages.append(m)
         if(not classic):
@@ -374,7 +378,7 @@ def main():
     parser.add_argument("--url",'-u',dest='url',
             default="", help="url of gist", required=True)
     flags = parser.parse_args()
-   
+ 
     msgs = doAnalysis(flags.url)
     print(getSummary(msgs))
     print(getResults(msgs))
