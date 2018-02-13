@@ -64,6 +64,11 @@ def checkCPU(lines):
     if(('APU' in cpu[0]) or ('Pentium' in cpu[0]) or ('Celeron' in cpu[0])):
         return [3, "INSUFFICIENT HARDWARE", "Your system is below minimum specs for obs ro run and too weak to do livestreaming. There are no settings which will save you from that lack of processing power. Replace your PC or Laptop."]
 
+def checkMemory(lines):
+    ram = search('Physical Memory:', lines)
+
+
+
 def checkGPU(lines):
     adapters = search('Adapter 1', lines)
     try:
@@ -255,7 +260,8 @@ def parseScenes(lines):
     ret=[]
     hit=False
     sceneLines = getScenes(lines)
-    if(len(sceneLines)>0):
+    sourceLines = search(' - source:',lines)
+    if((len(sceneLines)>0) and (len(sourceLines)>0)):
         sections = getSections(lines)
         higher = 0
         for s in sceneLines:
