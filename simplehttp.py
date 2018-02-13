@@ -52,6 +52,14 @@ def getDetailsHTML(messages):
 
     return res
 
+def getDescr(messages):
+    res = ""
+    for i in messages:
+        if(i[0]==0):
+            res=i[2]
+    return res
+
+
 
 def application(environ, start_response):
     response_body=html
@@ -63,12 +71,14 @@ def application(environ, start_response):
         crit,warn,info = getSummaryHTML(msgs)
         details = getDetailsHTML(msgs)
         response_body = html.format(ph=url,
+                description=getDescr(msgs),
                 summary_critical=crit,
                 summary_warning=warn,
                 summary_info=info,
                 details=details)
     else:
         response_body = html.format(ph="Paste log url here.",
+                description="no log",
                 summary_critical="Please analyze log first.",
                 summary_warning="Please analyze log first.",
                 summary_info="Please analyze log first.",
