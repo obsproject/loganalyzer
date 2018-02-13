@@ -71,7 +71,7 @@ def application(environ, start_response):
         crit,warn,info = getSummaryHTML(msgs)
         details = getDetailsHTML(msgs)
         response_body = html.format(ph=url,
-                description=getDescr(msgs),
+                description="""<a href="{}">{}</a>""".format(url,getDescr(msgs)),
                 summary_critical=crit,
                 summary_warning=warn,
                 summary_info=info,
