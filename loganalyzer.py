@@ -242,7 +242,35 @@ def checkStreamSettingsNVENC(lines):
         if(bitrate < bitrateEstimate):
             return [1, "LOW STREAM BANDWITH","Your stream encoder is set to a too low video bitrate. This will lower picture quality especially in high motion scenes like fast paced games. Use the autoconfig wizard to adjust your settings to the optimum for your situation. It can be accessed from the Tools menu in OBS, and then just follow the on-screen directions."]
 
-
+def checkVideoSettings(lines):
+    videoSettings = []
+    res=None
+    for i,s in enumerate(lines):
+        if "video settings reset:" in s:
+            videoSettings.append(i)
+    if(len(videoSettings)>0):
+        basex,basey     = lines[videoSettings[-1]+1].split()[-1].split('x')
+        outx,outy       = lines[videoSettings[-1]+2].split()[-1].split('x')
+        fps_num,fps_den = lines[videoSettings[-1]+4].split()[-1].split('/')
+        fmt             = lines[videoSettings[-1]+4].split()[-1]
+        baseAspect=float(basex)/float(basey)
+        outAspect=float(outx)/float(outy)
+        fps=float(fps_num)/float(fps_den)
+        if((not((1.77<baseAspect) and (baseAspect <1.778))) or
+                (not((1.77<outAspect) and (outAspect <1.778)))):
+            if(res is None):
+                res=[]
+            res.append([2, "WRONG ASPECT RATIO", "Almost all modern streaming services and video platforms expect video in 16:9 aspect ratio. OBS is currently configured to record in an aspect ration that differs from that. You will see black bars during playback."])
+        if fmt is not 'NV12':
+            if(res is None):
+                res=[]
+            res.append([3, "WRONG COLOR FORMAT", "Color Formats other than NV12 are primarily intended for recording, and are not recommended when streaming. Streaming may incur increased CPU usage due to color format conversion"])
+        print(fps)
+        if(not((fps==60) or (fps==30))):
+            if(res is None):
+                res=[]
+            res.append([2, "NONSTANDARD FRAMERATE", "Framerates other than 30fps or 60fps may lead to playback issues like stuttering or screen tearing. Stick to either of these for better compatibility with video players."])
+    return res
 
 def getScenes(lines):
     scenePos = []
@@ -379,6 +407,10 @@ def doAnalysis(url):
             messages.append(checkMulti(logLines))
             messages.append(checkStreamSettingsX264(logLines))
             messages.append(checkStreamSettingsNVENC(logLines))
+            m = checkVideoSettings(logLines)
+            for sublist in m:
+                if(sublist != None):
+                    messages.append(sublist)
             m=parseScenes(logLines)
             for sublist in m:
                 if(sublist != None):
