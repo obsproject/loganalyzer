@@ -139,6 +139,20 @@ def checkPreset(lines):
     if((len(encoderLines) >0)and (not sensiblePreset)):
         return [2, "WRONG PRESET","A slower x264 preset than 'veryfast' is in use. It is recommended to leave this value on veryfast, as there are significant diminishing returns to setting it lower."]
 
+def checkCustom(lines):
+    encoderLines = search("'adv_ffmpeg_output':", lines)
+    if(len(encoderLines)>0):
+        return [2, "CUSTOM FFMPEG OUTPUT", """Custom ffmpeg output is in use. Only absolute professionals should use this. If you got your settings from a Youtube video advertising "Absolute best OBS settings" or similar you're wrong here and better off using Simple output mode."""]
+
+def checkAudio(lines):
+    buffering = search('total audio buffering is now', lines)
+    vals = []
+    for i in buffering:
+        vals.append(int(i.split()[12]))
+    if(max(vals)>500):
+        return [2, "HIGH AUDIO BUFFERING", "Audio buffering reached values above 500ms. This is an indicator of too high system load and will affect stream latency."]
+
+
 def checkMulti(lines):
     mem = search('user is forcing shared memory', lines)
     if(len(mem)>0):
@@ -149,7 +163,7 @@ def checkDrop(lines):
     val = 0
     severity = 9000
     for drop in drops:
-        v = float(drop[drop.find("(")+1:drop.find(")")].strip('%'))
+        v = float(drop[drop.find("(")+1:drop.find(")")].strip('%').replace(",","."))
         if(v > val):
             val=v
     if(val!=0):
@@ -166,7 +180,7 @@ def checkRendering(lines):
     val = 0
     severity = 9000
     for drop in drops:
-        v = float(drop[drop.find("(")+1:drop.find(")")].strip('%'))
+        v = float(drop[drop.find("(")+1:drop.find(")")].strip('%').replace(",","."))
         if(v > val):
             val=v
     if(val!=0):
@@ -183,7 +197,7 @@ def checkEncoding(lines):
     val = 0
     severity = 9000
     for drop in drops:
-        v = float(drop[drop.find("(")+1:drop.find(")")].strip('%'))
+        v = float(drop[drop.find("(")+1:drop.find(")")].strip('%').replace(",","."))
         if(v > val):
             val=v
     if(val!=0):
@@ -357,6 +371,8 @@ def doAnalysis(url):
             messages.append(checkMP4(logLines))
             messages.append(checkMov(logLines))
             messages.append(checkPreset(logLines))
+            messages.append(checkCustom(logLines))
+            messages.append(checkAudio(logLines))
             messages.append(checkDrop(logLines))
             messages.append(checkRendering(logLines))
             messages.append(checkEncoding(logLines))
