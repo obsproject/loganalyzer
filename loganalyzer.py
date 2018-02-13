@@ -64,8 +64,11 @@ def checkAutoconfig(lines):
 
 def checkCPU(lines):
     cpu = search('CPU Name', lines)
-    if(('APU' in cpu[0]) or ('Pentium' in cpu[0]) or ('Celeron' in cpu[0])):
-        return [3, "INSUFFICIENT HARDWARE", "Your system is below minimum specs for obs ro run and too weak to do livestreaming. There are no settings which will save you from that lack of processing power. Replace your PC or Laptop."]
+    if(len(cpu)>0):
+        if(('APU' in cpu[0]) or ('Pentium' in cpu[0]) or ('Celeron' in cpu[0])):
+            return [3, "INSUFFICIENT HARDWARE", "Your system is below minimum specs for obs ro run and too weak to do livestreaming. There are no settings which will save you from that lack of processing power. Replace your PC or Laptop."]
+        elif('i3' in cpu[0]):
+            return [1, "INSUFFICIENT HARDWARE", "Your system is barely above minimum specs for obs ro run and too weak to do livestreaming with software encoding. Livestreams and recordings will only run smoothly if you are using the hardware QuickSync encoder."]
 
 def checkMemory(lines):
     ram = search('Physical Memory:', lines)
@@ -82,6 +85,8 @@ def checkGPU(lines):
     if(len(d3dAdapter)>0):
         if(len(adapters)==2 and ('Intel' in d3dAdapter[0])):
             return [3, "WRONG GPU", """Your Laptop has two GPUs. OBS is running on the weak integrated Intel GPU. For better rerformance as well as game capture being available you should run OBS on the dedicated GPU. Check the <a href="https://obsproject.com/wiki/Laptop-Performance-Issues">Laptop Troubleshooting Guide</a>."""]
+        elif(len(adapters)==1 and ('Intel' in adapters[0])):
+            return [2, "INTEGRATED GPU", "OBS is running on an Intel iGPU. This hardware is generally not powerful enough to be used for both gaming and running obs. Situations where only sources from e.g. cameras and capture cards are used might work."]
 
 def checkNVENC(lines):
     #TODO wait for kurufu
