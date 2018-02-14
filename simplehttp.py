@@ -3,14 +3,15 @@
 from loganalyzer import *
 from wsgiref.simple_server import *
 import cgi
+import html
 
-html=""
+htmlTemplate=""
 with open("template.html","r") as f:
-    html=f.read()
+    htmlTemplate=f.read()
 
-detail=""
+htmlDetail=""
 with open("detail.html","r") as f:
-    detail=f.read()
+    htmlDetail=f.read()
 
 
 def getSummaryHTML(messages):
@@ -30,21 +31,21 @@ def getDetailsHTML(messages):
     res=""
     for i in messages:
         if(i[0]==3):
-            res = res + detail.format(anchor=i[1],
+            res = res + htmlDetail.format(anchor=i[1],
                     sev='danger',
                     severity='Critical',
                     title=i[1],
                     text=i[2])
     for i in messages:
         if(i[0]==2):
-            res = res + detail.format(anchor=i[1],
+            res = res + htmlDetail.format(anchor=i[1],
                     sev='warning',
                     severity='Warning',
                     title=i[1],
                     text=i[2])
     for i in messages:
         if(i[0]==1):
-            res= res + detail.format(anchor=i[1],
+            res= res + htmlDetail.format(anchor=i[1],
                     sev='info',
                     severity='Info',
                     title=i[1],
@@ -61,7 +62,7 @@ def getDescr(messages):
 
 
 def genEmptyResponse():
-    response_body = html.format(ph="",
+    response_body = htmlTemplate.format(ph="",
             description="no log",
             summary_critical="Please analyze log first.",
             summary_warning="Please analyze log first.",
@@ -75,18 +76,17 @@ def application(environ, start_response):
     response_body=""
     form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
     if 'url' in form:
-        url = form['url'].value
+        url = html.escape(form['url'].value)
         match = re.match(r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))",url)
         if(match == None):
             response_body = genEmptyResponse()
         else:
-            sanitizedUrl = "https://gist.github.com/{}".format(match.groups()[-1])
             msgs=[]
-            msgs = doAnalysis(sanitizedUrl)
+            msgs = doAnalysis(url)
             crit,warn,info = getSummaryHTML(msgs)
             details = getDetailsHTML(msgs)
-            response_body = html.format(ph=sanitizedUrl,
-                    description="""<a href="{}">{}</a>""".format(sanitizedUrl,getDescr(msgs)),
+            response_body = htmlTemplate.format(ph=url,
+                    description="""<a href="{}">{}</a>""".format(url,getDescr(msgs)),
                     summary_critical=crit,
                     summary_warning=warn,
                     summary_info=info,
