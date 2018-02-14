@@ -85,8 +85,8 @@ def application(environ, start_response):
             msgs = doAnalysis(url)
             crit,warn,info = getSummaryHTML(msgs)
             details = getDetailsHTML(msgs)
-            response_body = htmlTemplate.format(ph=sanitizedUrl,
-                    description="""<a href="{}">{}</a>""".format(sanitizedUrl,getDescr(msgs)),
+            response_body = htmlTemplate.format(ph=url,
+                    description="""<a href="{}">{}</a>""".format(url,getDescr(msgs)),
                     summary_critical=crit,
                     summary_warning=warn,
                     summary_info=info,

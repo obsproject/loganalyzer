@@ -34,7 +34,10 @@ def getLines(gistObject):
     return files[0][0]['content'].split('\n')
 
 def getDescription(gistObject):
-    return [0,"DESCRIPTION",gistObject['description']]
+    desc = gistObject['description']
+    if(desc ==""):
+        desc=gistObject['id']
+    return [0,"DESCRIPTION",desc]
 
 def search(term, lines):
     return [ s for s in lines if term in s ]
@@ -140,10 +143,13 @@ def checkCustom(lines):
 def checkAudio(lines):
     buffering = search('total audio buffering is now', lines)
     vals = []
-    for i in buffering:
-        vals.append(int(i.split()[12]))
-    if(max(vals)>500):
-        return [2, "HIGH AUDIO BUFFERING", "Audio buffering reached values above 500ms. This is an indicator of too high system load and will affect stream latency."]
+    if(len(buffering)>0):
+        for i in buffering:
+            vals.append(int(i.split()[12]))
+        if(max(vals)>500):
+            return [2, "HIGH AUDIO BUFFERING", "Audio buffering reached values above 500ms. This is an indicator of too high system load and will affect stream latency."]
+    else:
+        return None
 
 
 def checkMulti(lines):
@@ -249,9 +255,9 @@ def checkVideoSettings(lines):
         baseAspect=float(basex)/float(basey)
         outAspect=float(outx)/float(outy)
         fps=float(fps_num)/float(fps_den)
-        if((not((1.77<baseAspect) and (baseAspect <1.778))) or
-                (not((1.77<outAspect) and (outAspect <1.778)))):
-            res.append([2, "WRONG ASPECT RATIO", "Almost all modern streaming services and video platforms expect video in 16:9 aspect ratio. OBS is currently configured to record in an aspect ration that differs from that. You will see black bars during playback."])
+        if((not((1.77<baseAspect) and (baseAspect <1.7787))) or
+                (not((1.77<outAspect) and (outAspect <1.7787)))):
+            res.append([2, "NON-STANDARD ASPECT RATIO", "Almost all modern streaming services and video platforms expect video in 16:9 aspect ratio. OBS is currently configured to record in an aspect ration that differs from that. You will see black bars during playback."])
         if(fmt != 'NV12'):
             res.append([3, "WRONG COLOR FORMAT", "Color Formats other than NV12 are primarily intended for recording, and are not recommended when streaming. Streaming may incur increased CPU usage due to color format conversion"])
         if(not((fps==60) or (fps==30))):
