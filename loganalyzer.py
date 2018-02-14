@@ -394,7 +394,6 @@ def doAnalysis(url):
             messages.append(checkStreamSettingsX264(logLines))
             messages.append(checkStreamSettingsNVENC(logLines))
             m = checkVideoSettings(logLines)
-            print(m)
             for sublist in m:
                 if(sublist != None):
                     messages.append(sublist)

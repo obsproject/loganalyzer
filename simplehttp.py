@@ -60,29 +60,39 @@ def getDescr(messages):
     return res
 
 
+def genEmptyResponse():
+    response_body = html.format(ph="",
+            description="no log",
+            summary_critical="Please analyze log first.",
+            summary_warning="Please analyze log first.",
+            summary_info="Please analyze log first.",
+            details="""<p class="text-warning">Please analyze log first.</p>""")
+    return response_body
+
+
 
 def application(environ, start_response):
-    response_body=html
+    response_body=""
     form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
     if 'url' in form:
         url = form['url'].value
-        msgs=[]
-        msgs = doAnalysis(url)
-        crit,warn,info = getSummaryHTML(msgs)
-        details = getDetailsHTML(msgs)
-        response_body = html.format(ph=url,
-                description="""<a href="{}">{}</a>""".format(url,getDescr(msgs)),
-                summary_critical=crit,
-                summary_warning=warn,
-                summary_info=info,
-                details=details)
+        match = re.match(r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))",url)
+        if(match == None):
+            response_body = genEmptyResponse()
+        else:
+            sanitizedUrl = "https://gist.github.com/{}".format(match.groups()[-1])
+            msgs=[]
+            msgs = doAnalysis(sanitizedUrl)
+            crit,warn,info = getSummaryHTML(msgs)
+            details = getDetailsHTML(msgs)
+            response_body = html.format(ph=sanitizedUrl,
+                    description="""<a href="{}">{}</a>""".format(sanitizedUrl,getDescr(msgs)),
+                    summary_critical=crit,
+                    summary_warning=warn,
+                    summary_info=info,
+                    details=details)
     else:
-        response_body = html.format(ph="Paste log url here.",
-                description="no log",
-                summary_critical="Please analyze log first.",
-                summary_warning="Please analyze log first.",
-                summary_info="Please analyze log first.",
-                details="""<p class="text-warning">Please analyze log first.</p>""")
+        response_body = genEmptyResponse()
 
 
     status = '200 OK'
