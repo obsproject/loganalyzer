@@ -39,13 +39,6 @@ def getDescription(gistObject):
 def search(term, lines):
     return [ s for s in lines if term in s ]
 
-def searchRange(term, lines, lower, higher):
-    res = []
-    for i in range(lower, higher):
-        if term in lines[i]:
-            res.append(lines[i])
-
-    return res
 
 def checkClassic(lines):
     if(len(search('Open Broadcaster Software', lines))>0):
@@ -244,7 +237,7 @@ def checkStreamSettingsNVENC(lines):
 
 def checkVideoSettings(lines):
     videoSettings = []
-    res=None
+    res=[]
     for i,s in enumerate(lines):
         if "video settings reset:" in s:
             videoSettings.append(i)
@@ -252,23 +245,16 @@ def checkVideoSettings(lines):
         basex,basey     = lines[videoSettings[-1]+1].split()[-1].split('x')
         outx,outy       = lines[videoSettings[-1]+2].split()[-1].split('x')
         fps_num,fps_den = lines[videoSettings[-1]+4].split()[-1].split('/')
-        fmt             = lines[videoSettings[-1]+4].split()[-1]
+        fmt             = lines[videoSettings[-1]+5].split()[-1]
         baseAspect=float(basex)/float(basey)
         outAspect=float(outx)/float(outy)
         fps=float(fps_num)/float(fps_den)
         if((not((1.77<baseAspect) and (baseAspect <1.778))) or
                 (not((1.77<outAspect) and (outAspect <1.778)))):
-            if(res is None):
-                res=[]
             res.append([2, "WRONG ASPECT RATIO", "Almost all modern streaming services and video platforms expect video in 16:9 aspect ratio. OBS is currently configured to record in an aspect ration that differs from that. You will see black bars during playback."])
-        if fmt is not 'NV12':
-            if(res is None):
-                res=[]
+        if(fmt != 'NV12'):
             res.append([3, "WRONG COLOR FORMAT", "Color Formats other than NV12 are primarily intended for recording, and are not recommended when streaming. Streaming may incur increased CPU usage due to color format conversion"])
-        print(fps)
         if(not((fps==60) or (fps==30))):
-            if(res is None):
-                res=[]
             res.append([2, "NONSTANDARD FRAMERATE", "Framerates other than 30fps or 60fps may lead to playback issues like stuttering or screen tearing. Stick to either of these for better compatibility with video players."])
     return res
 
@@ -294,8 +280,8 @@ def getNextPos(old, lst):
 def checkSources(lower, higher, lines):
     res=None
     violation=False
-    monitor = searchRange('monitor_capture', lines, lower, higher)
-    game = searchRange('game_capture', lines, lower, higher)
+    monitor = search('monitor_capture', lines[lower:higher])
+    game = search('game_capture', lines[lower:higher])
     if(len(monitor)>0 and len(game)>0):
         res=[]
         res.append([1,"CAPTURE INTERFERENCE", "Monitor and Game Capture Sources interfere with each other. Never put them in the same scene"])
@@ -408,6 +394,7 @@ def doAnalysis(url):
             messages.append(checkStreamSettingsX264(logLines))
             messages.append(checkStreamSettingsNVENC(logLines))
             m = checkVideoSettings(logLines)
+            print(m)
             for sublist in m:
                 if(sublist != None):
                     messages.append(sublist)
