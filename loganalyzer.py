@@ -23,25 +23,50 @@ REVERSE = "\033[;7m"
 # 3 = critical
 
 
-API_URL = "https://api.github.com"
+###### gist.github.com
+#####################################
 
 def getGist(inputUrl):
+    API_URL = "https://api.github.com"
     gistId=inputUrl
     return requests.get('{0}/gists/{1}'.format(API_URL,gistId)).json()
 
-def getLines(gistObject):
+def getLinesGist(gistObject):
     files = [(v,k) for (k,v) in gistObject['files'].items()]
     return files[0][0]['content'].split('\n')
 
-def getDescription(gistObject):
+def getDescriptionGist(gistObject):
     desc = gistObject['description']
     if(desc ==""):
         desc=gistObject['id']
     return [0,"DESCRIPTION",desc]
 
+
+####### hastebin.com
+########################################
+
+def getHaste(inputUrl):
+    API_URL = "https://hastebin.com"
+    hasteId=inputUrl
+    return requests.get('{0}/documents/{1}'.format(API_URL,hasteId)).json()
+
+def getLinesHaste(hasteObject):
+    text = hasteObject['data']
+    return text.split('\n')
+
+def getDescriptionHaste(lines):
+    return [0,"DESCRIPTION",lines[0]]
+
+
+######## other functions
+########################################
+
 def search(term, lines):
     return [ s for s in lines if term in s ]
 
+
+######## checks
+########################################
 
 def checkClassic(lines):
     if(len(search('Open Broadcaster Software', lines))>0):
@@ -319,6 +344,9 @@ def parseScenes(lines):
         ret.append([[1,"NO SCENES/SOURCES","""There are neither scenes nor sources added to OBS. You won't be able to record anything but a black screen without adding soueces to your scenes. If you're new to OBS Studio, the community has created some resources for you to use. Check out our Overview Guide at <a href="https://goo.gl/zyMvr1">https://goo.gl/zyMvr1</a> and Nerd or Die's video guide at <a href="http://goo.gl/dGcPZ3">http://goo.gl/dGcPZ3</a>"""]])
     return ret
 
+######## main functions
+##############################################
+
 def textOutput(string):
     dedented_text = textwrap.dedent(string).strip()
     return textwrap.fill(dedented_text,initial_indent=' ' * 4, subsequent_indent=' ' * 4, width=80, )
@@ -370,11 +398,21 @@ def getResults(messages):
 
 def doAnalysis(url):
     messages=[]
-    match = re.match(r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))",url)
-    if(match):
-        gistObject = getGist(match.groups()[-1])
-        logLines=getLines(gistObject)
-        messages.append(getDescription(gistObject))
+    success = False
+    logLines = []
+    matchGist = re.match(r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))",url)
+    matchHaste = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))",url)
+    if(matchGist):
+        gistObject = getGist(matchGist.groups()[-1])
+        logLines=getLinesGist(gistObject)
+        messages.append(getDescriptionGist(gistObject))
+        success = True
+    elif(matchHaste):
+        hasteObject = getHaste(matchHaste.groups()[-1])
+        logLines = getLinesHaste(hasteObject)
+        messages.append(getDescriptionHaste(logLines))
+        success = True
+    if(success):
         classic, m = checkClassic(logLines)
         messages.append(m)
         if(not classic):
@@ -421,7 +459,7 @@ def doAnalysis(url):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--url",'-u',dest='url',
-            default="", help="url of gist", required=True)
+            default="", help="url of gist or haste", required=True)
     flags = parser.parse_args()
  
     msgs = doAnalysis(flags.url)
