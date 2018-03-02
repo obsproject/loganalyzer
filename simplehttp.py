@@ -70,6 +70,19 @@ def genEmptyResponse():
             details="""<p class="text-warning">Please analyze log first.</p>""")
     return response_body
 
+def genFullResponse(url):
+    msgs=[]
+    msgs = doAnalysis(url)
+    crit,warn,info = getSummaryHTML(msgs)
+    details = getDetailsHTML(msgs)
+    response = htmlTemplate.format(ph=url,
+            description="""<a href="{}">{}</a>""".format(url,getDescr(msgs)),
+            summary_critical=crit,
+            summary_warning=warn,
+            summary_info=info,
+            details=details)
+    return response
+
 
 
 def application(environ, start_response):
@@ -77,20 +90,14 @@ def application(environ, start_response):
     form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
     if 'url' in form:
         url = html.escape(form['url'].value)
-        match = re.match(r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))",url)
-        if(match == None):
-            response_body = genEmptyResponse()
+        matchGist = re.match(r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))",url)
+        matchHaste = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))",url)
+        if(matchGist != None):
+            response_body = genFullResponse(url)
+        elif(matchHaste != None):
+            response_body = genFullResponse(url)
         else:
-            msgs=[]
-            msgs = doAnalysis(url)
-            crit,warn,info = getSummaryHTML(msgs)
-            details = getDetailsHTML(msgs)
-            response_body = htmlTemplate.format(ph=url,
-                    description="""<a href="{}">{}</a>""".format(url,getDescr(msgs)),
-                    summary_critical=crit,
-                    summary_warning=warn,
-                    summary_info=info,
-                    details=details)
+            response_body = genEmptyResponse()
     else:
         response_body = genEmptyResponse()
 
