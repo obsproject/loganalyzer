@@ -320,7 +320,7 @@ def checkSources(lower, higher, lines):
         if(res is None):
             res=[]
         violation=True
-        res.append([1,"MULTIPLE GAMECAPTURE", "Multiple Game Capture sources are usually not needed, and can sometimes interfere with each other. You can use the same Game Capture for all your games! If you change games often, try out the hotkey mode, which lets you press a key to select your active game. If you play games in fullscreen, use 'Capture any fullscreen application' mode."])
+        res.append([2,"MULTIPLE GAMECAPTURE", "Multiple Game Capture sources are usually not needed, and can sometimes interfere with each other. You can use the same Game Capture for all your games! If you change games often, try out the hotkey mode, which lets you press a key to select your active game. If you play games in fullscreen, use 'Capture any fullscreen application' mode."])
     return res,violation
 
 def parseScenes(lines):
