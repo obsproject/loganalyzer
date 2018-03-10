@@ -4,6 +4,7 @@ from loganalyzer import *
 from wsgiref.simple_server import *
 import cgi
 import html
+import argparse
 
 htmlTemplate=""
 with open("template.html","r") as f:
@@ -112,12 +113,19 @@ def application(environ, start_response):
     return [response_body.encode()]
 
 
-if __name__ == '__main__':
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--host",dest='host', default="localhost", help="address to bind to")
+    parser.add_argument("--port",dest='port', default="8080", help="port to bind to")
+    flags = parser.parse_args()
     try:
         from wsgiref.simple_server import make_server
-        httpd = make_server('', 8080, application)
-        print('Serving on port 8080...')
+        httpd = make_server(flags.host, int(flags.port), application)
+        print("""Serving on "{}" with port "{}" """.format(flags.host, flags.port))
         httpd.serve_forever()
     except KeyboardInterrupt:
         print('Goodbye.')
+
+if __name__ == "__main__":
+    main()
 
