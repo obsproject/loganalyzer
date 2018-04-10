@@ -131,6 +131,11 @@ def checkAdmin(lines):
     if((len(l)>0) and (l[0].split()[-1]=='false')):
         return [1, "NOT ADMIN", "OBS is not running as administrator. This can lead to obs not being able to gamecapture certain games"]
 
+def checkAMDdrivers(lines):
+    l = search('The AMF Runtime is very old and unsupported', lines)
+    if(len(l)>0):
+        return [2, "AMD DRIVERS", """The AMF Runtime is very old and unsupported. The AMF Encoder will no work properly or not show up at all. Consider updating your drivers by downloading the newest installer from <a href="https://support.amd.com/en-us/download">AMD's website</a>. """]
+
 def checkMP4(lines):
     writtenFiles = search('Writing file ', lines)
     mp4 = search('.mp4', writtenFiles)
@@ -315,7 +320,7 @@ def checkSources(lower, higher, lines):
     game = search('game_capture', lines[lower:higher])
     if(len(monitor)>0 and len(game)>0):
         res=[]
-        res.append([1,"CAPTURE INTERFERENCE", "Monitor and Game Capture Sources interfere with each other. Never put them in the same scene"])
+        res.append([2,"CAPTURE INTERFERENCE", "Monitor and Game Capture Sources interfere with each other. Never put them in the same scene"])
     if(len(game)>1):
         if(res is None):
             res=[]
@@ -419,6 +424,7 @@ def doAnalysis(url):
             messages.append(checkDual(logLines))
             messages.append(checkAutoconfig(logLines))
             messages.append(checkCPU(logLines))
+            messages.append(checkAMDdrivers(logLines))
             messages.append(checkGPU(logLines))
             messages.append(checkInit(logLines))
             messages.append(checkNVENC(logLines))
