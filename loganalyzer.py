@@ -45,33 +45,38 @@ def getDescriptionGist(gistObject):
 ####### hastebin.com
 ########################################
 
-def getHaste(inputUrl):
+def getHaste(hasteId):
     API_URL = "https://hastebin.com"
-    hasteId=inputUrl
     return requests.get('{0}/documents/{1}'.format(API_URL,hasteId)).json()
 
 def getLinesHaste(hasteObject):
     text = hasteObject['data']
     return text.split('\n')
 
-def getDescriptionHaste(lines):
+def getDescription(lines):
     return [0,"DESCRIPTION",lines[0]]
 
 
 ####### obsproject.com
 ########################################
 
-def getObslog(inputUrl):
+def getObslog(obslogId):
     API_URL = "https://obsproject.com/logs"
-    obslogId=inputUrl
     return requests.get('{0}/{1}'.format(API_URL,obslogId)).text
 
 def getLinesObslog(obslogText):
     return obslogText.split('\n')
 
-def getDescriptionObslog(lines):
-    return [0,"DESCRIPTION",lines[0]]
     
+####### pastebin.com
+########################################
+
+def getRawPaste(obslogId):
+    API_URL = "https://pastebin.com/raw"
+    return requests.get('{0}/{1}'.format(API_URL,obslogId)).text
+
+def getLinesPaste(obslogText):
+    return obslogText.split('\n')
 
 ######## other functions
 ########################################
@@ -427,6 +432,7 @@ def doAnalysis(url):
     matchGist = re.match(r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))", url)
     matchHaste = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))", url)
     matchObs = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?obsproject\.com)/logs/)(.{16}))", url)
+    matchPastebin = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?pastebin\.com/))(.{8}))", url)
     if(matchGist):
         gistObject = getGist(matchGist.groups()[-1])
         logLines=getLinesGist(gistObject)
@@ -435,12 +441,17 @@ def doAnalysis(url):
     elif(matchHaste):
         hasteObject = getHaste(matchHaste.groups()[-1])
         logLines = getLinesHaste(hasteObject)
-        messages.append(getDescriptionHaste(logLines))
+        messages.append(getDescription(logLines))
         success = True
     elif(matchObs):
         obslogObject = getObslog(matchObs.groups()[-1])
         logLines = getLinesObslog(obslogObject)
-        messages.append(getDescriptionObslog(logLines))
+        messages.append(getDescription(logLines))
+        success = True
+    elif(matchPastebin):
+        pasteObject = getRawPaste(matchPastebin.groups()[-1])
+        logLines = getLinesPaste(pasteObject)
+        messages.append(getDescription(logLines))
         success = True
     if(success):
         classic, m = checkClassic(logLines)

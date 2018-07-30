@@ -107,13 +107,8 @@ def checkUrl(url):
     matchGist = re.match(r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))",url)
     matchHaste = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))",url)
     matchObs = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?obsproject\.com)/logs/)(.{16}))", url)
-    if(matchGist != None):
-        validity = True 
-    elif(matchHaste != None):
-        validity = True 
-    elif(matchObs != None):
-        validity = True 
-    return validity
+    matchPastebin = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?pastebin\.com/))(.{8}))", url)
+    return any((matchGist, matchHaste, matchObs, matchPastebin))
 
 
 def application(environ, start_response):
