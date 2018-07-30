@@ -28,6 +28,23 @@ def getSummaryHTML(messages):
             info = info + """<p><a href="#"""+ i[1] +""""><button type="button" class="btn btn-info">""" + i[1] + "</button></a></p>\n"
     return critical,warning,info
 
+def genBotResponse(url):
+    msgs=[]
+    msgs = doAnalysis(url)
+    critical = []
+    warning = []
+    info = []
+    for i in msgs:
+        if(i[0]==3):
+            critical.append(i[1])
+        elif(i[0]==2):
+            warning.append(i[1])
+        elif(i[0]==1):
+            warning.append(i[1])
+
+    return json.dumps({"critical": critical, "warning": warning, "info": info})
+
+
 def getDetailsHTML(messages):
     res=""
     for i in messages:
@@ -85,25 +102,37 @@ def genFullResponse(url):
     return response
 
 
+def checkUrl(url):
+    validity = False
+    matchGist = re.match(r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))",url)
+    matchHaste = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))",url)
+    matchObs = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?obsproject\.com)/logs/)(.{16}))", url)
+    if(matchGist != None):
+        validity = True 
+    elif(matchHaste != None):
+        validity = True 
+    elif(matchObs != None):
+        valid = True 
+    return validity
+
 
 def application(environ, start_response):
     response_body=""
     form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
-    if 'url' in form:
+    if (('format' in form) and ('url' in form)):
         url = html.escape(form['url'].value)
-        matchGist = re.match(r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))",url)
-        matchHaste = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))",url)
-        matchObs = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?obsproject\.com)/logs/)(.{16}))", url)
-        if(matchGist != None):
-            response_body = genFullResponse(url)
-        elif(matchHaste != None):
-            response_body = genFullResponse(url)
-        elif(matchObs != None):
+        output_format = html.escape(form['format'].value)
+        if((checkUrl(url)) and (output_format == 'json')):
+            response_body = genBotResponse(url)
+    elif 'url' in form:
+        url = html.escape(form['url'].value)
+        if(checkUrl(url)):
             response_body = genFullResponse(url)
         else:
             response_body = genEmptyResponse()
     else:
         response_body = genEmptyResponse()
+
 
 
     status = '200 OK'
