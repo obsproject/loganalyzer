@@ -40,7 +40,7 @@ def genBotResponse(url):
         elif(i[0]==2):
             warning.append(i[1])
         elif(i[0]==1):
-            warning.append(i[1])
+            info.append(i[1])
 
     return json.dumps({"critical": critical, "warning": warning, "info": info})
 
