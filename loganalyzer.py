@@ -176,7 +176,7 @@ def checkAttempt(lines):
     recordingStarts = search('== Recording Start ==', lines)
     streamingStarts = search('== Streaming Start ==', lines)
     if( len(recordingStarts) + len(streamingStarts) == 0):
-        return [1, "EMPTY LOG", "Your log contains no recording or streaming session. Results of this log analysis are limited. Please post a link to a clean log file. To make a clean log file, first restart OBS, then start your stream/recording for ~30 seconds and stop it again. Make sure you replicate any issues as best you can, which means having any games/apps open and captured, etc. When you're done select Help > Log Files > Upload Current Log File. Copy the URL and paste it here."]
+        return [1, "NO OUTPUT SESSION", "Your log contains no recording or streaming session. Results of this log analysis are limited. Please post a link to a clean log file. To make a clean log file, first restart OBS, then start your stream/recording for ~30 seconds and stop it again. Make sure you replicate any issues as best you can, which means having any games/apps open and captured, etc. When you're done select Help > Log Files > Upload Current Log File. Copy the URL and paste it here."]
 
 def checkPreset(lines):
     encoderLines = search('x264 encoder:', lines)
