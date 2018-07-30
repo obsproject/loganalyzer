@@ -112,7 +112,7 @@ def checkUrl(url):
     elif(matchHaste != None):
         validity = True 
     elif(matchObs != None):
-        valid = True 
+        validity = True 
     return validity
 
 
@@ -124,22 +124,30 @@ def application(environ, start_response):
         output_format = html.escape(form['format'].value)
         if((checkUrl(url)) and (output_format == 'json')):
             response_body = genBotResponse(url)
+            response_headers = [
+                ('Content-Type', 'application/json'),
+                ('Content-Length', str(len(response_body)))
+            ]
     elif 'url' in form:
         url = html.escape(form['url'].value)
         if(checkUrl(url)):
             response_body = genFullResponse(url)
         else:
             response_body = genEmptyResponse()
+        response_headers = [
+            ('Content-Type', 'text/html'),
+            ('Content-Length', str(len(response_body)))
+        ]
     else:
         response_body = genEmptyResponse()
+        response_headers = [
+            ('Content-Type', 'text/html'),
+            ('Content-Length', str(len(response_body)))
+        ]
 
 
 
     status = '200 OK'
-    response_headers = [
-        ('Content-Type', 'text/html'),
-        ('Content-Length', str(len(response_body)))
-    ]
 
     start_response(status, response_headers)
     return [response_body.encode()]
