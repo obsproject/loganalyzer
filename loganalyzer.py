@@ -146,6 +146,10 @@ def checkAdmin(lines):
     if((len(l)>0) and (l[0].split()[-1]=='false')):
         return [1, "NOT ADMIN", "OBS is not running as administrator. This can lead to obs not being able to gamecapture certain games"]
 
+def checkElements(lines):
+    if(len(search('obs-streamelements', lines))>0):
+        return [2, "STREAMELEMENTS", """The obs.live plugin is installed. This overwrites OBS' default browser source and causes a severe performance impact. To get rid of it, please manually uninstall OBS completely. Then reinstall with the latest installer from <a href="https://obsproject.com/download">https://obsproject.com/download</a>"""]
+
 def checkAMDdrivers(lines):
     l = search('The AMF Runtime is very old and unsupported', lines)
     if(len(l)>0):
@@ -448,6 +452,7 @@ def doAnalysis(url):
             messages.append(checkAMDdrivers(logLines))
             messages.append(checkGPU(logLines))
             messages.append(checkInit(logLines))
+            messages.append(checkElements(logLines))
             messages.append(checkNVENC(logLines))
             messages.append(checkKiller(logLines))
             messages.append(checkWifi(logLines))
