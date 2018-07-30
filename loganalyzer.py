@@ -148,7 +148,7 @@ def checkAdmin(lines):
 
 def checkElements(lines):
     if(len(search('obs-streamelements', lines))>0):
-        return [2, "STREAMELEMENTS", """The obs.live plugin is installed. This overwrites OBS' default browser source and causes a severe performance impact. To get rid of it, please manually uninstall OBS completely. Then reinstall with the latest installer from <a href="https://obsproject.com/download">https://obsproject.com/download</a>"""]
+        return [2, "STREAMELEMENTS", """The obs.live plugin is installed. This overwrites OBS' default browser source and causes a severe performance impact. To get rid of it, first, export your scene collections and profiles, second manually uninstall OBS completely, third reinstall OBS Studio only with the latest installer from <a href="https://obsproject.com/download">https://obsproject.com/download</a>"""]
 
 def checkAMDdrivers(lines):
     l = search('The AMF Runtime is very old and unsupported', lines)
