@@ -315,7 +315,7 @@ def checkVideoSettings(lines):
         if(fmt != 'NV12'):
             res.append([3, "Wrong Color Format", "Color Formats other than NV12 are primarily intended for recording, and are not recommended when streaming. Streaming may incur increased CPU usage due to color format conversion"])
         if(not((fps==60) or (fps==30))):
-            res.append([2, "Nonstandart Framerate", "Framerates other than 30fps or 60fps may lead to playback issues like stuttering or screen tearing. Stick to either of these for better compatibility with video players."])
+            res.append([2, "Non-Standard Framerate", "Framerates other than 30fps or 60fps may lead to playback issues like stuttering or screen tearing. Stick to either of these for better compatibility with video players."])
     return res
 
 def getScenes(lines):
