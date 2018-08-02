@@ -134,6 +134,12 @@ def checkNVENC(lines):
     if(1==0):
         return [2, "Nvidia Drivers", """NVENC fails to start up because your GPU drivers are out of date. You can perform a clean driver installation for your GPU by following the instructions at <a href="http://obsproject.com/forum/resources/performing-a-clean-gpu-driver-installation.65/"> Clean GPU driver installation</a>"""]
 
+def check940(lines):
+    gpu = search('NVIDIA GeForce 940', lines)
+    attempt = search('NVENC encoder', lines)
+    if (len(gpu)>0) and (len(attempt)>0):
+        return [3, "NVENC Not Supported", """NVENC is not supported on the Nvidia 940 and 940MX. Recording fails to start because of this. Please select "Software (x264)" or "Hardware (QSV)" as encoder instead."""]
+
 def checkInit(lines):
     if(len(search('Failed to initialize video', lines))>0):
         return [3, "Initialize Failed", "Failed to initialize video. Your GPU may not be supported, or your graphics drivers may need to be updated."]
@@ -465,6 +471,7 @@ def doAnalysis(url):
             messages.append(checkInit(logLines))
             messages.append(checkElements(logLines))
             messages.append(checkNVENC(logLines))
+            messages.append(check940(logLines))
             messages.append(checkKiller(logLines))
             messages.append(checkWifi(logLines))
             messages.append(checkAdmin(logLines))
