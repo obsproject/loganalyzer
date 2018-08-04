@@ -205,7 +205,10 @@ def checkAudio(lines):
     vals = []
     if(len(buffering)>0):
         for i in buffering:
-            vals.append(int(i.split()[12]))
+            if (i.split()[12]=="now"):
+                vals.append(int(i.split()[13]))
+            else:
+                vals.append(int(i.split()[12]))
         if(max(vals)>500):
             return [2, "High Audio Buffering", "Audio buffering reached values above 500ms. This is an indicator of too high system load and will affect stream latency."]
     else:
