@@ -78,6 +78,16 @@ def getRawPaste(obslogId):
 def getLinesPaste(obslogText):
     return obslogText.split('\n')
 
+####### discord
+########################################
+
+def getRawDiscord(obslogId):
+    API_URL = "https://cdn.discordapp.com/attachments"
+    return requests.get('{0}/{1}'.format(API_URL,obslogId)).text
+
+def getLinesDiscord(obslogText):
+    return obslogText.split('\n')
+
 ######## other functions
 ########################################
 
@@ -442,6 +452,7 @@ def doAnalysis(url):
     matchHaste = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))", url)
     matchObs = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?obsproject\.com)/logs/)(.{16}))", url)
     matchPastebin = re.match(r"(?i)\b((?:https?:(?:/{1,3}(www\.)?pastebin\.com/))(.{8}))", url)
+    matchDiscord = re.match(r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18}/[0-9]{18}/[0-9\-\_]{19}.txt))", url)
     if(matchGist):
         gistObject = getGist(matchGist.groups()[-1])
         logLines=getLinesGist(gistObject)
@@ -460,6 +471,11 @@ def doAnalysis(url):
     elif(matchPastebin):
         pasteObject = getRawPaste(matchPastebin.groups()[-1])
         logLines = getLinesPaste(pasteObject)
+        messages.append(getDescription(logLines))
+        success = True
+    elif(matchDiscord):
+        pasteObject = getRawDiscord(matchDiscord.groups()[-1])
+        logLines = getLinesDiscord(pasteObject)
         messages.append(getDescription(logLines))
         success = True
     if(success):
