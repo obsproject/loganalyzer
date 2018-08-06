@@ -167,6 +167,12 @@ def checkAdmin(lines):
     if((len(l)>0) and (l[0].split()[-1]=='false')):
         return [1, "Not Admin", "OBS is not running as administrator. This can lead to obs not being able to gamecapture certain games"]
 
+def check32bitOn64bit(lines):
+    winVersion = search('Windows Version', lines)
+    obsVersion = search('OBS', lines)
+    if(('64-bit' in winVersion[0]) and ('64bit' not in obsVersion)):
+        return [2, "32bit OBS on 64bit Windows", "You are running the 32 bit version of OBS on a 64 bit system. This will reduce performance and greatly increase the risk of crashes due to memory limitations. You should only use the 32 bit version if you have a capture device that lacks 64 bit drivers. Please run OBS using the 64bit shortcut."]
+
 def checkElements(lines):
     if(len(search('obs-streamelements', lines))>0):
         return [2, "Streamelements", """The obs.live plugin is installed. This overwrites OBS' default browser source and causes a severe performance impact. To get rid of it, first, export your scene collections and profiles, second manually uninstall OBS completely, third reinstall OBS Studio only with the latest installer from <a href="https://obsproject.com/download">https://obsproject.com/download</a>"""]
@@ -494,6 +500,7 @@ def doAnalysis(url):
             messages.append(checkKiller(logLines))
             messages.append(checkWifi(logLines))
             messages.append(checkAdmin(logLines))
+            messages.append(check32bitOn64bit(logLines))
             messages.append(checkAttempt(logLines))
             messages.append(checkMP4(logLines))
             messages.append(checkMov(logLines))
