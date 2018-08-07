@@ -140,9 +140,9 @@ def checkGPU(lines):
             return [2, "Integrated GPU", "OBS is running on an Intel iGPU. This hardware is generally not powerful enough to be used for both gaming and running obs. Situations where only sources from e.g. cameras and capture cards are used might work."]
 
 def checkNVENC(lines):
-    #TODO wait for kurufu
-    if(1==0):
-        return [2, "Nvidia Drivers", """NVENC fails to start up because your GPU drivers are out of date. You can perform a clean driver installation for your GPU by following the instructions at <a href="http://obsproject.com/forum/resources/performing-a-clean-gpu-driver-installation.65/"> Clean GPU driver installation</a>"""]
+    msgs = search("Failed to open NVENC codec", lines)
+    if(len(msgs)>0):
+        return [2, "NVENC Start Failure", """NVENC failed to start up because of a variety of reasons. Make sure that Widows Game Bar and Windows Game DVR are disabled and that your GPU drivers are up to date. You can perform a clean driver installation for your GPU by following the instructions at <a href="http://obsproject.com/forum/resources/performing-a-clean-gpu-driver-installation.65/"> Clean GPU driver installation</a>"""]
 
 def check940(lines):
     gpu = search('NVIDIA GeForce 940', lines)
@@ -171,6 +171,7 @@ def check32bitOn64bit(lines):
     winVersion = search('Windows Version', lines)
     obsVersion = search('OBS', lines)
     if(('64-bit' in winVersion[0]) and ('64bit' not in obsVersion[0])):
+        #thx to secretply for the bugfix
         return [2, "32bit OBS on 64bit Windows", "You are running the 32 bit version of OBS on a 64 bit system. This will reduce performance and greatly increase the risk of crashes due to memory limitations. You should only use the 32 bit version if you have a capture device that lacks 64 bit drivers. Please run OBS using the 64bit shortcut."]
 
 def checkElements(lines):
@@ -382,6 +383,7 @@ def parseScenes(lines):
     hit=False
     sceneLines = getScenes(lines)
     sourceLines = search(' - source:',lines)
+    added = search('User added source',lines)
     if((len(sceneLines)>0) and (len(sourceLines)>0)):
         sections = getSections(lines)
         higher = 0
@@ -394,6 +396,8 @@ def parseScenes(lines):
             if(not hit):
                 ret.append(m)
                 hit=h
+    elif(len(added)>0):
+        ret = []
     else:
         ret.append([[1,"No Scenes/Sources","""There are neither scenes nor sources added to OBS. You won't be able to record anything but a black screen without adding soueces to your scenes. If you're new to OBS Studio, the community has created some resources for you to use. Check out our Overview Guide at <a href="https://goo.gl/zyMvr1">https://goo.gl/zyMvr1</a> and Nerd or Die's video guide at <a href="http://goo.gl/dGcPZ3">http://goo.gl/dGcPZ3</a>"""]])
     return ret
