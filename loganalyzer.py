@@ -162,6 +162,10 @@ def checkWifi(lines):
     if(len(search('802.11',lines))>0):
         return [2, "WIFI Streaming", "In many cases, wireless connections can cause issues because of their unstable nature. Streaming really requires a stable connection. Often wireless connections are fine, but if you have problems, then we are going to be very unlikely to be able to help you diagnose it if you're on a wireless just because it adds yet another variable. We recommend streaming on wired connections."]
 
+def checkBind(lines):
+    if(len(search('Binding to ',lines))>0):
+        return [2, "Binding to IP", """Binding to a manually chosen is only rarely needed. Go to Settigs → Advanced → Network and set "Bind to IP" back to "Default". """]
+
 def checkAdmin(lines):
     l = search('Running as administrator', lines)
     if((len(l)>0) and (l[0].split()[-1]=='false')):
@@ -186,14 +190,9 @@ def checkAMDdrivers(lines):
 def checkMP4(lines):
     writtenFiles = search('Writing file ', lines)
     mp4 = search('.mp4', writtenFiles)
-    if(len(mp4)>0):
-        return [3, "MP4 Recording","If you record to MP4 and the recording is interrupted, the file will be corrupted and unrecoverable. If you require MP4 files for some other purpose like editing, remux them afterwards by selecting File > Remux Recordings in the main OBS Studio window."]
-
-def checkMov(lines):
-    writtenFiles = search('Writing file ', lines)
-    mp4 = search('.mov', writtenFiles)
-    if(len(mp4)>0):
-        return [3, "MOV Recording","If you record to MP4 and the recording is interrupted, the file will be corrupted and unrecoverable. If you require MP4 files for some other purpose like editing, remux them afterwards by selecting File > Remux Recordings in the main OBS Studio window."]
+    mov = search('.mov', writtenFiles)
+    if(len(mp4)>0 or len(mov)>0):
+        return [3, "MP4/MOV Recording","If you record to MP4 or MOV and the recording is interrupted, the file will be corrupted and unrecoverable. If you require MP4 files for some other purpose like editing, remux them afterwards by selecting File > Remux Recordings in the main OBS Studio window."]
 
 def checkAttempt(lines):
     recordingStarts = search('== Recording Start ==', lines)
@@ -503,11 +502,11 @@ def doAnalysis(url):
             messages.append(check940(logLines))
             messages.append(checkKiller(logLines))
             messages.append(checkWifi(logLines))
+            messages.append(checkBind(logLines))
             messages.append(checkAdmin(logLines))
             messages.append(check32bitOn64bit(logLines))
             messages.append(checkAttempt(logLines))
             messages.append(checkMP4(logLines))
-            messages.append(checkMov(logLines))
             messages.append(checkPreset(logLines))
             messages.append(checkCustom(logLines))
             messages.append(checkAudio(logLines))
