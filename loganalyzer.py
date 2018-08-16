@@ -139,6 +139,10 @@ def checkGPU(lines):
         elif(len(adapters)==1 and ('Intel' in adapters[0])):
             return [2, "Integrated GPU", "OBS is running on an Intel iGPU. This hardware is generally not powerful enough to be used for both gaming and running obs. Situations where only sources from e.g. cameras and capture cards are used might work."]
 
+def checkMicrosoftSoftwareGPU(lines):
+    if(len(search('Microsoft Basic Render Driver', lines))>0):
+        return [3, "No GPU driver available", "Your GPU is using the Microsoft Basic Render Driver, which is a pure software render. This will cause very high CPU load when used with OBS. Make sure to install proper drivers for your GPU. To use OBS in a virtual machine, you need to enable GPU passthrough."]
+
 def checkNVENC(lines):
     msgs = search("Failed to open NVENC codec", lines)
     if(len(msgs)>0):
@@ -516,6 +520,7 @@ def doAnalysis(url):
             messages.append(checkMulti(logLines))
             messages.append(checkStreamSettingsX264(logLines))
             messages.append(checkStreamSettingsNVENC(logLines))
+            messages.append(checkMicrosoftSoftwareGPU(logLines))
             m = checkVideoSettings(logLines)
             for sublist in m:
                 if(sublist != None):
