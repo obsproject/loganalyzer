@@ -302,7 +302,7 @@ def checkRendering(lines):
             severity = 2
         else:
             severity = 1
-        return [severity, "{}% Rendering Lag".format(val), "Your GPU is maxed out and OBS can't render scenes fast enough. Running a game without vertical sync or a frame rate limiter will frequently cause performance issues with OBS because your GPU will be maxed out. Enable vsync or set a reasonable frame rate limit that your GPU can handle without hitting 100% usage. If that's not enough you may also need to turn down some of the video quality options in the game."]
+        return [severity, "{}% Rendering Lag".format(val), "Your GPU is maxed out and OBS can't render scenes fast enough. Running a game without vertical sync or a frame rate limiter will frequently cause performance issues with OBS because your GPU will be maxed out. Enable vsync or set a reasonable frame rate limit that your GPU can handle without hitting 100% usage. If that's not enough you may also need to turn down some of the video quality options in the game. If you are experiencing issues in general while using OBS, your GPU may be overloaded for the settings you are trying to use. Please check our guide for ideas why this may be happening, and steps you can take to correct it: https://obsproject.com/wiki/GPU-overload-issues"]
 
 
 def checkEncoding(lines):
