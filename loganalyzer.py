@@ -198,7 +198,7 @@ def checkAdmin(lines):
 def check32bitOn64bit(lines):
     winVersion = search('Windows Version', lines)
     obsVersion = search('OBS', lines)
-    if(('64-bit' in winVersion[0]) and ('64bit' not in obsVersion[0])):
+    if(('64-bit' in winVersion[0]) and ('64-bit' not in obsVersion[0])):
         # thx to secretply for the bugfix
         return [2, "32bit OBS on 64bit Windows", "You are running the 32 bit version of OBS on a 64 bit system. This will reduce performance and greatly increase the risk of crashes due to memory limitations. You should only use the 32 bit version if you have a capture device that lacks 64 bit drivers. Please run OBS using the 64bit shortcut."]
 
