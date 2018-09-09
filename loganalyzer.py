@@ -116,21 +116,21 @@ def checkClassic(lines):
 
 def checkDual(lines):
     if(len(search('Warning: OBS is already running!', lines)) > 0):
-        return [3, "Two Instances", "Two instances of OBS are running. They will likely interfere with each other and consume exessive ressources. Stop one of them. Check task manager for stray OBS processes if you can't find the other one."]
+        return [3, "Two Instances", "Two instances of OBS are running. They will likely interfere with each other and consume excessive resources. Stop one of them. Check task manager for stray OBS processes if you can't find the other one."]
 
 
 def checkAutoconfig(lines):
     if(len(search('Auto-config wizard', lines)) > 0):
-        return [3, "Autoconfig Wizard", """The log contains an Auto-config wizard run. Results of this analysis are therefore inaccurate. Please post a link to a clean log file. To make a clean log file, first restart OBS, then start your stream/recording for ~30 seconds and stop it again. Make sure you replicate any issues as best you can, which means having any games/apps open and captured, etc. When you're done select Help > Log Files > Upload Current Log File. Copy the URL and paste it here."""]
+        return [3, "Auto-Config Wizard", """The log contains an Auto-Config Wizard run. Results of this analysis are therefore inaccurate. Please post a link to a clean log file. To make a clean log file, first restart OBS, then start your stream/recording for ~30 seconds and stop it again. Make sure you replicate any issues as best you can, which means having any games/apps open and captured, etc. When you're done select Help > Log Files > Upload Current Log File. Copy the URL and paste it here."""]
 
 
 def checkCPU(lines):
     cpu = search('CPU Name', lines)
     if(len(cpu) > 0):
         if(('APU' in cpu[0]) or ('Pentium' in cpu[0]) or ('Celeron' in cpu[0])):
-            return [3, "Insufficient Hardware", "Your system is below minimum specs for obs ro run and too weak to do livestreaming. There are no settings which will save you from that lack of processing power. Replace your PC or Laptop."]
+            return [3, "Insufficient Hardware", "Your system is below minimum specs for OBS to run and too weak to do livestreaming. There are no settings which will save you from that lack of processing power. Replace your PC or Laptop."]
         elif('i3' in cpu[0]):
-            return [1, "Insufficient Hardware", "Your system is barely above minimum specs for obs ro run and too weak to do livestreaming with software encoding. Livestreams and recordings will only run smoothly if you are using the hardware QuickSync encoder."]
+            return [1, "Insufficient Hardware", "Your system is barely above minimum specs for OBS to run and too weak to do livestreaming with software encoding. Livestreams and recordings will only run smoothly if you are using the hardware QuickSync encoder."]
 
 
 def checkMemory(lines):
@@ -159,14 +159,14 @@ def checkMicrosoftSoftwareGPU(lines):
 def checkNVENC(lines):
     msgs = search("Failed to open NVENC codec", lines)
     if(len(msgs) > 0):
-        return [2, "NVENC Start Failure", """NVENC failed to start up because of a variety of reasons. Make sure that Widows Game Bar and Windows Game DVR are disabled and that your GPU drivers are up to date. You can perform a clean driver installation for your GPU by following the instructions at <a href="http://obsproject.com/forum/resources/performing-a-clean-gpu-driver-installation.65/"> Clean GPU driver installation</a>"""]
+        return [2, "NVENC Start Failure", """NVENC failed to start up because of a variety of reasons. Make sure that Windows Game Bar and Windows Game DVR are disabled and that your GPU drivers are up to date. You can perform a clean driver installation for your GPU by following the instructions at <a href="http://obsproject.com/forum/resources/performing-a-clean-gpu-driver-installation.65/"> Clean GPU driver installation</a>"""]
 
 
 def check940(lines):
     gpu = search('NVIDIA GeForce 940', lines)
     attempt = search('NVENC encoder', lines)
     if (len(gpu) > 0) and (len(attempt) > 0):
-        return [3, "NVENC Not Supported", """NVENC is not supported on the Nvidia 940 and 940MX. Recording fails to start because of this. Please select "Software (x264)" or "Hardware (QSV)" as encoder instead."""]
+        return [3, "NVENC Not Supported", """NVENC is not supported on the NVIDIA 940 and 940MX. Recording fails to start because of this. Please select "Software (x264)" or "Hardware (QSV)" as encoder instead."""]
 
 
 def checkInit(lines):
@@ -186,7 +186,7 @@ def checkWifi(lines):
 
 def checkBind(lines):
     if(len(search('Binding to ', lines)) > 0):
-        return [2, "Binding to IP", """Binding to a manually chosen is only rarely needed. Go to Settigs → Advanced → Network and set "Bind to IP" back to "Default". """]
+        return [2, "Binding to IP", """Binding to a manually chosen is only rarely needed. Go to Settings → Advanced → Network and set "Bind to IP" back to "Default". """]
 
 
 def checkAdmin(lines):
@@ -204,12 +204,12 @@ def check32bitOn64bit(lines):
             and '64-bit' not in obsVersion[0] 
             and '64bit' not in obsVersion[0]):
         # thx to secretply for the bugfix
-        return [2, "32bit OBS on 64bit Windows", "You are running the 32 bit version of OBS on a 64 bit system. This will reduce performance and greatly increase the risk of crashes due to memory limitations. You should only use the 32 bit version if you have a capture device that lacks 64 bit drivers. Please run OBS using the 64bit shortcut."]
+        return [2, "32-bit OBS on 64-bit Windows", "You are running the 32 bit version of OBS on a 64 bit system. This will reduce performance and greatly increase the risk of crashes due to memory limitations. You should only use the 32 bit version if you have a capture device that lacks 64 bit drivers. Please run OBS using the 64-bit shortcut."]
 
 
 def checkElements(lines):
     if(len(search('obs-streamelements', lines)) > 0):
-        return [2, "Streamelements", """The obs.live plugin is installed. This overwrites OBS' default browser source and causes a severe performance impact. To get rid of it, first, export your scene collections and profiles, second manually uninstall OBS completely, third reinstall OBS Studio only with the latest installer from <a href="https://obsproject.com/download">https://obsproject.com/download</a>"""]
+        return [2, "StreamElements OBS.Live", """The obs.live plugin is installed. This overwrites OBS' default browser source and causes a severe performance impact. To get rid of it, first, export your scene collections and profiles, second manually uninstall OBS completely, third reinstall OBS Studio only with the latest installer from <a href="https://obsproject.com/download">https://obsproject.com/download</a>"""]
 
 
 def checkAMDdrivers(lines):
@@ -247,7 +247,7 @@ def checkPreset(lines):
 def checkCustom(lines):
     encoderLines = search("'adv_ffmpeg_output':", lines)
     if(len(encoderLines) > 0):
-        return [2, "Custom FFMPEG Output", """Custom ffmpeg output is in use. Only absolute professionals should use this. If you got your settings from a Youtube video advertising "Absolute best OBS settings" or similar you're wrong here and better off using Simple output mode."""]
+        return [2, "Custom FFMPEG Output", """Custom FFMPEG output is in use. Only absolute professionals should use this. If you got your settings from a YouTube video advertising "Absolute best OBS settings" or similar you're wrong here and better off using Simple output mode."""]
 
 
 def checkAudio(lines):
@@ -268,7 +268,7 @@ def checkAudio(lines):
 def checkMulti(lines):
     mem = search('user is forcing shared memory', lines)
     if(len(mem) > 0):
-        return [1, "Memory Capture", "Shared memory capture is very slow only to be used on SLI & Crossfire systems. Don't enable it anywhere else."]
+        return [1, "Memory Capture", "Shared memory capture is very slow, and only to be used on SLI & Crossfire systems. Don't enable it anywhere else."]
 
 
 def checkDrop(lines):
@@ -287,7 +287,7 @@ def checkDrop(lines):
             severity = 2
         else:
             severity = 1
-    return [severity, "{}% Framedrops".format(val), """Your log contains streaming sessions with dropped frames. This can only be caused by a failure in your internet connection or your networking hardware. It is not caused by OBS. Follow the troubleshooting steps at: <a href="https://obsproject.com/wiki/Dropped-Frames-and-General-Connection-Issues">Dropped Frames and General Connection Issues</a>"""]
+    return [severity, "{}% Dropped Frames".format(val), """Your log contains streaming sessions with dropped frames. This can only be caused by a failure in your internet connection or your networking hardware. It is not caused by OBS. Follow the troubleshooting steps at: <a href="https://obsproject.com/wiki/Dropped-Frames-and-General-Connection-Issues">Dropped Frames and General Connection Issues</a>"""]
 
 
 def checkRendering(lines):
@@ -360,7 +360,7 @@ def checkStreamSettingsNVENC(lines):
 
         bitrateEstimate = (width * height * fps_num) / 20000
         if(bitrate < bitrateEstimate):
-            return [1, "Low Stream Bandwidth", "Your stream encoder is set to a too low video bitrate. This will lower picture quality especially in high motion scenes like fast paced games. Use the autoconfig wizard to adjust your settings to the optimum for your situation. It can be accessed from the Tools menu in OBS, and then just follow the on-screen directions."]
+            return [1, "Low Stream Bandwidth", "Your stream encoder is set to a too low video bitrate. This will lower picture quality especially in high motion scenes like fast paced games. Use the Auto-Config Wizard to adjust your settings to the optimum for your situation. It can be accessed from the Tools menu in OBS, and then just follow the on-screen directions."]
 
 
 def checkVideoSettings(lines):
@@ -422,7 +422,7 @@ def checkSources(lower, higher, lines):
         if(res is None):
             res = []
         violation = True
-        res.append([2, "Multiple Gamecapture", "Multiple Game Capture sources are usually not needed, and can sometimes interfere with each other. You can use the same Game Capture for all your games! If you change games often, try out the hotkey mode, which lets you press a key to select your active game. If you play games in fullscreen, use 'Capture any fullscreen application' mode."])
+        res.append([2, "Multiple Game Capture", "Multiple Game Capture sources are usually not needed, and can sometimes interfere with each other. You can use the same Game Capture for all your games! If you change games often, try out the hotkey mode, which lets you press a key to select your active game. If you play games in fullscreen, use 'Capture any fullscreen application' mode."])
     return res, violation
 
 
@@ -447,7 +447,7 @@ def parseScenes(lines):
     elif(len(added) > 0):
         ret = []
     else:
-        ret.append([[1, "No Scenes/Sources", """There are neither scenes nor sources added to OBS. You won't be able to record anything but a black screen without adding soueces to your scenes. If you're new to OBS Studio, the community has created some resources for you to use. Check out our Overview Guide at <a href="https://goo.gl/zyMvr1">https://goo.gl/zyMvr1</a> and Nerd or Die's video guide at <a href="http://goo.gl/dGcPZ3">http://goo.gl/dGcPZ3</a>"""]])
+        ret.append([[1, "No Scenes/Sources", """There are neither scenes nor sources added to OBS. You won't be able to record anything but a black screen without adding sources to your scenes. If you're new to OBS Studio, the community has created some resources for you to use. Check out our Overview Guide at <a href="https://goo.gl/zyMvr1">https://goo.gl/zyMvr1</a> and Nerd or Die's video guide at <a href="http://goo.gl/dGcPZ3">http://goo.gl/dGcPZ3</a>"""]])
     return ret
 
 # main functions
