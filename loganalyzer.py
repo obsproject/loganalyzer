@@ -342,7 +342,6 @@ def checkStreamSettingsX264(lines):
         height = float(lines[streamingSessions[-1] + 8].split()[-1])
 
         bitrateEstimate = (width * height * fps_num / fps_den) / 20000
-        # print("{} {} {} {} {} {} ".format(bitrate,fps_num,fps_den,width,height,bitrateEstimate))
         if(bitrate < bitrateEstimate):
             return [1, "Low Stream Bandwidth", "Your stream encoder is set to a too low video bitrate. This will lower picture quality especially in high motion scenes like fast paced games. Use the autoconfig wizard to adjust your settings to the optimum for your situation. It can be accessed from the Tools menu in OBS, and then just follow the on-screen directions."]
 
