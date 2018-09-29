@@ -5,7 +5,7 @@ import requests
 import json
 import argparse
 import textwrap
-
+from pkg_resources import parse_version
 
 RED = "\033[1;31m"
 GREEN = "\033[0;32m"
@@ -16,6 +16,8 @@ CYAN = "\033[1;36m"
 RESET = "\033[0;0m"
 BOLD = "\033[;1m"
 REVERSE = "\033[;7m"
+
+CURRENT_VERSION = '22.0.2'
 
 # error levels:
 # 1 = info
@@ -135,6 +137,15 @@ def checkCPU(lines):
 
 def checkMemory(lines):
     ram = search('Physical Memory:', lines)
+
+def checkOldVersion(lines):
+    versionLines = search('OBS', lines)
+    if versionLines[0].split()[0] == 'OBS':
+        versionString = versionLines[0].split()[1]
+    else:
+        versionString = versionLines[0].split()[2]
+    if parse_version(versionString)<parse_version(CURRENT_VERSION):
+        return [2, "Old Version", """You are not running the latest version of OBS Studio. Please update by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
 
 
 def checkGPU(lines):
@@ -547,6 +558,7 @@ def doAnalysis(url):
         classic, m = checkClassic(logLines)
         messages.append(m)
         if(not classic):
+            messages.append(checkOldVersion(logLines))
             messages.append(checkDual(logLines))
             messages.append(checkAutoconfig(logLines))
             messages.append(checkCPU(logLines))
