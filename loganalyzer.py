@@ -187,7 +187,7 @@ def checkInit(lines):
 
 def checkKiller(lines):
     if(len(search('Interface: Killer', lines)) > 0):
-        return [1, "Killer NIC", """Killer's Firewall is known for it's poor performance and issues when trying to stream. Please download the driver pack from <a href="http://www.killernetworking.com/driver-downloads/category/other-downloads">the vendor's page</a> , completely uninstall all Killer NIC items and install their Driver only package."""]
+        return [1, "Killer NIC", """Killer's Firewall is known for it's poor performance and issues when trying to stream. Please download the driver pack from <a href="https://www.killernetworking.com/killersupport/driver-downloads/category/other-downloads">the vendor's page</a> , completely uninstall all Killer NIC items and install their Driver only package."""]
 
 
 def checkWifi(lines):
