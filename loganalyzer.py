@@ -437,7 +437,7 @@ def checkVideoSettings(lines):
                         "Framerates other than 30fps or 60fps may lead to playback issues like stuttering or screen tearing. Stick to either of these for better compatibility with video players."])
         if 'Full' in yuv:
             res.append([2, "Wrong YUV Color Range",
-                        """Having the YUV Color range set to "Full" will cause playback issues in certain browsers and on various video plattforms. Shadows, Highlights and color will look off. In OBS, go to "Settings -> Advanced" and set "YUV Color Range" back to "Partial" """])
+                        """Having the YUV Color range set to "Full" will cause playback issues in certain browsers and on various video plattforms. Shadows, highlights and color will look off. In OBS, go to "Settings -> Advanced" and set "YUV Color Range" back to "Partial"."""])
     return res
 
 
