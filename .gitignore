@@ -102,3 +102,6 @@ ENV/
 
 # temporary files
 *.swp
+
+# idea stuff
+.idea/

@@ -421,6 +421,7 @@ def checkVideoSettings(lines):
         outx, outy = lines[videoSettings[-1] + 2].split()[-1].split('x')
         fps_num, fps_den = lines[videoSettings[-1] + 4].split()[-1].split('/')
         fmt = lines[videoSettings[-1] + 5].split()[-1]
+        yuv = lines[videoSettings[-1] + 6].split()[-1]
         baseAspect = float(basex) / float(basey)
         outAspect = float(outx) / float(outy)
         fps = float(fps_num) / float(fps_den)
@@ -434,6 +435,9 @@ def checkVideoSettings(lines):
         if (not ((fps == 60) or (fps == 30))):
             res.append([2, "Non-Standard Framerate",
                         "Framerates other than 30fps or 60fps may lead to playback issues like stuttering or screen tearing. Stick to either of these for better compatibility with video players."])
+        if 'Full' in yuv:
+            res.append([2, "Wrong YUV Color Range",
+                        """Having the YUV Color range set to "Full" will cause playback issues in certain browsers and on various video plattforms. Shadows, Highlights and color will look off. In OBS, go to "Settings -> Advanced" and set "YUV Color Range" back to "Partial" """])
     return res
 
 
