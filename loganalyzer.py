@@ -171,7 +171,7 @@ def checkGPU(lines):
     if (len(d3dAdapter) > 0):
         if (len(adapters) == 2 and ('Intel' in d3dAdapter[0])):
             return [3, "Wrong GPU",
-                    """Your Laptop has two GPUs. OBS is running on the weak integrated Intel GPU. For better performance as well as game capture being available you should run OBS on the dedicated GPU. Check the <a href="https://obsproject.com/wiki/Laptop-Performance-Issues">Laptop Troubleshooting Guide</a>."""]
+                    """Your Laptop has two GPUs. OBS is running on the weak integrated Intel GPU. For better performance as well as game capture being available you should run OBS on the dedicated GPU. Check the <a href="https://obsproject.com/wiki/Laptop-Troubleshooting">Laptop Troubleshooting Guide</a>."""]
         elif (len(adapters) == 1 and ('Intel' in adapters[0])):
             return [2, "Integrated GPU",
                     "OBS is running on an Intel iGPU. This hardware is generally not powerful enough to be used for both gaming and running obs. Situations where only sources from e.g. cameras and capture cards are used might work."]
