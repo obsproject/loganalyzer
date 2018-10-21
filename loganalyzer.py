@@ -182,6 +182,15 @@ def checkMicrosoftSoftwareGPU(lines):
         return [3, "No GPU driver available",
                 "Your GPU is using the Microsoft Basic Render Driver, which is a pure software render. This will cause very high CPU load when used with OBS. Make sure to install proper drivers for your GPU. To use OBS in a virtual machine, you need to enable GPU passthrough."]
 
+def checkGamingFeatures(lines):
+    features = 0
+    features += len(search('Game Bar: On', lines))
+    features += len(search('Game DVR: On', lines))
+    features += len(search('Game DVR Background Recording: On', lines))
+    if features > 0:
+        return [2, "Windows 10 Gaming Features",
+                    "Certain Windows 10 Gaming features are turned on and interfere with OBS by putting additional load on your CPU and GPU. Please disable Game bar, Game DVR and Game DVR Background Recording via Windows Settings app."]
+    
 
 def checkNVENC(lines):
     msgs = search("Failed to open NVENC codec", lines)
@@ -631,6 +640,7 @@ def doAnalysis(url):
             messages.append(checkStreamSettingsX264(logLines))
             messages.append(checkStreamSettingsNVENC(logLines))
             messages.append(checkMicrosoftSoftwareGPU(logLines))
+            messages.append(checkGamingFeatures(logLines))
             m = checkVideoSettings(logLines)
             for sublist in m:
                 if sublist is not None:
