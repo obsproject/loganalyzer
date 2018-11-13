@@ -620,7 +620,7 @@ def doAnalysis(url):
             messages.append(checkAMDdrivers(logLines))
             messages.append(checkGPU(logLines))
             messages.append(checkInit(logLines))
-            messages.append(checkElements(logLines))
+            #messages.append(checkElements(logLines))
             messages.append(checkNVENC(logLines))
             messages.append(check940(logLines))
             messages.append(checkKiller(logLines))
