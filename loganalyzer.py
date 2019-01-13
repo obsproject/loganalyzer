@@ -182,6 +182,12 @@ def checkMicrosoftSoftwareGPU(lines):
         return [3, "No GPU driver available",
                 "Your GPU is using the Microsoft Basic Render Driver, which is a pure software render. This will cause very high CPU load when used with OBS. Make sure to install proper drivers for your GPU. To use OBS in a virtual machine, you need to enable GPU passthrough."]
 
+def checkOpenGLonWindows(lines):
+    opengl = search('Warning: The OpenGL renderer is currently in use.', lines)
+    if (len(opengl) > 0):
+        return [3, "OpenGL Renderer",
+                    "The OpenGL renderer should not be used on Windows, as it is not well optimized and can have visual artefacting. Switch back to the Direct3D renderer in Settings > Advanced."]
+
 def checkGamingFeatures(lines):
     features = 0
     features += len(search('Game Bar: On', lines))
@@ -640,6 +646,7 @@ def doAnalysis(url):
             messages.append(checkStreamSettingsX264(logLines))
             messages.append(checkStreamSettingsNVENC(logLines))
             messages.append(checkMicrosoftSoftwareGPU(logLines))
+            messages.append(checkOpenGLonWindows(logLines))
             messages.append(checkGamingFeatures(logLines))
             m = checkVideoSettings(logLines)
             for sublist in m:
