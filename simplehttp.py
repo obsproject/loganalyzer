@@ -92,14 +92,15 @@ def getDescr(messages):
             res = i[2]
     return res
 
+no_log = "Please analyze a log first."
 
 def genEmptyResponse():
     response_body = htmlTemplate.format(ph="",
                                         description="no log",
-                                        summary_critical="Please analyze log first.",
-                                        summary_warning="Please analyze log first.",
-                                        summary_info="Please analyze log first.",
-                                        details="""<p class="text-warning">Please analyze log first.</p>""")
+                                        summary_critical=no_log,
+                                        summary_warning=no_log,
+                                        summary_info=no_log,
+                                        details="""<p class="text-warning">""" + no_log + """</p>""")
     return response_body
 
 
