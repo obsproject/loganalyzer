@@ -32,6 +32,12 @@ def getSummaryHTML(messages):
             info = info + """<p><a href="#""" + \
                 i[1] + """"><button type="button" class="btn btn-info">""" + \
                 i[1] + "</button></a></p>\n"
+    if(len(critical) == 0):
+        critical = "No critical issues."
+    if(len(warning) == 0):
+        warning = "No warnings."
+    if(len(info) == 0):
+        info = "-"
     return critical, warning, info
 
 
