@@ -419,11 +419,20 @@ def checkStreamSettingsNVENC(lines):
         if "[NVENC encoder: 'streaming_h264'] settings:" in s:
             streamingSessions.append(i)
     if (len(streamingSessions) > 0):
-        bitrate = float(lines[streamingSessions[-1] + 2].split()[-1])
-        fps_num = float(lines[streamingSessions[-1] + 4].split()[-1]) / 2
-        width = float(lines[streamingSessions[-1] + 8].split()[-1])
-        height = float(lines[streamingSessions[-1] + 9].split()[-1])
-
+        bitrate = 0
+        fps_num = 0
+        width = 0
+        height = 0
+        for i in range(12):
+            chunks = lines[streamingSessions[-1] + i].split()
+            if (chunks[-2] == 'bitrate:'): 
+                bitrate = float(chunks[-1])
+            elif (chunks[-2] == 'keyint:'): 
+                fps_num = float(chunks[-1])
+            elif (chunks[-2] == 'width:'): 
+                width = float(chunks[-1])
+            elif (chunks[-2] == 'height:'): 
+                height = float(chunks[-1])
         bitrateEstimate = (width * height * fps_num) / 20000
         if (bitrate < bitrateEstimate):
             return [1, "Low Stream Bitrate",
