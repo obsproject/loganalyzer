@@ -200,7 +200,7 @@ def checkGamingFeatures(lines):
     features += len(search('Game DVR Background Recording: On', lines))
     if features > 0:
         return [2, "Windows 10 Gaming Features",
-                    """Certain Windows 10 Gaming features are turned on and interfere with OBS by putting additional load on your CPU and GPU. We recommend disabling them when using OBS via <a href="https://obsproject.com/wiki/How-to-disable-Windows-10-Game-Mode">these instructions</a>.<br><br>These features are designed to provide the most performance to your game by lowering GPU priority of other applications, which would be fine if OBS didn't need a tiny bit of GPU to function."""]
+                    """Certain Windows 10 Gaming features are turned on and interfere with OBS by putting additional load on your CPU and GPU. We recommend disabling them when using OBS via <a href="https://obsproject.com/wiki/How-to-disable-Windows-10-Gaming-Features">these instructions</a>.<br><br>These features are designed to provide the most performance to your game by lowering GPU priority of other applications, which would be fine if OBS didn't need a tiny bit of GPU to function."""]
     
 
 def checkNVENC(lines):
