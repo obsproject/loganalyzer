@@ -163,6 +163,9 @@ def checkOldVersion(lines):
     elif versionString.startswith('22.0.2-26'):
         return [1, "Beta OBS Version",
                 """You are running a beta build of OBS Studio."""]
+    elif versionString.startswith('23.0.0-rc'):
+        return [1, "Release Candidate", 
+        """You are running a release candidate version of OBS Studio."""]
     elif parse_version(versionString) < parse_version(CURRENT_VERSION):
         return [2, "Old Version",
                 """You are not running the latest version of OBS Studio. Please update by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
