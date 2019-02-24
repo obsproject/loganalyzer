@@ -153,14 +153,19 @@ def checkOldVersion(lines):
     versionLines = search('OBS', lines)
     if versionLines[0].split()[0] == 'OBS':
         versionString = versionLines[0].split()[1]
+    elif versionLines[0].split()[2] == 'OBS':
+        versionString = versionLines[0].split()[3]
     else:
         versionString = versionLines[0].split()[2]
     if parse_version(versionString) == parse_version('21.1.0'):
         return [2, "Broken Auto-Update",
                 """You are not running the latest version of OBS Studio. Automatic updates in version 21.1.0 are broken due to a bug. <br>Please update by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
     elif versionString.startswith('22.0.2-26'):
-        return [2, "Beta OBS Version",
+        return [1, "Beta OBS Version",
                 """You are running a beta build of OBS Studio."""]
+    elif versionString.startswith('23.0.0-rc'):
+        return [1, "Release Candidate", 
+        """You are running a release candidate version of OBS Studio."""]
     elif parse_version(versionString) < parse_version(CURRENT_VERSION):
         return [2, "Old Version",
                 """You are not running the latest version of OBS Studio. Please update by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
