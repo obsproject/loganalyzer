@@ -153,6 +153,8 @@ def checkOldVersion(lines):
     versionLines = search('OBS', lines)
     if versionLines[0].split()[0] == 'OBS':
         versionString = versionLines[0].split()[1]
+    elif versionLines[0].split()[2] == 'OBS':
+        versionString = versionLines[0].split()[3]
     else:
         versionString = versionLines[0].split()[2]
     if parse_version(versionString) == parse_version('21.1.0'):
