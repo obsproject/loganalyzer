@@ -305,7 +305,7 @@ def checkPreset(lines):
             sensiblePreset = False
 
     if ((len(encoderLines) > 0) and (not sensiblePreset)):
-        return [2, "Wrong Preset",
+        return [1, "Non-Default x264 Preset",
                 "A slower x264 preset than 'veryfast' is in use. It is recommended to leave this value on veryfast, as there are significant diminishing returns to setting it lower. It can also result in very poor gaming performance on the system if you're not using a 2 PC setup."]
 
 
