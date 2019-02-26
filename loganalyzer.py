@@ -17,7 +17,7 @@ RESET = "\033[0;0m"
 BOLD = "\033[;1m"
 REVERSE = "\033[;7m"
 
-CURRENT_VERSION = '22.0.2'
+CURRENT_VERSION = '23.0.0'
 
 
 # error levels:
