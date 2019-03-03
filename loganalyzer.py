@@ -526,9 +526,9 @@ def parseScenes(lines):
         higher = 0
         for s in sceneLines:
             if (s != sceneLines[-1]):
-                higher = getNextPos(s, sceneLines) - 1
+                higher = getNextPos(s, sceneLines)
             else:
-                higher = getNextPos(s, sections) - 1
+                higher = getNextPos(s, sections)
             m, h = checkSources(s, higher, lines)
             if (not hit):
                 ret.append(m)
