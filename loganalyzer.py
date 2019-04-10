@@ -385,6 +385,12 @@ def checkRendering(lines):
                 """Your GPU is maxed out and OBS can't render scenes fast enough. Running a game without vertical sync or a frame rate limiter will frequently cause performance issues with OBS because your GPU will be maxed out. OBS requires a little GPU to render your scene. <br><br>Enable Vsync or set a reasonable frame rate limit that your GPU can handle without hitting 100% usage. <br>If that's not enough you may also need to turn down some of the video quality options in the game. If you are experiencing issues in general while using OBS, your GPU may be overloaded for the settings you are trying to use. <br>Please check our guide for ideas why this may be happening, and steps you can take to correct it: <a href="https://obsproject.com/wiki/GPU-overload-issues">GPU Overload Issues</a>."""]
 
 
+def checkEncodeError(lines):
+    if (len(search('Error encoding with encoder', lines)) > 0):
+        return [1, "Encoder start error",
+                """An encoder failed to start. This could result in a bitrate stuck at 0 or OBS stuck on "Stopping Recording". Depending on your encoder, try updating your drivers. If you're using QSV, make sure your iGPU is enabled. If that still doesn't help, try switching to a different encoder in Settings -> Output."""]
+
+
 def checkEncoding(lines):
     drops = search('skipped frames', lines)
     val = 0
@@ -667,6 +673,7 @@ def doAnalysis(url):
             messages.append(checkAudio(logLines))
             messages.append(checkDrop(logLines))
             messages.append(checkRendering(logLines))
+            messages.append(checkEncodeError(logLines))
             messages.append(checkEncoding(logLines))
             messages.append(checkMulti(logLines))
             messages.append(checkStreamSettingsX264(logLines))
