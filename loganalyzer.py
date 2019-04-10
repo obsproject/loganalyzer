@@ -279,6 +279,12 @@ def checkAMDdrivers(lines):
                 """The AMF Runtime is very old and unsupported. The AMF Encoder will no work properly or not show up at all. Consider updating your drivers by downloading the newest installer from <a href="https://support.amd.com/en-us/download">AMD's website</a>. """]
 
 
+def checkNVIDIAdrivers(lines):
+    if (len(search('[jim-nvenc] Current driver version does not support this NVENC version, please upgrade your driver', lines)) > 0):
+        return [2, "Old NVIDIA Drivers",
+                """The installed NVIDIA driver does not support NVENC features needed for optimized encoders. Consider updating your drivers by downloading the newest installer from<a href="https://www.nvidia.de/Download/index.aspx">NVIDIA's website</a>. """]
+
+
 def checkMP4(lines):
     writtenFiles = search('Writing file ', lines)
     mp4 = search('.mp4', writtenFiles)
@@ -643,6 +649,7 @@ def doAnalysis(url):
             messages.append(checkAutoconfig(logLines))
             messages.append(checkCPU(logLines))
             messages.append(checkAMDdrivers(logLines))
+            messages.append(checkNVIDIAdrivers(logLines))
             messages.append(checkGPU(logLines))
             messages.append(checkInit(logLines))
             #messages.append(checkElements(logLines))
