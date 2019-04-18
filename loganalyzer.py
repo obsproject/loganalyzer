@@ -474,13 +474,13 @@ def checkVideoSettings(lines):
         if ((not ((1.77 < baseAspect) and (baseAspect < 1.7787))) or
                 (not ((1.77 < outAspect) and (outAspect < 1.7787)))):
             res.append([2, "Non-Standard Aspect Ratio",
-                        "Almost all modern streaming services and video platforms expect video in 16:9 aspect ratio. OBS is currently configured to record in an aspect ration that differs from that. You (or your viewers) will see black bars during playback."])
+                        "Almost all modern streaming services and video platforms expect video in 16:9 aspect ratio. OBS is currently configured to record in an aspect ration that differs from that. You (or your viewers) will see black bars during playback. Go to Settings -> Video and change your Canvas Resolution to one that is 16:9."])
         if (fmt != 'NV12'):
             res.append([3, "Wrong Color Format",
-                        "Color Formats other than NV12 are primarily intended for recording, and are not recommended when streaming. Streaming may incur increased CPU usage due to color format conversion."])
+                        "Color Formats other than NV12 are primarily intended for recording, and are not recommended when streaming. Streaming may incur increased CPU usage due to color format conversion. You can change your Color Format in Settings -> Advanced."])
         if (not ((fps == 60) or (fps == 30))):
             res.append([2, "Non-Standard Framerate",
-                        "Framerates other than 30fps or 60fps may lead to playback issues like stuttering or screen tearing. Stick to either of these for better compatibility with video players."])
+                        "Framerates other than 30fps or 60fps may lead to playback issues like stuttering or screen tearing. Stick to either of these for better compatibility with video players. You can change your OBS frame rate in Settings -> Video."])
         if 'Full' in yuv:
             res.append([2, "Wrong YUV Color Range",
                         """Having the YUV Color range set to "Full" will cause playback issues in certain browsers and on various video platforms. Shadows, highlights and color will look off. In OBS, go to "Settings -> Advanced" and set "YUV Color Range" back to "Partial"."""])
