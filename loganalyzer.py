@@ -324,6 +324,10 @@ def checkCustom(lines):
 
 def checkAudio(lines):
     buffering = search('total audio buffering is now', lines)
+    maxBuffering = search('Max audio buffering reached!', lines)
+    if (len(maxBuffering) > 0):
+        return [3, "Max Audio Buffering",
+                "Audio buffering hit the maximum value. This is an indicator of very high system load, will affect stream latency, and may even cause individual audio sources to stop working. Keep an eye on CPU usage especially, and close background programs if needed. Restart OBS to reset buffering."]
     vals = []
     if (len(buffering) > 0):
         for i in buffering:
