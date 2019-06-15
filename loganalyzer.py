@@ -19,7 +19,6 @@ REVERSE = "\033[;7m"
 
 CURRENT_VERSION = '23.2.1'
 
-
 # error levels:
 # 1 = info
 # 2 = warning
@@ -148,8 +147,7 @@ def checkCPU(lines):
 def checkMemory(lines):
     ram = search('Physical Memory:', lines)
 
-
-def checkOldVersion(lines):
+def getOBSVersion(lines):
     versionLines = search('OBS', lines)
     if versionLines[0].split()[0] == 'OBS':
         versionString = versionLines[0].split()[1]
@@ -157,6 +155,11 @@ def checkOldVersion(lines):
         versionString = versionLines[0].split()[3]
     else:
         versionString = versionLines[0].split()[2]
+    return versionString
+
+
+def checkOldVersion(lines):
+    versionString = getOBSVersion(lines)
     if parse_version(versionString) == parse_version('21.1.0'):
         return [2, "Broken Auto-Update",
                 """You are not running the latest version of OBS Studio. Automatic updates in version 21.1.0 are broken due to a bug. <br>Please update by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
@@ -172,16 +175,27 @@ def checkOldVersion(lines):
 
 
 def checkGPU(lines):
-    adapters = search('Adapter 1', lines)
-    try:
-        adapters.append(search('Adapter 2', lines)[0])
-    except IndexError:
-        pass
+    versionString = getOBSVersion(lines)
+    if parse_version(versionString) < parse_version('23.2.1'):
+        adapters = search('Adapter 1', lines)
+        try:
+            adapters.append(search('Adapter 2', lines)[0])
+        except IndexError:
+            pass
+    else:
+        adapters = search('Adapter 0', lines)
+        try:
+            adapters.append(search('Adapter 1', lines)[0])
+        except IndexError:
+            pass
     d3dAdapter = search('Loading up D3D11', lines)
     if (len(d3dAdapter) > 0):
         if (len(adapters) == 2 and ('Intel' in d3dAdapter[0])):
             return [3, "Wrong GPU",
                     """Your Laptop has two GPUs. OBS is running on the weak integrated Intel GPU. For better performance as well as game capture being available you should run OBS on the dedicated GPU. Check the <a href="https://obsproject.com/wiki/Laptop-Troubleshooting">Laptop Troubleshooting Guide</a>."""]
+        if (len(adapters) == 2 and ('Vega' in d3dAdapter[0])):
+            return [3, "Wrong GPU",
+                    """Your Laptop has two GPUs. OBS is running on the weak integrated AMD Vega GPU. For better performance as well as game capture being available you should run OBS on the dedicated GPU. Check the <a href="https://obsproject.com/wiki/Laptop-Troubleshooting">Laptop Troubleshooting Guide</a>."""]
         elif (len(adapters) == 1 and ('Intel' in adapters[0])):
             return [2, "Integrated GPU",
                     "OBS is running on an Intel iGPU. This hardware is generally not powerful enough to be used for both gaming and running obs. Situations where only sources from e.g. cameras and capture cards are used might work."]
