@@ -499,6 +499,9 @@ def checkVideoSettings(lines):
         if (not ((fps == 60) or (fps == 30))):
             res.append([2, "Non-Standard Framerate",
                         "Framerates other than 30fps or 60fps may lead to playback issues like stuttering or screen tearing. Stick to either of these for better compatibility with video players. You can change your OBS frame rate in Settings -> Video."])
+        if (fps >= 144):
+            res.append([2, "Excessively High Framerate",
+                        "Recording at a tremendously high framerate will not give you higher quality recordings. Usually quite the opposite. Most computers cannot handle encoding at high framerates. You can change your OBS frame rate in Settings -> Video."])
         if 'Full' in yuv:
             res.append([2, "Wrong YUV Color Range",
                         """Having the YUV Color range set to "Full" will cause playback issues in certain browsers and on various video platforms. Shadows, highlights and color will look off. In OBS, go to "Settings -> Advanced" and set "YUV Color Range" back to "Partial"."""])
