@@ -305,7 +305,7 @@ def checkMP4(lines):
     mov = search('.mov', writtenFiles)
     if (len(mp4) > 0 or len(mov) > 0):
         return [3, "MP4/MOV Recording",
-                "If you record to MP4 or MOV and the recording is interrupted, the file will be corrupted and unrecoverable. <br><br>If you require MP4 files for some other purpose like editing, remux them afterwards by selecting File > Remux Recordings in the main OBS Studio window."]
+                "Record to FLV or MKV. If you record to MP4 or MOV and the recording is interrupted, the file will be corrupted and unrecoverable. <br><br>If you require MP4 files for some other purpose like editing, remux them afterwards by selecting File > Remux Recordings in the main OBS Studio window."]
 
 
 def checkAttempt(lines):
