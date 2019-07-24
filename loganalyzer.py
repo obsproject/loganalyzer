@@ -147,19 +147,29 @@ def checkCPU(lines):
 def checkMemory(lines):
     ram = search('Physical Memory:', lines)
 
-def getOBSVersion(lines):
+
+def getOBSVersionLine(lines):
     versionLines = search('OBS', lines)
-    if versionLines[0].split()[0] == 'OBS':
-        versionString = versionLines[0].split()[1]
-    elif versionLines[0].split()[2] == 'OBS':
-        versionString = versionLines[0].split()[3]
+    correctLine = 0
+    if 'already running' in versionLines[correctLine]:
+        correctLine += 1
+    if 'multiple instances' in versionLines[correctLine]:
+        correctLine += 1
+    return versionLines[correctLine]
+
+def getOBSVersionString(lines):
+    versionLine = getOBSVersionLine(lines)
+    if versionLine.split()[0] == 'OBS':
+        versionString = versionLine.split()[1]
+    elif versionLine.split()[2] == 'OBS':
+        versionString = versionLine.split()[3]
     else:
-        versionString = versionLines[0].split()[2]
+        versionString = versionLine.split()[2]
     return versionString
 
 
 def checkOldVersion(lines):
-    versionString = getOBSVersion(lines)
+    versionString = getOBSVersionString(lines)
     if parse_version(versionString) == parse_version('21.1.0'):
         return [2, "Broken Auto-Update",
                 """You are not running the latest version of OBS Studio. Automatic updates in version 21.1.0 are broken due to a bug. <br>Please update by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
@@ -175,7 +185,7 @@ def checkOldVersion(lines):
 
 
 def checkGPU(lines):
-    versionString = getOBSVersion(lines)
+    versionString = getOBSVersionString(lines)
     if parse_version(versionString) < parse_version('23.2.1'):
         adapters = search('Adapter 1', lines)
         try:
@@ -270,12 +280,11 @@ def checkAdmin(lines):
 
 def check32bitOn64bit(lines):
     winVersion = search('Windows Version', lines)
-    obsVersion = search('OBS', lines)
+    obsVersion = getOBSVersionLine(lines)
     if (len(winVersion) > 0
-            and len(obsVersion) > 0
             and '64-bit' in winVersion[0]
-            and '64-bit' not in obsVersion[0]
-            and '64bit' not in obsVersion[0]):
+            and '64-bit' not in obsVersion
+            and '64bit' not in obsVersion):
         # thx to secretply for the bugfix
         return [2, "32-bit OBS on 64-bit Windows",
                 "You are running the 32 bit version of OBS on a 64 bit system. This will reduce performance and greatly increase the risk of crashes due to memory limitations. You should only use the 32 bit version if you have a capture device that lacks 64 bit drivers. Please run OBS using the 64-bit shortcut."]
