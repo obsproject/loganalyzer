@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
+import argparse
+import datetime
+import json
 import re
 import requests
-import json
-import argparse
+import sys
 import textwrap
+
 from pkg_resources import parse_version
 
 RED = "\033[1;31m"
@@ -17,7 +20,7 @@ RESET = "\033[0;0m"
 BOLD = "\033[;1m"
 REVERSE = "\033[;7m"
 
-CURRENT_VERSION = '24.0.1'
+CURRENT_VERSION = '24.0.3'
 
 LEVEL_INFO = 1
 LEVEL_WARNING = 2
@@ -99,6 +102,14 @@ def getRawDiscord(obslogId):
 def getLinesDiscord(obslogText):
     return obslogText.split('\n')
 
+
+# local file
+def getLinesLocal(filename):
+    try:
+        with open(filename, "r") as f:
+            return f.readlines()
+    except:
+        return
 
 # other functions
 # --------------------------------------
@@ -275,6 +286,163 @@ def checkBind(lines):
                 """Binding to a manually chosen IP address is rarely needed. Go to Settings → Advanced → Network and set "Bind to IP" back to "Default"."""]
 
 
+# Log line examples:
+# win 7: 19:39:17.395: Windows Version: 6.1 Build 7601 (revision: 24535; 64-bit)
+# win 10: 22:29:11.437: Windows Version: 10.0 Build 18362 (revision: 535; 64-bit)
+def getWindowsVersionLine(lines):
+    versionLines = search('Windows Version:', lines)
+    if len(versionLines) > 0:
+        return versionLines[0]
+
+
+winver_re = re.compile(r"""
+    (?i)
+    Windows\sVersion: \s+ (?P<version>[0-9.]+)
+    \s+
+    Build \s+ (?P<build>\d+)
+    \s+
+    \(
+        revision: \s+ (?P<revision>\d+);
+        \s+
+        (?P<bits>\d+)-bit
+    \)
+    """, re.VERBOSE)
+
+# I guess I'll call the Win10 sub-versions "releases", even though Microsoft
+# calls them "versions" because Win10 is also "Version 10.0" and seriously wtf.
+#
+# We probably don't need all the info here, but since I'm creating the data
+# table anyhow, it's basically free to add the extra data.
+win10versions = {
+    10240: {
+        "release": 1507,
+        "name": "Windows 10 1507",
+        "date": datetime.date(2015, 7, 29),
+        "EoS": datetime.date(2017, 5, 9),
+    },
+    10586: {
+        "release": 1511,
+        "name": "Windows 10 1511",
+        "date": datetime.date(2015, 11, 10),
+        "EoS": datetime.date(2017, 10, 10),
+    },
+    14393: {
+        "release": 1607,
+        "name": "Windows 10 1607",
+        "date": datetime.date(2016, 8, 2),
+        "EoS": datetime.date(2018, 4, 10),
+    },
+    15063: {
+        "release": 1703,
+        "name": "Windows 10 1703",
+        "date": datetime.date(2017, 4, 5),
+        "EoS": datetime.date(2018, 10, 9),
+    },
+    16299: {
+        "release": 1709,
+        "name": "Windows 10 1709",
+        "date": datetime.date(2017, 10, 17),
+        "EoS": datetime.date(2019, 4, 9),
+    },
+    17134: {
+        "release": 1803,
+        "name": "Windows 10 1803",
+        "date": datetime.date(2018, 4, 30),
+        "EoS": datetime.date(2019, 11, 12),
+    },
+    17763: {
+        "release": 1809,
+        "name": "Windows 10 1809",
+        "date": datetime.date(2018, 11, 13),
+        "EoS": datetime.date(2020, 5, 12),
+    },
+    18362: {
+        "release": 1903,
+        "name": "Windows 10 1903",
+        "date": datetime.date(2019, 5, 21),
+        "EoS": datetime.date(2020, 12, 8),
+    },
+    18363: {
+        "release": 1909,
+        "name": "Windows 10 1909",
+        "date": datetime.date(2019, 11, 12),
+        "EoS": datetime.date(2021, 5, 11),
+    },
+}
+
+winversions = {
+    "6.1": {
+        "name": "Windows 7",
+        "date": datetime.date(2012, 10, 26),
+        "EoS": datetime.date(2020, 1, 14),
+    },
+    "6.2": {
+        "name": "Windows 8",
+        "date": datetime.date(2013, 10, 17),
+        "EoS": datetime.date(2016, 1, 12),
+    },
+    "6.3": {
+        "name": "Windows 8.1",
+        "date": datetime.date(2013, 10, 17),
+        "EoS": datetime.date(2023, 1, 10),
+    },
+}
+
+
+def getWindowsVersion(lines):
+    versionLine = getWindowsVersionLine(lines)
+
+    if not versionLine:
+        return
+
+    m = winver_re.search(versionLine)
+    if not m:
+        return
+
+    ver = {
+        "version": m.group("version"),
+        "build": int(m.group("build")),
+        "revision": int(m.group("revision")),
+        "bits": int(m.group("bits"))
+    }
+
+    # Older naming/numbering/etc
+    if ver["version"] in winversions:
+        v = winversions[ver["version"]]
+        ver.update(v)
+        return ver
+
+    if ver["version"] == "10.0":
+        if ver["build"] in win10versions:
+            v = win10versions[ver["build"]]
+            ver.update(v)
+        return ver
+
+    return
+
+
+def checkWindowsVer(lines):
+    verinfo = getWindowsVersion(lines)
+    if not verinfo:
+        return
+
+    # This is such a hack, but it's unclear how to do this better
+    if verinfo["version"] == "10.0" and "release" not in verinfo:
+        msg = "You are running an unknown Windows 10 release (build %d), which means you are probably using an 'insider' build. Becaue insider builds are test versions, you may have problems that would not happen with release versions of windows." % (
+            verinfo["build"])
+        return[LEVEL_WARNING, "Windows 10 Version Unknown", msg]
+
+    if "EoS" in verinfo and datetime.date.today() > verinfo["EoS"]:
+        msg = "You are running %s, which has not been supported by Microsoft since %s. We recommend updating to the latest Windows release to insure continued security, functionality, and compatibility." % (
+            verinfo["name"], verinfo["EoS"].strftime("%Y-%m-%d"))
+        return [LEVEL_WARNING, "Windows Version Outdated", msg]
+
+    # else
+    msg = "You are running %s, which is supported by microsoft until %s" % (
+        verinfo["name"], verinfo["EoS"].strftime("%Y-%m-%d"))
+    return [LEVEL_INFO, "Windows Version OK", msg]
+
+
 def checkAdmin(lines):
     adminlines = search('Running as administrator', lines)
     if ((len(adminlines) > 0) and (adminlines[0].split()[-1] == 'false')):
@@ -285,10 +453,10 @@ def checkAdmin(lines):
 def check32bitOn64bit(lines):
     winVersion = search('Windows Version', lines)
     obsVersion = getOBSVersionLine(lines)
-    if (len(winVersion) > 0 and
-            '64-bit' in winVersion[0] and
-            '64-bit' not in obsVersion and
-            '64bit' not in obsVersion):
+    if (len(winVersion) > 0
+            and '64-bit' in winVersion[0]
+            and '64-bit' not in obsVersion
+            and '64bit' not in obsVersion):
         # thx to secretply for the bugfix
         return [LEVEL_WARNING, "32-bit OBS on 64-bit Windows",
                 "You are running the 32 bit version of OBS on a 64 bit system. This will reduce performance and greatly increase the risk of crashes due to memory limitations. You should only use the 32 bit version if you have a capture device that lacks 64 bit drivers. Please run OBS using the 64-bit shortcut."]
@@ -502,8 +670,8 @@ def checkVideoSettings(lines):
         baseAspect = float(basex) / float(basey)
         outAspect = float(outx) / float(outy)
         fps = float(fps_num) / float(fps_den)
-        if ((not ((1.77 < baseAspect) and (baseAspect < 1.7787)))
-                or (not ((1.77 < outAspect) and (outAspect < 1.7787)))):
+        if ((not ((1.77 < baseAspect) and (baseAspect < 1.7787))) or
+                (not ((1.77 < outAspect) and (outAspect < 1.7787)))):
             res.append([LEVEL_WARNING, "Non-Standard Aspect Ratio",
                         "Almost all modern streaming services and video platforms expect video in 16:9 aspect ratio. OBS is currently configured to record in an aspect ration that differs from that. You (or your viewers) will see black bars during playback. Go to Settings -> Video and change your Canvas Resolution to one that is 16:9."])
         if (fmt != 'NV12'):
@@ -598,19 +766,19 @@ def textOutput(string):
 
 def getSummary(messages):
     summary = ""
-    critical = ""
-    warning = ""
-    info = ""
+    critical = []
+    warning = []
+    info = []
     for i in messages:
-        if (i[0] == 3):
-            critical = critical + i[1] + ", "
-        elif (i[0] == 2):
-            warning = warning + i[1] + ", "
-        elif (i[0] == 1):
-            info = info + i[1] + ", "
-    summary += "{}Critical: {}\n".format(RED, critical)
-    summary += "{}Warning:  {}\n".format(YELLOW, warning)
-    summary += "{}Info:     {}\n".format(CYAN, info)
+        if (i[0] == LEVEL_CRITICAL):
+            critical.append(i[1])
+        elif (i[0] == LEVEL_WARNING):
+            warning.append(i[1])
+        elif (i[0] == LEVEL_INFO):
+            info.append(i[1])
+    summary += "{}Critical: {}\n".format(RED, ", ".join(critical))
+    summary += "{}Warning:  {}\n".format(YELLOW, ", ".join(warning))
+    summary += "{}Info:     {}\n".format(CYAN, ", ".join(info))
     return summary
 
 
@@ -638,48 +806,58 @@ def getResults(messages):
         if (i[0] == 1):
             results += "\n{}{}\n".format(CYAN, i[1])
             results += textOutput(i[2])
+
+    results += "{} \n".format(RESET)
     return results
 
 
-def doAnalysis(url):
+def doAnalysis(flags):
     messages = []
     success = False
     logLines = []
-    matchGist = re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))", url)
-    matchHaste = re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))", url)
-    matchObs = re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}(www\.)?obsproject\.com)/logs/)(.{16}))", url)
-    matchPastebin = re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}(www\.)?pastebin\.com/))(.{8}))", url)
-    matchDiscord = re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18}/[0-9]{18}/[0-9\-\_]{19}.txt))", url)
-    if (matchGist):
-        gistObject = getGist(matchGist.groups()[-1])
-        logLines = getLinesGist(gistObject)
-        messages.append(getDescriptionGist(gistObject))
-        success = True
-    elif (matchHaste):
-        hasteObject = getHaste(matchHaste.groups()[-1])
-        logLines = getLinesHaste(hasteObject)
+
+    if flags.url is not None:
+        matchGist = re.match(
+            r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))", flags.url)
+        matchHaste = re.match(
+            r"(?i)\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))", flags.url)
+        matchObs = re.match(
+            r"(?i)\b((?:https?:(?:/{1,3}(www\.)?obsproject\.com)/logs/)(.{16}))", flags.url)
+        matchPastebin = re.match(
+            r"(?i)\b((?:https?:(?:/{1,3}(www\.)?pastebin\.com/))(.{8}))", flags.url)
+        matchDiscord = re.match(
+            r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18}/[0-9]{18}/[0-9\-\_]{19}.txt))", flags.url)
+        if (matchGist):
+            gistObject = getGist(matchGist.groups()[-1])
+            logLines = getLinesGist(gistObject)
+            messages.append(getDescriptionGist(gistObject))
+            success = True
+        elif (matchHaste):
+            hasteObject = getHaste(matchHaste.groups()[-1])
+            logLines = getLinesHaste(hasteObject)
+            messages.append(getDescription(logLines))
+            success = True
+        elif (matchObs):
+            obslogObject = getObslog(matchObs.groups()[-1])
+            logLines = getLinesObslog(obslogObject)
+            messages.append(getDescription(logLines))
+            success = True
+        elif (matchPastebin):
+            pasteObject = getRawPaste(matchPastebin.groups()[-1])
+            logLines = getLinesPaste(pasteObject)
+            messages.append(getDescription(logLines))
+            success = True
+        elif (matchDiscord):
+            pasteObject = getRawDiscord(matchDiscord.groups()[-1])
+            logLines = getLinesDiscord(pasteObject)
+            messages.append(getDescription(logLines))
+            success = True
+
+    elif flags.file is not None:
+        logLines = getLinesLocal(flags.file)
         messages.append(getDescription(logLines))
         success = True
-    elif (matchObs):
-        obslogObject = getObslog(matchObs.groups()[-1])
-        logLines = getLinesObslog(obslogObject)
-        messages.append(getDescription(logLines))
-        success = True
-    elif (matchPastebin):
-        pasteObject = getRawPaste(matchPastebin.groups()[-1])
-        logLines = getLinesPaste(pasteObject)
-        messages.append(getDescription(logLines))
-        success = True
-    elif (matchDiscord):
-        pasteObject = getRawDiscord(matchDiscord.groups()[-1])
-        logLines = getLinesDiscord(pasteObject)
-        messages.append(getDescription(logLines))
-        success = True
+
     if (success):
         classic, m = checkClassic(logLines)
         messages.append(m)
@@ -698,6 +876,7 @@ def doAnalysis(url):
             messages.append(checkKiller(logLines))
             messages.append(checkWifi(logLines))
             messages.append(checkBind(logLines))
+            messages.append(checkWindowsVer(logLines))
             messages.append(checkAdmin(logLines))
             messages.append(check32bitOn64bit(logLines))
             messages.append(checkAttempt(logLines))
@@ -726,7 +905,7 @@ def doAnalysis(url):
                         messages.append(item)
     else:
         messages.append([LEVEL_CRITICAL, "NO LOG",
-                         "URL doesn't contain a log."])
+                         "URL or file doesn't contain a log."])
     # print(messages)
     ret = [i for i in messages if i is not None]
     # print(ret)
@@ -735,11 +914,15 @@ def doAnalysis(url):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--url", '-u', dest='url',
-                        default="", help="url of gist or haste", required=True)
+    loggroup = parser.add_mutually_exclusive_group(required=True)
+
+    loggroup.add_argument("--url", '-u', dest='url',
+                          default=None, help="url of gist or haste with log")
+    loggroup.add_argument("--file", "-f", dest='file',
+                          default=None, help="local filenamne with log")
     flags = parser.parse_args()
 
-    msgs = doAnalysis(flags.url)
+    msgs = doAnalysis(flags)
     print(getSummary(msgs))
     print(getResults(msgs))
 
