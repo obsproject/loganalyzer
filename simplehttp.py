@@ -43,7 +43,7 @@ def getSummaryHTML(messages):
 
 def genBotResponse(url):
     msgs = []
-    msgs = doAnalysis(url)
+    msgs = doAnalysis(url=url)
     critical = []
     warning = []
     info = []
@@ -92,7 +92,9 @@ def getDescr(messages):
             res = i[2]
     return res
 
+
 no_log = "Please analyze a log first."
+
 
 def genEmptyResponse():
     response_body = htmlTemplate.format(ph="",
@@ -106,7 +108,7 @@ def genEmptyResponse():
 
 def genFullResponse(url):
     msgs = []
-    msgs = doAnalysis(url)
+    msgs = doAnalysis(url=url)
     crit, warn, info = getSummaryHTML(msgs)
     details = getDetailsHTML(msgs)
     response = htmlTemplate.format(ph=url,
