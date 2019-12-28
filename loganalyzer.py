@@ -811,22 +811,22 @@ def getResults(messages):
     return results
 
 
-def doAnalysis(flags):
+def doAnalysis(url=None, filename=None):
     messages = []
     success = False
     logLines = []
 
-    if flags.url is not None:
+    if url is not None:
         matchGist = re.match(
-            r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))", flags.url)
+            r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))", url)
         matchHaste = re.match(
-            r"(?i)\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))", flags.url)
+            r"(?i)\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))", url)
         matchObs = re.match(
-            r"(?i)\b((?:https?:(?:/{1,3}(www\.)?obsproject\.com)/logs/)(.{16}))", flags.url)
+            r"(?i)\b((?:https?:(?:/{1,3}(www\.)?obsproject\.com)/logs/)(.{16}))", url)
         matchPastebin = re.match(
-            r"(?i)\b((?:https?:(?:/{1,3}(www\.)?pastebin\.com/))(.{8}))", flags.url)
+            r"(?i)\b((?:https?:(?:/{1,3}(www\.)?pastebin\.com/))(.{8}))", url)
         matchDiscord = re.match(
-            r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18}/[0-9]{18}/[0-9\-\_]{19}.txt))", flags.url)
+            r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18}/[0-9]{18}/[0-9\-\_]{19}.txt))", url)
         if (matchGist):
             gistObject = getGist(matchGist.groups()[-1])
             logLines = getLinesGist(gistObject)
@@ -853,8 +853,8 @@ def doAnalysis(flags):
             messages.append(getDescription(logLines))
             success = True
 
-    elif flags.file is not None:
-        logLines = getLinesLocal(flags.file)
+    elif filename is not None:
+        logLines = getLinesLocal(filename)
         messages.append(getDescription(logLines))
         success = True
 
@@ -922,7 +922,7 @@ def main():
                           default=None, help="local filenamne with log")
     flags = parser.parse_args()
 
-    msgs = doAnalysis(flags)
+    msgs = doAnalysis(url=flags.url, filename=flags.file)
     print(getSummary(msgs))
     print(getResults(msgs))
 
