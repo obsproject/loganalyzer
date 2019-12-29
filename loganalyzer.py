@@ -433,14 +433,16 @@ def checkWindowsVer(lines):
         return[LEVEL_WARNING, "Windows 10 Version Unknown", msg]
 
     if "EoS" in verinfo and datetime.date.today() > verinfo["EoS"]:
-        msg = "You are running %s, which has not been supported by Microsoft since %s. We recommend updating to the latest Windows release to insure continued security, functionality, and compatibility." % (
+        wv = "%s (EOL)" % (verinfo["name"])
+        msg = "You are running %s, which has not been supported by Microsoft since %s. We recommend updating to the latest Windows release to ensure continued security, functionality, and compatibility." % (
             verinfo["name"], verinfo["EoS"].strftime("%Y-%m-%d"))
-        return [LEVEL_WARNING, "Windows Version Outdated", msg]
+        return [LEVEL_WARNING, wv, msg]
 
     # else
-    msg = "You are running %s, which is supported by microsoft until %s" % (
+    wv = "%s (OK)" % (verinfo["name"])
+    msg = "You are running %s, which will be supported by Microsoft until %s." % (
         verinfo["name"], verinfo["EoS"].strftime("%Y-%m-%d"))
-    return [LEVEL_INFO, "Windows Version OK", msg]
+    return [LEVEL_INFO, wv, msg]
 
 
 def checkAdmin(lines):
