@@ -237,14 +237,26 @@ def checkOpenGLonWindows(lines):
                 "The OpenGL renderer should not be used on Windows, as it is not well optimized and can have visual artifacting. Switch back to the Direct3D renderer in Settings > Advanced."]
 
 
-def checkGamingFeatures(lines):
-    features = 0
-    features += len(search('Game Bar: On', lines))
-    features += len(search('Game DVR: On', lines))
-    features += len(search('Game DVR Background Recording: On', lines))
-    if features > 0:
-        return [LEVEL_WARNING, "Windows 10 Gaming Features",
-                """Certain Windows 10 Gaming features are turned on and interfere with OBS by putting additional load on your CPU and GPU. We recommend disabling them when using OBS via <a href="https://obsproject.com/wiki/How-to-disable-Windows-10-Gaming-Features">these instructions</a>.<br><br>These features are designed to provide the most performance to your game by lowering GPU priority of other applications, which would be fine if OBS didn't need a tiny bit of GPU to function."""]
+def checkGameDVR(lines):
+    if search('Game DVR Background Recording: On', lines):
+        return [LEVEL_WARNING, "Windows 10 Game DVR",
+                """To ensure that OBS Studio has the hardware resources it needs for realtime streaming and recording, we recommend disabling the "Game DVR Background Recording" feature via <a href="https://obsproject.com/wiki/How-to-disable-Windows-10-Gaming-Features#game-dvrcaptures">these instructions</a>."""]
+
+
+def checkGameMode(lines):
+    verinfo = getWindowsVersion(lines)
+
+    if not verinfo or verinfo["version"] != "10.0":
+        return
+
+    if search("Game Mode: On", lines) and verinfo["release"] < 1809:
+        return [LEVEL_WARNING, "Windows 10 Game Mode",
+                """In some versions of Windows 10 (prior to version 1809), the "Game Mode" feature interferes with OBS Studio's normal functionality by starving it of CPU and GPU resources. We recommend disabling it via <a href="https://obsproject.com/wiki/How-to-disable-Windows-10-Gaming-Features#game-mode">these instructions</a>."""]
+
+    # else
+    if search("Game Mode: Off", lines):
+        return [LEVEL_INFO, "Windows 10 Game Mode",
+                """In Windows 10 versions 1809 and newer, we recommend that "Game Mode" be enabled for maximum gaming performance. Game Mode can be enabled via the Windows 10 "Settings" app, under Gaming > Game Mode"""]
 
 
 def checkNVENC(lines):
@@ -895,7 +907,8 @@ def doAnalysis(url=None, filename=None):
             messages.append(checkStreamSettingsNVENC(logLines))
             messages.append(checkMicrosoftSoftwareGPU(logLines))
             messages.append(checkOpenGLonWindows(logLines))
-            messages.append(checkGamingFeatures(logLines))
+            messages.append(checkGameDVR(logLines))
+            messages.append(checkGameMode(logLines))
             m = checkVideoSettings(logLines)
             for sublist in m:
                 if sublist is not None:
