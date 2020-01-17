@@ -156,10 +156,6 @@ def checkCPU(lines):
                     "Your system is below minimum specs for OBS to run and is too underpowered to livestream using software encoding. Livestreams and recordings will only run smoothly if you are using the hardware QuickSync encoder (via Settings -> Output)."]
 
 
-def checkMemory(lines):
-    ram = search('Physical Memory:', lines)
-
-
 def getOBSVersionLine(lines):
     versionLines = search('OBS', lines)
     correctLine = 0
