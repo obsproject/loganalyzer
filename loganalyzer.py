@@ -245,6 +245,9 @@ def checkGameMode(lines):
     if not verinfo or verinfo["version"] != "10.0":
         return
 
+    if verinfo["version"] == "10.0" and "release" not in verinfo:
+        return
+
     if search("Game Mode: On", lines) and verinfo["release"] < 1809:
         return [LEVEL_WARNING, "Windows 10 Game Mode",
                 """In some versions of Windows 10 (prior to version 1809), the "Game Mode" feature interferes with OBS Studio's normal functionality by starving it of CPU and GPU resources. We recommend disabling it via <a href="https://obsproject.com/wiki/How-to-disable-Windows-10-Gaming-Features#game-mode">these instructions</a>."""]
@@ -436,7 +439,7 @@ def checkWindowsVer(lines):
 
     # This is such a hack, but it's unclear how to do this better
     if verinfo["version"] == "10.0" and "release" not in verinfo:
-        msg = "You are running an unknown Windows 10 release (build %d), which means you are probably using an 'insider' build. Becaue insider builds are test versions, you may have problems that would not happen with release versions of windows." % (
+        msg = "You are running an unknown Windows 10 release (build %d), which means you are probably using an Insider build. Some checks that are applicable only to specific Windows versions will not be performed. Also, because Insider builds are test versions, you may have problems that would not happen with release versions of Windows." % (
             verinfo["build"])
         return[LEVEL_WARNING, "Windows 10 Version Unknown", msg]
 
