@@ -379,6 +379,10 @@ win10versions = {
         "date": datetime.date(2019, 11, 12),
         "EoS": datetime.date(2021, 5, 11),
     },
+    19041: {
+        "release": 2004,
+        "name": "Windows 10 2004",
+    },
 }
 
 winversions = {
@@ -451,8 +455,13 @@ def checkWindowsVer(lines):
 
     # else
     wv = "%s (OK)" % (verinfo["name"])
-    msg = "You are running %s, which will be supported by Microsoft until %s." % (
-        verinfo["name"], verinfo["EoS"].strftime("%Y-%m-%d"))
+    if "EoS" in verinfo:
+        msg = "You are running %s, which will be supported by Microsoft until %s." % (
+            verinfo["name"], verinfo["EoS"].strftime("%Y-%m-%d"))
+    else:
+        msg = "You are running %s, for which Microsoft has not yet announced an end of life date." % (
+            verinfo["name"])
+
     return [LEVEL_INFO, wv, msg]
 
 
