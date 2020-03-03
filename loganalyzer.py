@@ -177,18 +177,44 @@ def getOBSVersionString(lines):
     return versionString
 
 
-def checkOldVersion(lines):
+obsver_re = re.compile(r"""
+    (?i)
+    (?P<ver_major>[0-9]+)
+    \.
+    (?P<ver_minor>[0-9]+)
+    \.
+    (?P<ver_micro>[0-9]+)
+    (
+        -
+        (?P<special> (?P<special_type> rc|beta) \d*)
+    )?
+    $
+    """, re.VERBOSE)
+
+
+def checkObsVersion(lines):
     versionString = getOBSVersionString(lines)
+
     if parse_version(versionString) == parse_version('21.1.0'):
         return [LEVEL_WARNING, "Broken Auto-Update",
                 """You are not running the latest version of OBS Studio. Automatic updates in version 21.1.0 are broken due to a bug. <br>Please update by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
-    elif versionString.startswith('22.0.2-26'):
-        return [LEVEL_INFO, "Beta OBS Version",
-                """You are running a beta build of OBS Studio."""]
-    elif versionString.startswith('23.0.0-rc'):
-        return [LEVEL_INFO, "Release Candidate",
-                """You are running a release candidate version of OBS Studio."""]
-    elif parse_version(versionString) < parse_version(CURRENT_VERSION):
+
+    m = obsver_re.search(versionString)
+
+    if m is None:
+        return [LEVEL_INFO, "Unparseable OBS Version (%s)" % (versionString), """Your OBS version identifies itself as '%s', which cannot be parsed as a valid OBS version number.""" % (versionString)]
+
+    # Do we want these to check the version number and tell the user that a
+    # release version is actually available, if one is actually available?
+    # We can consider adding something like that later.
+    if m.group("special") is not None:
+        if m.group("special_type") == "beta":
+            return [LEVEL_INFO, "Beta OBS Version (%s)" % (versionString), """You are running a beta version of OBS. There is nothing wrong with this, but you may experience problems that you may not experience with fully released OBS versions. You are encouraged to upgrade to a released version of OBS as soon as one is available."""]
+
+        if m.group("special_type") == "rc":
+            return [LEVEL_INFO, "Release Candidate OBS Version (%s)" % (versionString), """You are running a release candidate version of OBS. There is nothing wrong with this, but you may experience problems that you may not experience with fully released OBS versions. You are encouraged to upgrade to a released version of OBS as soon as one is available."""]
+
+    if parse_version(versionString) < parse_version(CURRENT_VERSION):
         return [LEVEL_WARNING, "Old Version",
                 """You are not running the latest version of OBS Studio. Please update by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
 
@@ -455,6 +481,7 @@ def checkWindowsVer(lines):
 
     # else
     wv = "%s (OK)" % (verinfo["name"])
+
     if "EoS" in verinfo:
         msg = "You are running %s, which will be supported by Microsoft until %s." % (
             verinfo["name"], verinfo["EoS"].strftime("%Y-%m-%d"))
@@ -884,7 +911,7 @@ def doAnalysis(url=None, filename=None):
         classic, m = checkClassic(logLines)
         messages.append(m)
         if (not classic):
-            messages.append(checkOldVersion(logLines))
+            messages.append(checkObsVersion(logLines))
             messages.append(checkDual(logLines))
             messages.append(checkAutoconfig(logLines))
             messages.append(checkCPU(logLines))
