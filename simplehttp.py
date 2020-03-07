@@ -41,19 +41,22 @@ def getSummaryHTML(messages):
     return critical, warning, info
 
 
-def genBotResponse(url):
+def genBotResponse(url, detailed):
     msgs = []
     msgs = doAnalysis(url=url)
     critical = []
     warning = []
     info = []
     for i in msgs:
+        entry = i[1]
+        if(detailed and detailed.lower() == 'true'):
+          entry = {"title": i[1], "details": i[2]}
         if(i[0] == 3):
-            critical.append(i[1])
+            critical.append(entry)
         elif(i[0] == 2):
-            warning.append(i[1])
+            warning.append(entry)
         elif(i[0] == 1):
-            info.append(i[1])
+            info.append(entry)
 
     return json.dumps({"critical": critical, "warning": warning, "info": info})
 
@@ -140,10 +143,14 @@ def application(environ, start_response):
     response_body = ""
     form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
     if (('format' in form) and ('url' in form)):
+        if('detailed' in form):
+          detailed = html.escape(form['detailed'].value)
+        else:
+          detailed = False
         url = html.escape(form['url'].value)
         output_format = html.escape(form['format'].value)
         if((checkUrl(url)) and (output_format == 'json')):
-            response_body = genBotResponse(url)
+            response_body = genBotResponse(url, detailed)
             response_headers = [
                 ('Content-Type', 'application/json'),
                 ('Content-Length', str(len(response_body)))
