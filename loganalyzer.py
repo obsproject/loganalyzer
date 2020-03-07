@@ -468,6 +468,13 @@ def checkWindowsVer(lines):
 def checkAdmin(lines):
     adminlines = search('Running as administrator', lines)
     if ((len(adminlines) > 0) and (adminlines[0].split()[-1] == 'false')):
+        renderlag = getRenderLag(lines)
+
+        if renderlag >= 3:
+            return [LEVEL_WARNING, "Not Admin",
+                    "OBS is not running as Administrator. Because of this, OBS will not be able to Game Capture certain games, and it will not be able to request a higher GPU priority for itself -- which is the likely cause of the render lag you are currently experincing. Run OBS as Administrator to help alleviate this problem."]
+
+        # else
         return [LEVEL_INFO, "Not Admin",
                 "OBS is not running as Administrator. This can lead to OBS not being able to Game Capture certain games. If you are not running into issues, you can ignore this."]
 
@@ -586,7 +593,7 @@ def checkDrop(lines):
             """Your log contains streaming sessions with dropped frames. This can only be caused by a failure in your internet connection or your networking hardware. It is not caused by OBS. Follow the troubleshooting steps at: <a href="https://obsproject.com/wiki/Dropped-Frames-and-General-Connection-Issues">Dropped Frames and General Connection Issues</a>."""]
 
 
-def checkRendering(lines):
+def getRenderLag(lines):
     drops = search('rendering lag', lines)
     val = 0
     severity = 9000
@@ -595,15 +602,23 @@ def checkRendering(lines):
                        ].strip('%').replace(",", "."))
         if (v > val):
             val = v
+
+    return val
+
+
+def checkRenderLag(lines):
+    val = getRenderLag(lines)
+
     if (val != 0):
-        if (val >= 15):
+        if (val >= 10):
             severity = LEVEL_CRITICAL
-        elif (15 > val and val >= 5):
+        elif (10 > val and val >= 3):
             severity = LEVEL_WARNING
         else:
             severity = LEVEL_INFO
+
         return [severity, "{}% Rendering Lag".format(val),
-                """Your GPU is maxed out and OBS can't render scenes fast enough. Running a game without vertical sync or a frame rate limiter will frequently cause performance issues with OBS because your GPU will be maxed out. OBS requires a little GPU to render your scene. <br><br>Enable Vsync or set a reasonable frame rate limit that your GPU can handle without hitting 100% usage. <br>If that's not enough you may also need to turn down some of the video quality options in the game. If you are experiencing issues in general while using OBS, your GPU may be overloaded for the settings you are trying to use. <br>Please check our guide for ideas why this may be happening, and steps you can take to correct it: <a href="https://obsproject.com/wiki/GPU-overload-issues">GPU Overload Issues</a>."""]
+                """Your GPU is maxed out and OBS can't render scenes fast enough. Running a game without vertical sync or a frame rate limiter will frequently cause performance issues with OBS because your GPU will be maxed out. OBS requires a little GPU to render your scene. <br><br>Enable Vsync or set a reasonable frame rate limit that your GPU can handle without hitting 100% usage. <br><br>If that's not enough you may also need to turn down some of the video quality options in the game. If you are experiencing issues in general while using OBS, your GPU may be overloaded for the settings you are trying to use.<br><br>Please check our guide for ideas why this may be happening, and steps you can take to correct it: <a href="https://obsproject.com/wiki/GPU-overload-issues">GPU Overload Issues</a>."""]
 
 
 def checkEncodeError(lines):
@@ -907,7 +922,7 @@ def doAnalysis(url=None, filename=None):
             messages.append(checkCustom(logLines))
             messages.append(checkAudio(logLines))
             messages.append(checkDrop(logLines))
-            messages.append(checkRendering(logLines))
+            messages.append(checkRenderLag(logLines))
             messages.append(checkEncodeError(logLines))
             messages.append(checkEncoding(logLines))
             messages.append(checkMulti(logLines))
