@@ -246,6 +246,67 @@ def checkGPU(lines):
                     "OBS is running on an Intel iGPU. This hardware is generally not powerful enough to be used for both gaming and running obs. Situations where only sources from e.g. cameras and capture cards are used might work."]
 
 
+refresh_re = re.compile(r"""
+    (?i)
+    output \s+ (?P<output_num>[0-9]+):
+    .*
+    refresh = (?P<refresh> [0-9.]+),
+    """, re.VERBOSE)
+
+
+def getMonitorRefreshes(lines):
+    refreshes = {}
+
+    refreshLines = search('refresh=', lines)
+
+    for rl in refreshLines:
+        m = refresh_re.search(rl)
+
+        if m is not None:
+            output = int(m.group("output_num"))
+            refresh = float(m.group("refresh"))
+
+            refreshes[output] = refresh
+
+    return refreshes
+
+
+def checkRefreshes(lines):
+    refreshes = getMonitorRefreshes(lines)
+    verinfo = getWindowsVersion(lines)
+
+    # Our log doesn't have any refresh rates, so bail
+    if len(refreshes) == 0:
+        return
+
+    # Couldn't figure out windows version
+    if not verinfo:
+        return
+
+    # If we know nothing about the windows version (Insider build?),
+    # assume mixed refresh is fine
+    if verinfo["version"] == "10.0" and "release" not in verinfo:
+        return
+
+    # FINALLY fixed in WIn10/2004
+    if verinfo["version"] and verinfo["release"] >= 2004:
+        return
+
+    # We're on a version that has the mixed-refresh-rate problem, so lets
+    # build a dict of the refresh rates we hvae, and see if it's bigger
+    # than a single element. We're going to round each entry as we add
+    # it, so that (e.g.) 59.94Hz and 60Hz are considered the same, since
+    # that doesn't really cause a problem.
+    r = {}
+    for _, hz in refreshes.items():
+        r[round(hz)] = True
+
+    if len(r) > 1:
+        return [LEVEL_WARNING, "Mismatched Refresh Rates",
+                "The version of Windows you are running has a limitation which causes performance issues in hardware accelerated applications (such as games) if multiple monitors with different refresh rates are present. Your system's monitors have " + str(len(r)) + " different refresh rates, so you are affected by this limitation. You can fix this performance problem by setting all displays to use the same refresh rate.<br><br>This problem is fixed in the '2004' release of Windows 10, due in the first half of 2020. A prerelease version of this Windows release is currently available via the Windows Insider 'Slow' ring."]
+    return
+
+
 def checkMicrosoftSoftwareGPU(lines):
     if (len(search('Microsoft Basic Render Driver', lines)) > 0):
         return [LEVEL_CRITICAL, "No GPU driver available",
@@ -339,6 +400,7 @@ winver_re = re.compile(r"""
     Build \s+ (?P<build>\d+)
     \s+
     \(
+        (release: \s+ (?P<release>\d+); \s+)?
         revision: \s+ (?P<revision>\d+);
         \s+
         (?P<bits>\d+)-bit
@@ -942,6 +1004,7 @@ def doAnalysis(url=None, filename=None):
             messages.append(checkAMDdrivers(logLines))
             messages.append(checkNVIDIAdrivers(logLines))
             messages.append(checkGPU(logLines))
+            messages.append(checkRefreshes(logLines))
             messages.append(checkInit(logLines))
             # messages.append(checkElements(logLines))
             messages.append(checkNVENC(logLines))
