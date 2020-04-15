@@ -391,7 +391,7 @@ win10versions = {
         "release": 1809,
         "name": "Windows 10 1809",
         "date": datetime.date(2018, 11, 13),
-        "EoS": datetime.date(2020, 5, 12),
+        "EoS": datetime.date(2020, 11, 10),
     },
     18362: {
         "release": 1903,
