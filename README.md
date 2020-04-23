@@ -21,7 +21,7 @@ The log specifide by `URL` will be automatically analyzed. Output looks like:
 ```
 Critical: AUTOCONFIG WIZARD, INSUFFICIENT HARDWARE, MP4 RECORDING, RENDERING LAG, CPU OVERLOAD, 
 Warning:
-Info:     NOT ADMIN, LOW STREAM BANDWITH, NO SCENES/SOURCES, 
+Info:     NOT ADMIN, LOW STREAM BANDWIDTH, NO SCENES/SOURCES, 
 --------------------------------------
  
 Details

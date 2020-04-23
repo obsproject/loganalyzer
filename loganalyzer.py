@@ -293,7 +293,7 @@ def checkRefreshes(lines):
         return
 
     # We're on a version that has the mixed-refresh-rate problem, so lets
-    # build a dict of the refresh rates we hvae, and see if it's bigger
+    # build a dict of the refresh rates we have, and see if it's bigger
     # than a single element. We're going to round each entry as we add
     # it, so that (e.g.) 59.94Hz and 60Hz are considered the same, since
     # that doesn't really cause a problem.
