@@ -854,7 +854,7 @@ def checkSources(lower, higher, lines):
     if (len(monitor) > 0 and len(game) > 0):
         res = []
         res.append([LEVEL_WARNING, "Capture Interference",
-                    "Display and Game Capture Sources interfere with each other. Never put them in the same scene"])
+                    "Display and Game Capture Sources interfere with each other. Never put them in the same scene."])
     if (len(game) > 1):
         if (res is None):
             res = []
