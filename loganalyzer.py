@@ -303,7 +303,7 @@ def checkRefreshes(lines):
 
     if len(r) > 1:
         return [LEVEL_WARNING, "Mismatched Refresh Rates",
-                "The version of Windows you are running has a limitation which causes performance issues in hardware accelerated applications (such as games) if multiple monitors with different refresh rates are present. Your system's monitors have " + str(len(r)) + " different refresh rates, so you are affected by this limitation. You can fix this performance problem by setting all displays to use the same refresh rate.<br><br>This problem is fixed in the '2004' release of Windows 10, due in the first half of 2020. A prerelease version of this Windows release is currently available via the Windows Insider 'Slow' ring."]
+                "The version of Windows you are running has a limitation which causes performance issues in hardware accelerated applications (such as games) if multiple monitors with different refresh rates are present. Your system's monitors have " + str(len(r)) + " different refresh rates, so you are affected by this limitation. You can fix this performance problem by setting all displays to use the same refresh rate.<br><br>This problem is fixed in the Windows 10 May 2020 Update, which has started rolling out to users as of May 27, 2020."]
     return
 
 
