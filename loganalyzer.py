@@ -381,7 +381,7 @@ def checkWifi(lines):
 def checkBind(lines):
     if (len(search('Binding to ', lines)) > 0):
         return [LEVEL_WARNING, "Binding to IP",
-                """Binding to a manually chosen IP address is rarely needed. Go to Settings → Advanced → Network and set "Bind to IP" back to "Default"."""]
+                """Binding to a manually chosen IP address is rarely needed. Go to Settings -> Advanced -> Network and set "Bind to IP" back to "Default"."""]
 
 
 # Log line examples:
