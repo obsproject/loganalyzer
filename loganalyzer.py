@@ -126,7 +126,7 @@ cleanLog = "<br>To make a clean log file, please follow these steps: <br><br>1) 
 
 
 def checkClassic(lines):
-    if (len(search('Open Broadcaster Software', lines)) > 0):
+    if (len(search(': Open Broadcaster Software v0.', lines)) > 0):
         return True, [LEVEL_CRITICAL, "OBS Classic",
                       """You are still using OBS Classic. This version is no longer supported. While we cannot and will not do anything to prevent you from using it, we cannot help with any issues that may come up. <br>It is recommended that you update to OBS Studio. <br><br>Further information on why you should update (and how): <a href="https://obsproject.com/forum/threads/how-to-easily-switch-to-obs-studio.55820/">OBS Classic to OBS Studio</a>."""]
     else:
