@@ -199,8 +199,14 @@ def checkObsVersion(lines):
         return [LEVEL_WARNING, "Broken Auto-Update",
                 """You are not running the latest version of OBS Studio. Automatic updates in version 21.1.0 are broken due to a bug. <br>Please update by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
 
-    m = obsver_re.search(versionString)
+    m = obsver_re.search(versionString.replace('-modified', ''))
 
+    if m is None and re.match(r"(?:\d)+\.(?:\d)+\.(?:\d)+\+(?:[\d\w\-\.~\+])+", versionString):
+        return [LEVEL_INFO, "Unofficial OBS Build (%s)" % (versionString), """Your OBS version identifies itself as '%s', which is not an official build. <br>If you are on Linux, ensure you're using the PPA. If you cannot switch to the PPA, contact the maintainer of the package for any support issues.""" % (versionString)]
+    if m is None and re.match(r"(?:\d)+\.(?:\d)+\.(?:\d\w)+(?:-caffeine)", versionString):
+        return [LEVEL_INFO, "Third party OBS Version (%s)" % (versionString), """Your OBS version identifies itself as '%s', which is made by a third party. Contact them for any support issues.""" % (versionString)]
+    if m is None and re.match(r"(?:\d)+\.(?:\d)+\.(?:\d)+-(?:[\d-])*([a-z0-9]+)(?:-modified){0,1}", versionString):
+        return [LEVEL_INFO, "Custom OBS Build (%s)" % (versionString), """Your OBS version identifies itself as '%s', which is not a released OBS version.""" % (versionString)]
     if m is None:
         return [LEVEL_INFO, "Unparseable OBS Version (%s)" % (versionString), """Your OBS version identifies itself as '%s', which cannot be parsed as a valid OBS version number.""" % (versionString)]
 
@@ -214,7 +220,7 @@ def checkObsVersion(lines):
         if m.group("special_type") == "rc":
             return [LEVEL_INFO, "Release Candidate OBS Version (%s)" % (versionString), """You are running a release candidate version of OBS. There is nothing wrong with this, but you may experience problems that you may not experience with fully released OBS versions. You are encouraged to upgrade to a released version of OBS as soon as one is available."""]
 
-    if parse_version(versionString) < parse_version(CURRENT_VERSION):
+    if parse_version(versionString.replace('-modified', '')) < parse_version(CURRENT_VERSION):
         return [LEVEL_WARNING, "Old Version",
                 """You are not running the latest version of OBS Studio. Please update by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
 
