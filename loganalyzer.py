@@ -312,6 +312,64 @@ def checkRefreshes(lines):
                 "The version of Windows you are running has a limitation which causes performance issues in hardware accelerated applications (such as games) if multiple monitors with different refresh rates are present. Your system's monitors have " + str(len(r)) + """ different refresh rates, so you are affected by this limitation. <br><br>To fix this issue, we recommend updating to the Windows 10 May 2020 Update. Follow <a href="https://blogs.windows.com/windowsexperience/2020/05/27/how-to-get-the-windows-10-may-2020-update/">these instructions</a> if you're not sure how to update."""]
     return
 
+samples_re = re.compile(r"""
+    (?i)
+    samples \sper \ssec:
+    \s*
+    (?P<samples>\d+)
+""" , re.VERBOSE)
+
+sample_re = re.compile(r"""
+    (?i)
+    WASAPI:
+    .*
+    '(?P<device>.*)'
+    .*
+    \[(?P<sample>\d{2,12})\sHz\]
+    .*
+""", re.VERBOSE)
+
+def getWasapiSampleRates(lines):
+    samples = {}
+    sampleLines = search(' Hz] initialized', lines)
+
+    for sl in sampleLines:
+            m = sample_re.search(sl)
+
+            if m is not None:
+                device = str(m.group('device'))
+                sample = int(m.group('sample'))
+
+                samples[device] = sample
+
+    return samples
+
+def checkWasapiSamples(lines):
+    obsSampleLines = search('samples per sec: ', lines)
+    obsSample = ""
+    for osl in obsSampleLines:
+        m = samples_re.search(osl)
+        if m is not None:
+            obsSample = int(m.group('samples'))
+    samples = getWasapiSampleRates(lines)
+
+    if len(samples) == 0:
+        return
+
+    s = {}
+    if obsSample != "":
+        s[round(obsSample)] = True
+    for _, hz in samples.items():
+        s[round(hz)] = True
+
+    if len(s) > 1:
+        smpls = ""
+        if obsSample != "":
+            smpls += "<br>OBS Sample Rate: <strong>" + str(obsSample) + "</strong> Hz"
+        for d, hz in samples.items():
+            smpls += "<br>" + d + ": <strong>" + str(hz) + "</strong> Hz"
+        return [LEVEL_WARNING, "Mismatched Sample Rates",
+            "At least one of your audio devices has a sample rate that doesn't match the rest. This can result in audio drift over time or sound distortion. Check your audio devices in Windows settings (both Playback and Recording) and ensure the Default Format (under Advanced) is consistent. 48000 Hz is recommended." + smpls]
 
 def checkMicrosoftSoftwareGPU(lines):
     if (len(search('Microsoft Basic Render Driver', lines)) > 0):
@@ -1055,6 +1113,7 @@ def doAnalysis(url=None, filename=None):
             messages.append(checkStreamSettingsX264(logLines))
             messages.append(checkStreamSettingsNVENC(logLines))
             messages.append(checkMicrosoftSoftwareGPU(logLines))
+            messages.append(checkWasapiSamples(logLines))
             messages.append(checkOpenGLonWindows(logLines))
             messages.append(checkGameDVR(logLines))
             messages.append(checkGameMode(logLines))
