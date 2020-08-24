@@ -392,7 +392,7 @@ def checkBind(lines):
 
 # Log line examples:
 # win 7: 19:39:17.395: Windows Version: 6.1 Build 7601 (revision: 24535; 64-bit)
-# win 10: 22:29:11.437: Windows Version: 10.0 Build 18362 (revision: 535; 64-bit)
+# win 10: 15:30:58.866: Windows Version: 10.0 Build 19041 (release: 2004; revision: 450; 64-bit)
 def getWindowsVersionLine(lines):
     versionLines = search('Windows Version:', lines)
     if len(versionLines) > 0:
@@ -414,10 +414,9 @@ winver_re = re.compile(r"""
     """, re.VERBOSE)
 
 # I guess I'll call the Win10 sub-versions "releases", even though Microsoft
-# calls them "versions" because Win10 is also "Version 10.0" and seriously wtf.
+# calls them "versions" because Win10 is also "Version 10.0".
 #
-# We probably don't need all the info here, but since I'm creating the data
-# table anyhow, it's basically free to add the extra data.
+# We probably don't need all the info here, but it comes in handy
 win10versions = {
     10240: {
         "release": 1507,
