@@ -406,7 +406,7 @@ def checkGameMode(lines):
     # else
     if search("Game Mode: Off", lines):
         return [LEVEL_INFO, "Windows 10 Game Mode",
-                """In Windows 10 versions 1809 and newer, we recommend that "Game Mode" be enabled for maximum gaming performance. Game Mode can be enabled via the Windows 10 "Settings" app, under Gaming > Game Mode"""]
+                """In Windows 10 versions 1809 and newer, we recommend that "Game Mode" be enabled for maximum gaming performance. Game Mode can be enabled via the Windows 10 "Settings" app, under Gaming > <a href="ms-settings:gaming-gamemode">Game Mode</a>."""]
 
 
 def checkNVENC(lines):
