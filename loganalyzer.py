@@ -601,8 +601,8 @@ def checkWindowsVer(lines):
 
     if "EoS" in verinfo and datetime.date.today() > verinfo["EoS"]:
         wv = "%s (EOL)" % (verinfo["name"])
-        msg = "You are running %s, which has not been supported by Microsoft since %s. We recommend updating to the latest Windows release to ensure continued security, functionality, and compatibility." % (
-            verinfo["name"], verinfo["EoS"].strftime("%Y-%m-%d"))
+        msg = "You are running %s, which has not been supported by Microsoft since <strong>%s</strong>. We recommend updating to the latest Windows release to ensure continued security, functionality, and compatibility." % (
+            verinfo["name"], verinfo["EoS"].strftime("%B %Y"))
         return [LEVEL_WARNING, wv, msg]
 
     # special case for OBS 24.0.3 and earlier, which report Windows 10/1909
@@ -618,8 +618,8 @@ def checkWindowsVer(lines):
     wv = "%s (OK)" % (verinfo["name"])
 
     if "EoS" in verinfo:
-        msg = "You are running %s, which will be supported by Microsoft until %s." % (
-            verinfo["name"], verinfo["EoS"].strftime("%Y-%m-%d"))
+        msg = "You are running %s, which will be supported by Microsoft until <strong>%s</strong>." % (
+            verinfo["name"], verinfo["EoS"].strftime("%B %Y"))
     else:
         msg = "You are running %s, for which Microsoft has not yet announced an end of life date." % (
             verinfo["name"])
