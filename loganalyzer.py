@@ -408,6 +408,10 @@ def checkGameMode(lines):
         return [LEVEL_INFO, "Windows 10 Game Mode",
                 """In Windows 10 versions 1809 and newer, we recommend that "Game Mode" be enabled for maximum gaming performance. Game Mode can be enabled via the Windows 10 "Settings" app, under Gaming > <a href="ms-settings:gaming-gamemode">Game Mode</a>."""]
 
+def checkWin10Hags(lines):
+    if search('Hardware GPU Scheduler: On', lines):
+        return [LEVEL_CRITICAL, "Hardware-accelerated GPU Scheduler",
+                """The new Windows 10 Hardware-accelerated GPU scheduling ("HAGS") added with version 2004 is currently known to cause performance and capture issues with OBS, games and overlay tools. It's a new and experimental feature and we recommend disabling it via <a href="ms-settings:display-advancedgraphics">this screen</a> or <a href="https://obsproject.com/wiki/How-to-disable-Windows-10-Hardware-GPU-Scheduler">these instructions</a>."""]
 
 def checkNVENC(lines):
     msgs = search("Failed to open NVENC codec", lines)
@@ -1117,6 +1121,7 @@ def doAnalysis(url=None, filename=None):
             messages.append(checkOpenGLonWindows(logLines))
             messages.append(checkGameDVR(logLines))
             messages.append(checkGameMode(logLines))
+            messages.append(checkWin10Hags(logLines))
             m = checkVideoSettings(logLines)
             for sublist in m:
                 if sublist is not None:
