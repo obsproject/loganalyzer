@@ -289,6 +289,10 @@ def checkRefreshes(lines):
     if not verinfo:
         return
 
+    # We don't care about refresh rates on Vista
+    if verinfo["version"] == "6.1":
+        return
+
     # If we know nothing about the windows version (Insider build?),
     # assume mixed refresh is fine
     if verinfo["version"] == "10.0" and "release" not in verinfo:
@@ -468,7 +472,7 @@ winver_re = re.compile(r"""
     Build \s+ (?P<build>\d+)
     \s+
     \(
-        (release: \s+ (?P<release>\d+); \s+)?
+        (release: \s+ (?P<release>\d|\w+); \s+)?
         revision: \s+ (?P<revision>\d+);
         \s+
         (?P<bits>\d+)-bit
