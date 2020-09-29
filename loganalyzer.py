@@ -7,6 +7,7 @@ import re
 import requests
 import sys
 import textwrap
+import html
 
 from pkg_resources import parse_version
 
@@ -202,23 +203,23 @@ def checkObsVersion(lines):
     m = obsver_re.search(versionString.replace('-modified', ''))
 
     if m is None and re.match(r"(?:\d)+\.(?:\d)+\.(?:\d)+\+(?:[\d\w\-\.~\+])+", versionString):
-        return [LEVEL_INFO, "Unofficial OBS Build (%s)" % (versionString), """Your OBS version identifies itself as '%s', which is not an official build. <br>If you are on Linux, ensure you're using the PPA. If you cannot switch to the PPA, contact the maintainer of the package for any support issues.""" % (versionString)]
+        return [LEVEL_INFO, "Unofficial OBS Build (%s)" % (html.escape(versionString)), """Your OBS version identifies itself as '%s', which is not an official build. <br>If you are on Linux, ensure you're using the PPA. If you cannot switch to the PPA, contact the maintainer of the package for any support issues.""" % (html.escape(versionString))]
     if m is None and re.match(r"(?:\d)+\.(?:\d)+\.(?:\d\w)+(?:-caffeine)", versionString):
-        return [LEVEL_INFO, "Third party OBS Version (%s)" % (versionString), """Your OBS version identifies itself as '%s', which is made by a third party. Contact them for any support issues.""" % (versionString)]
+        return [LEVEL_INFO, "Third party OBS Version (%s)" % (html.escape(versionString)), """Your OBS version identifies itself as '%s', which is made by a third party. Contact them for any support issues.""" % (html.escape(versionString))]
     if m is None and re.match(r"(?:\d)+\.(?:\d)+\.(?:\d)+-(?:[\d-])*([a-z0-9]+)(?:-modified){0,1}", versionString):
-        return [LEVEL_INFO, "Custom OBS Build (%s)" % (versionString), """Your OBS version identifies itself as '%s', which is not a released OBS version.""" % (versionString)]
+        return [LEVEL_INFO, "Custom OBS Build (%s)" % (html.escape(versionString)), """Your OBS version identifies itself as '%s', which is not a released OBS version.""" % (html.escape(versionString))]
     if m is None:
-        return [LEVEL_INFO, "Unparseable OBS Version (%s)" % (versionString), """Your OBS version identifies itself as '%s', which cannot be parsed as a valid OBS version number.""" % (versionString)]
+        return [LEVEL_INFO, "Unparseable OBS Version (%s)" % (html.escape(versionString)), """Your OBS version identifies itself as '%s', which cannot be parsed as a valid OBS version number.""" % (html.escape(versionString))]
 
     # Do we want these to check the version number and tell the user that a
     # release version is actually available, if one is actually available?
     # We can consider adding something like that later.
     if m.group("special") is not None:
         if m.group("special_type") == "beta":
-            return [LEVEL_INFO, "Beta OBS Version (%s)" % (versionString), """You are running a beta version of OBS. There is nothing wrong with this, but you may experience problems that you may not experience with fully released OBS versions. You are encouraged to upgrade to a released version of OBS as soon as one is available."""]
+            return [LEVEL_INFO, "Beta OBS Version (%s)" % (html.escape(versionString)), """You are running a beta version of OBS. There is nothing wrong with this, but you may experience problems that you may not experience with fully released OBS versions. You are encouraged to upgrade to a released version of OBS as soon as one is available."""]
 
         if m.group("special_type") == "rc":
-            return [LEVEL_INFO, "Release Candidate OBS Version (%s)" % (versionString), """You are running a release candidate version of OBS. There is nothing wrong with this, but you may experience problems that you may not experience with fully released OBS versions. You are encouraged to upgrade to a released version of OBS as soon as one is available."""]
+            return [LEVEL_INFO, "Release Candidate OBS Version (%s)" % (html.escape(versionString)), """You are running a release candidate version of OBS. There is nothing wrong with this, but you may experience problems that you may not experience with fully released OBS versions. You are encouraged to upgrade to a released version of OBS as soon as one is available."""]
 
     if parse_version(versionString.replace('-modified', '')) < parse_version(CURRENT_VERSION):
         return [LEVEL_WARNING, "Old Version",
@@ -608,9 +609,9 @@ def checkWindowsVer(lines):
         return[LEVEL_WARNING, "Windows 10 Version Unknown", msg]
 
     if "EoS" in verinfo and datetime.date.today() > verinfo["EoS"]:
-        wv = "%s (EOL)" % (verinfo["name"])
+        wv = "%s (EOL)" % (html.escape(verinfo["name"]))
         msg = "You are running %s, which has not been supported by Microsoft since <strong>%s</strong>. We recommend updating to the latest Windows release to ensure continued security, functionality, and compatibility." % (
-            verinfo["name"], verinfo["EoS"].strftime("%B %Y"))
+            html.escape(verinfo["name"]), verinfo["EoS"].strftime("%B %Y"))
         return [LEVEL_WARNING, wv, msg]
 
     # special case for OBS 24.0.3 and earlier, which report Windows 10/1909
@@ -623,14 +624,14 @@ def checkWindowsVer(lines):
 
     # our windows version isn't out of support, so just say what version the user has and when
     # it actually does go out of support
-    wv = "%s (OK)" % (verinfo["name"])
+    wv = "%s (OK)" % (html.escape(verinfo["name"]))
 
     if "EoS" in verinfo:
         msg = "You are running %s, which will be supported by Microsoft until <strong>%s</strong>." % (
-            verinfo["name"], verinfo["EoS"].strftime("%B %Y"))
+            html.escape(verinfo["name"]), verinfo["EoS"].strftime("%B %Y"))
     else:
         msg = "You are running %s, for which Microsoft has not yet announced an end of life date." % (
-            verinfo["name"])
+            html.escape(verinfo["name"]))
 
     return [LEVEL_INFO, wv, msg]
 
