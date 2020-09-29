@@ -917,6 +917,21 @@ def checkVideoSettings(lines):
                         """Having the YUV Color range set to "Full" will cause playback issues in certain browsers and on various video platforms. Shadows, highlights and color will look off. In OBS, go to "Settings -> Advanced" and set "YUV Color Range" back to "Partial"."""])
     return res
 
+nicspeed_re = re.compile(r"(?i)Interface: (?P<nicname>.+) \(ethernet, (?P<speed>\d+) mbps\)")
+
+def checkNICSpeed(lines):
+    nicLines = search('Interface: ', lines)
+    if (len(nicLines) > 0):
+        for i in nicLines:
+            m = nicspeed_re.search(i)
+            if m:
+                nic = m.group("nicname")
+                speed = int(m.group("speed"))
+                if speed < 1000:
+                    if 'GbE' in nic or 'Gigabit' in nic:
+                        return [LEVEL_WARNING, "Slow Network Connection", "Your gigabit-capable network card is only connecting at 100mbps. This may indicate a bad network cable or outdated router / switch which could be impacting network performance."]
+    return None
+
 
 def getScenes(lines):
     scenePos = []
@@ -1127,6 +1142,7 @@ def doAnalysis(url=None, filename=None):
             messages.append(checkGameDVR(logLines))
             messages.append(checkGameMode(logLines))
             messages.append(checkWin10Hags(logLines))
+            messages.append(checkNICSpeed(logLines))
             m = checkVideoSettings(logLines)
             for sublist in m:
                 if sublist is not None:
