@@ -579,7 +579,8 @@ def getWindowsVersion(lines):
         "version": m.group("version"),
         "build": int(m.group("build")),
         "revision": int(m.group("revision")),
-        "bits": int(m.group("bits"))
+        "bits": int(m.group("bits")),
+        "release": 0
     }
 
     # Older naming/numbering/etc
