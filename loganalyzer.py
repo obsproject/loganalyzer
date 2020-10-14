@@ -989,7 +989,7 @@ def parseScenes(lines):
             else:
                 higher = getNextPos(s, sections)
             m, h = checkSources(s, higher, lines)
-            if (not hit):
+            if (not hit and m not in ret):
                 ret.append(m)
                 hit = h
     elif (len(added) > 0):
