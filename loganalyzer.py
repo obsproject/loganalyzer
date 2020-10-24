@@ -546,6 +546,11 @@ win10versions = {
         "name": "Windows 10 2004",
         "date": datetime.date(2020, 5, 27)
     },
+    19042: {
+        "release": 2009,
+        "name": "Windows 10 2009",
+        "date": datetime.date(2020, 10, 20)
+    },
 }
 
 winversions = {
