@@ -260,6 +260,8 @@ refresh_re = re.compile(r"""
     output \s+ (?P<output_num>[0-9]+):
     .*
     refresh = (?P<refresh> [0-9.]+),
+    .*
+    name = (?P<name> .*)
     """, re.VERBOSE)
 
 
@@ -272,7 +274,10 @@ def getMonitorRefreshes(lines):
         m = refresh_re.search(rl)
 
         if m is not None:
-            output = int(m.group("output_num"))
+            if m.group("name") is not None:
+                output = m.group("name").strip() + " (" + str(int(m.group("output_num")) + 1) + ")"
+            else:
+                output = "Display " + m.group("output_num")
             refresh = float(m.group("refresh"))
 
             refreshes[output] = refresh
@@ -315,8 +320,11 @@ def checkRefreshes(lines):
         r[round(hz)] = True
 
     if len(r) > 1:
+        rfrshs = "<br>"
+        for output, hz in refreshes.items():
+            rfrshs += "<br>" + output + ": <strong>" + str(int(hz)) + "</strong>Hz"
         return [LEVEL_WARNING, "Mismatched Refresh Rates",
-                "The version of Windows you are running has a limitation which causes performance issues in hardware accelerated applications (such as games) if multiple monitors with different refresh rates are present. Your system's monitors have " + str(len(r)) + """ different refresh rates, so you are affected by this limitation. <br><br>To fix this issue, we recommend updating to the Windows 10 May 2020 Update. Follow <a href="https://blogs.windows.com/windowsexperience/2020/05/27/how-to-get-the-windows-10-may-2020-update/">these instructions</a> if you're not sure how to update."""]
+                "The version of Windows you are running has a limitation which causes performance issues in hardware accelerated applications (such as games) if multiple monitors with different refresh rates are present. Your system's monitors have " + str(len(r)) + """ different refresh rates, so you are affected by this limitation. <br><br>To fix this issue, we recommend updating to the Windows 10 May 2020 Update. Follow <a href="https://blogs.windows.com/windowsexperience/2020/05/27/how-to-get-the-windows-10-may-2020-update/">these instructions</a> if you're not sure how to update.""" + rfrshs]
     return
 
 samples_re = re.compile(r"""
