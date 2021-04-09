@@ -1138,7 +1138,7 @@ def doAnalysis(url=None, filename=None):
             messages.append(checkGPU(logLines))
             messages.append(checkRefreshes(logLines))
             messages.append(checkInit(logLines))
-            # messages.append(checkElements(logLines))
+            messages.append(checkElements(logLines))
             messages.append(checkNVENC(logLines))
             messages.append(check940(logLines))
             messages.append(checkKiller(logLines))
