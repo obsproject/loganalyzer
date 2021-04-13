@@ -97,7 +97,10 @@ def getLinesPaste(obslogText):
 
 def getRawDiscord(obslogId):
     API_URL = "https://cdn.discordapp.com/attachments"
-    return requests.get('{0}/{1}'.format(API_URL, obslogId)).text
+    resp = requests.get('{0}/{1}'.format(API_URL, obslogId))
+    if resp.status_code == 200:
+        return resp.text
+    return ""
 
 
 def getLinesDiscord(obslogText):
@@ -1093,7 +1096,7 @@ def doAnalysis(url=None, filename=None):
         matchPastebin = re.match(
             r"(?i)\b((?:https?:(?:/{1,3}(www\.)?pastebin\.com/))(?:raw/)?(.{8}))", url)
         matchDiscord = re.match(
-            r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18}/[0-9]{18}/[0-9\-\_]{19}.txt))", url)
+            r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18}/[0-9]{18}/([0-9\-\_]{19}|message).txt))", url)
         if (matchGist):
             gistObject = getGist(matchGist.groups()[-1])
             logLines = getLinesGist(gistObject)
@@ -1115,10 +1118,14 @@ def doAnalysis(url=None, filename=None):
             messages.append(getDescription(logLines))
             success = True
         elif (matchDiscord):
-            pasteObject = getRawDiscord(matchDiscord.groups()[-1])
-            logLines = getLinesDiscord(pasteObject)
-            messages.append(getDescription(logLines))
-            success = True
+            attachment = matchDiscord.groups()[-1]
+            if attachment == "message":
+                attachment = matchDiscord.groups()[-2]
+            pasteObject = getRawDiscord(attachment)
+            if len(pasteObject) > 0:
+                logLines = getLinesDiscord(pasteObject)
+                messages.append(getDescription(logLines))
+                success = True
 
     elif filename is not None:
         logLines = getLinesLocal(filename)
