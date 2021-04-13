@@ -1086,6 +1086,7 @@ def doAnalysis(url=None, filename=None):
     success = False
     logLines = []
 
+    # If you modify this regex, modify it in simplehttp.py checkUrl() too
     if url is not None:
         matchGist = re.match(
             r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))", url)
