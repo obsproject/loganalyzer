@@ -1097,7 +1097,7 @@ def doAnalysis(url=None, filename=None):
         matchPastebin = re.match(
             r"(?i)\b((?:https?:(?:/{1,3}(www\.)?pastebin\.com/))(?:raw/)?(.{8}))", url)
         matchDiscord = re.match(
-            r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18}/[0-9]{18}/([0-9\-\_]{19}|message).txt))", url)
+            r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18}/[0-9]{18}/(?:[0-9\-\_]{19}|message).txt))", url)
         if (matchGist):
             gistObject = getGist(matchGist.groups()[-1])
             logLines = getLinesGist(gistObject)

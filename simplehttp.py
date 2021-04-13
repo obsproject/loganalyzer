@@ -135,7 +135,7 @@ def checkUrl(url):
     matchPastebin = re.match(
         r"(?i)\b((?:https?:(?:/{1,3}(www\.)?pastebin\.com/))(.{8}))", url)
     matchDiscord = re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18}/[0-9]{18}/([0-9\-\_]{19}|message).txt))", url)
+        r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18}/[0-9]{18}/(?:[0-9\-\_]{19}|message).txt))", url)
     return any((matchGist, matchHaste, matchObs, matchPastebin, matchDiscord))
 
 
