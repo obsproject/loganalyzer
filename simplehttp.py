@@ -151,6 +151,9 @@ def application(environ, start_response):
         output_format = html.escape(form['format'].value)
         if((checkUrl(url)) and (output_format == 'json')):
             response_body = genBotResponse(url, detailed)
+        elif output_format == 'json':
+            response_body = json.dumps({})
+        if output_format == 'json':
             response_headers = [
                 ('Content-Type', 'application/json'),
                 ('Content-Length', str(len(response_body)))
