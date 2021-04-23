@@ -4,14 +4,16 @@ from loganalyzer import *
 from wsgiref.simple_server import *
 import cgi
 import html
+import json
 import argparse
 
+
 htmlTemplate = ""
-with open("template.html", "r") as f:
+with open("templates/index.html", "r") as f:
     htmlTemplate = f.read()
 
 htmlDetail = ""
-with open("detail.html", "r") as f:
+with open("templates/detail.html", "r") as f:
     htmlDetail = f.read()
 
 
@@ -20,23 +22,23 @@ def getSummaryHTML(messages):
     warning = ""
     info = ""
     for i in messages:
-        if(i[0] == 3):
+        if (i[0] == 3):
             critical = critical + """<p><a href="#""" + \
                 i[1] + """"><button type="button" class="btn btn-danger">""" + \
                 i[1] + "</button></a></p>\n"
-        elif(i[0] == 2):
+        elif (i[0] == 2):
             warning = warning + """<p><a href="#""" + \
                 i[1] + """"><button type="button" class="btn btn-warning">""" + \
                 i[1] + "</button></a></p>\n"
-        elif(i[0] == 1):
+        elif (i[0] == 1):
             info = info + """<p><a href="#""" + \
                 i[1] + """"><button type="button" class="btn btn-info">""" + \
                 i[1] + "</button></a></p>\n"
-    if(len(critical) == 0):
+    if (len(critical) == 0):
         critical = "No critical issues."
-    if(len(warning) == 0):
+    if (len(warning) == 0):
         warning = "No warnings."
-    if(len(info) == 0):
+    if (len(info) == 0):
         info = "-"
     return critical, warning, info
 
@@ -49,13 +51,13 @@ def genBotResponse(url, detailed):
     info = []
     for i in msgs:
         entry = i[1]
-        if(detailed and detailed.lower() == 'true'):
-          entry = {"title": i[1], "details": i[2]}
-        if(i[0] == 3):
+        if (detailed and detailed.lower() == 'true'):
+            entry = {"title": i[1], "details": i[2]}
+        if (i[0] == 3):
             critical.append(entry)
-        elif(i[0] == 2):
+        elif (i[0] == 2):
             warning.append(entry)
-        elif(i[0] == 1):
+        elif (i[0] == 1):
             info.append(entry)
 
     return json.dumps({"critical": critical, "warning": warning, "info": info})
@@ -64,21 +66,21 @@ def genBotResponse(url, detailed):
 def getDetailsHTML(messages):
     res = ""
     for i in messages:
-        if(i[0] == 3):
+        if (i[0] == 3):
             res = res + htmlDetail.format(anchor=i[1],
                                           sev='danger',
                                           severity='Critical',
                                           title=i[1],
                                           text=i[2])
     for i in messages:
-        if(i[0] == 2):
+        if (i[0] == 2):
             res = res + htmlDetail.format(anchor=i[1],
                                           sev='warning',
                                           severity='Warning',
                                           title=i[1],
                                           text=i[2])
     for i in messages:
-        if(i[0] == 1):
+        if (i[0] == 1):
             res = res + htmlDetail.format(anchor=i[1],
                                           sev='info',
                                           severity='Info',
@@ -91,7 +93,7 @@ def getDetailsHTML(messages):
 def getDescr(messages):
     res = ""
     for i in messages:
-        if(i[0] == 0):
+        if (i[0] == 0):
             res = i[2]
     return res
 
@@ -123,33 +125,22 @@ def genFullResponse(url):
                                    details=details)
     return response
 
-# If you modify this regex, modify it in loganalyzer.py doAnalysis() too
+
 def checkUrl(url):
-    validity = False
-    matchGist = re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))", url)
-    matchHaste = re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))", url)
-    matchObs = re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}(www\.)?obsproject\.com)/logs/)(.{16}))", url)
-    matchPastebin = re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}(www\.)?pastebin\.com/))(.{8}))", url)
-    matchDiscord = re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18}/[0-9]{18}/(?:[0-9\-\_]{19}|message).txt))", url)
-    return any((matchGist, matchHaste, matchObs, matchPastebin, matchDiscord))
+    return any((matchGist(url), matchHaste(url), matchObs(url), matchPastebin(url), matchDiscord(url)))
 
 
 def application(environ, start_response):
     response_body = ""
     form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
     if (('format' in form) and ('url' in form)):
-        if('detailed' in form):
-          detailed = html.escape(form['detailed'].value)
+        if ('detailed' in form):
+            detailed = html.escape(form['detailed'].value)
         else:
-          detailed = False
+            detailed = False
         url = html.escape(form['url'].value)
         output_format = html.escape(form['format'].value)
-        if((checkUrl(url)) and (output_format == 'json')):
+        if ((checkUrl(url)) and (output_format == 'json')):
             response_body = genBotResponse(url, detailed)
         elif output_format == 'json':
             response_body = json.dumps({})
@@ -160,7 +151,7 @@ def application(environ, start_response):
             ]
     elif 'url' in form:
         url = html.escape(form['url'].value)
-        if(checkUrl(url)):
+        if (checkUrl(url)):
             response_body = genFullResponse(url)
         else:
             response_body = genEmptyResponse()
