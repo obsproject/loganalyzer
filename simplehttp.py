@@ -1,23 +1,31 @@
 #!/usr/bin/env python3
 
-from loganalyzer import *
-from wsgiref.simple_server import *
-import cgi
-import html
-import json
+import logging
 import argparse
+from concurrent import futures
+import asyncio
+from aiohttp import web
+import json
+import loganalyzer as analyze
 
+loop = asyncio.get_event_loop()
+threadPool = futures.ThreadPoolExecutor(thread_name_prefix='loganalyzer: worker thread')
+app = web.Application()
 
-htmlTemplate = ""
-with open("templates/index.html", "r") as f:
+with open("templates/index.html", "r") as f:  # Grab main HTML page
     htmlTemplate = f.read()
 
-htmlDetail = ""
-with open("templates/detail.html", "r") as f:
+with open("templates/detail.html", "r") as f:  # Grab details page
     htmlDetail = f.read()
 
 
+def checkUrl(url):
+    """Check if the incoming URL can be analyzed"""
+    return any((analyze.matchGist(url), analyze.matchHaste(url), analyze.matchObs(url), analyze.matchPastebin(url), analyze.matchDiscord(url)))
+
+
 def getSummaryHTML(messages):
+    """Helper func. Generates the summary secion of the HTML page."""
     critical = ""
     warning = ""
     info = ""
@@ -43,27 +51,8 @@ def getSummaryHTML(messages):
     return critical, warning, info
 
 
-def genBotResponse(url, detailed):
-    msgs = []
-    msgs = doAnalysis(url=url)
-    critical = []
-    warning = []
-    info = []
-    for i in msgs:
-        entry = i[1]
-        if (detailed and detailed.lower() == 'true'):
-            entry = {"title": i[1], "details": i[2]}
-        if (i[0] == 3):
-            critical.append(entry)
-        elif (i[0] == 2):
-            warning.append(entry)
-        elif (i[0] == 1):
-            info.append(entry)
-
-    return json.dumps({"critical": critical, "warning": warning, "info": info})
-
-
 def getDetailsHTML(messages):
+    """Helper func. Generates detailes section of the HTML page."""
     res = ""
     for i in messages:
         if (i[0] == 3):
@@ -86,11 +75,11 @@ def getDetailsHTML(messages):
                                           severity='Info',
                                           title=i[1],
                                           text=i[2])
-
     return res
 
 
 def getDescr(messages):
+    """Helper func. Gets the desciption created by the analysis."""
     res = ""
     for i in messages:
         if (i[0] == 0):
@@ -98,22 +87,9 @@ def getDescr(messages):
     return res
 
 
-no_log = "Please analyze a log first."
-
-
-def genEmptyResponse():
-    response_body = htmlTemplate.format(ph="",
-                                        description="no log",
-                                        summary_critical=no_log,
-                                        summary_warning=no_log,
-                                        summary_info=no_log,
-                                        details="""<p class="text-warning">""" + no_log + """</p>""")
-    return response_body
-
-
-def genFullResponse(url):
-    msgs = []
-    msgs = doAnalysis(url=url)
+def genFullHtmlResponse(url):
+    """Runs an analysis and returns a full HTML page with the response."""
+    msgs = analyze.doAnalysis(url=url)
     crit, warn, info = getSummaryHTML(msgs)
     details = getDetailsHTML(msgs)
     response = htmlTemplate.format(ph=url,
@@ -126,67 +102,100 @@ def genFullResponse(url):
     return response
 
 
-def checkUrl(url):
-    return any((matchGist(url), matchHaste(url), matchObs(url), matchPastebin(url), matchDiscord(url)))
+def genEmptyHtmlResponse():
+    """Generates a full HTML page with no analysis."""
+    no_log = "Please analyze a log first."
+    response_body = htmlTemplate.format(ph="",
+                                        description="no log",
+                                        summary_critical=no_log,
+                                        summary_warning=no_log,
+                                        summary_info=no_log,
+                                        details="""<p class="text-warning">""" + no_log + """</p>""")
+    return response_body
 
 
-def application(environ, start_response):
-    response_body = ""
-    form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
-    if (('format' in form) and ('url' in form)):
-        if ('detailed' in form):
-            detailed = html.escape(form['detailed'].value)
+def genJsonResponse(url, detailed):
+    """Runs an analysis and returns the results as JSON."""
+    msgs = []
+    msgs = analyze.doAnalysis(url=url)
+    critical = []
+    warning = []
+    info = []
+    for i in msgs:
+        entry = i[1]
+        if detailed:
+            entry = {"title": i[1], "details": i[2]}
+        if (i[0] == 3):
+            critical.append(entry)
+        elif (i[0] == 2):
+            warning.append(entry)
+        elif (i[0] == 1):
+            info.append(entry)
+    return {"critical": critical, "warning": warning, "info": info}
+
+
+def sync_request_handler(request):
+    """Non-async request handler processed within the thread pool. Do not share global resources without a Lock."""
+    query = request.query  # Get HTTP query string as a MultiDict
+    format = 'html'
+    if 'format' in query:  # Check for requested response format
+        format = query['format'].lower()
+
+    logging.info('New HTTP Request | Remote: {} | Format: {} | Url: {}'.format(request.remote, format, 'url' in query))
+
+    if 'url' in query:
+        url = query['url']
+        detailed = 'detailed' in query and query['detailed'] == 'true'
+        if not checkUrl(url):  # Return empty data/page if URL is invalid
+            logging.info('Invalid URL: {}'.format(url))
+            if format == 'json':
+                logging.info('Returning empty JSON response.')
+                return web.json_response({})
+            else:
+                logging.info('Returning default HTML response.')
+                return web.Response(text=genEmptyHtmlResponse(), content_type='text/html')
+        if format == 'json':
+            logging.info('Returning JSON response for url: {}'.format(url))
+            response = genJsonResponse(url, detailed)
+            return web.json_response(response)
         else:
-            detailed = False
-        url = html.escape(form['url'].value)
-        output_format = html.escape(form['format'].value)
-        if ((checkUrl(url)) and (output_format == 'json')):
-            response_body = genBotResponse(url, detailed)
-        elif output_format == 'json':
-            response_body = json.dumps({})
-        if output_format == 'json':
-            response_headers = [
-                ('Content-Type', 'application/json'),
-                ('Content-Length', str(len(response_body)))
-            ]
-    elif 'url' in form:
-        url = html.escape(form['url'].value)
-        if (checkUrl(url)):
-            response_body = genFullResponse(url)
-        else:
-            response_body = genEmptyResponse()
-        response_headers = [
-            ('Content-Type', 'text/html'),
-            ('Content-Length', str(len(response_body)))
-        ]
+            logging.info('Returning HTML response for url: {}'.format(url))
+            return web.Response(text=genFullHtmlResponse(url), content_type='text/html')
     else:
-        response_body = genEmptyResponse()
-        response_headers = [
-            ('Content-Type', 'text/html'),
-            ('Content-Length', str(len(response_body)))
-        ]
+        if format == 'json':
+            logging.info('Returning empty JSON response.')
+            return web.json_response({})
+        else:
+            logging.info('Returning default HTML response.')
+            return web.Response(text=genEmptyHtmlResponse(), content_type='text/html')
 
-    status = '200 OK'
 
-    start_response(status, response_headers)
-    return [response_body.encode()]
+async def request_handler(request):
+    """Async request handler. Submits the incoming request to the thread pool to be handled."""
+    return (await loop.run_in_executor(None, sync_request_handler, request))  # Submits the request to a handler inside the threadpool
 
 
 def main():
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] [%(funcName)s] %(message)s")
+    aiohttpLogger = logging.getLogger('aiohttp')
+    aiohttpLogger.setLevel(logging.WARNING)
     parser = argparse.ArgumentParser()
-    parser.add_argument("--host", dest='host',
-                        default="localhost", help="address to bind to")
-    parser.add_argument("--port", dest='port',
-                        default="8080", help="port to bind to")
+    parser.add_argument("--host", default="localhost", type=str, help="address to bind to", dest='host')
+    parser.add_argument("--port", default="8080", type=int, help="port to bind to", dest='port')
     flags = parser.parse_args()
+
+    loop.set_default_executor(threadPool)  # Set the default executor to our thread pool
+    app.add_routes([web.get('/', request_handler)])
+    applicationTask = loop.create_task(web._run_app(app, host=flags.host, port=flags.port, print=logging.info))
     try:
-        from wsgiref.simple_server import make_server
-        httpd = make_server(flags.host, int(flags.port), application)
-        print("""Serving on "{}" with port "{}" """.format(flags.host, flags.port))
-        httpd.serve_forever()
+        loop.run_forever()
     except KeyboardInterrupt:
-        print('Goodbye.')
+        pass
+    finally:
+        logging.info('Exiting application.')
+        applicationTask.cancel()  # Shuts down the HTTP server
+        threadPool.shutdown()  # Shuts down the running thread pool
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
