@@ -8,6 +8,7 @@ from checks.core import *
 from checks.audio import *
 from checks.encoding import *
 from checks.graphics import *
+from checks.macos import *
 from checks.network import *
 from checks.sources import *
 from checks.windows import *
@@ -140,6 +141,7 @@ def doAnalysis(url=None, filename=None):
                 checkWifi(logLines),
                 checkBind(logLines),
                 checkWindowsVer(logLines),
+                checkMacVer(logLines),
                 checkAdmin(logLines),
                 check32bitOn64bit(logLines),
                 checkAttempt(logLines),
