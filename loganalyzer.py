@@ -146,6 +146,7 @@ def doAnalysis(url=None, filename=None):
                 checkMP4(logLines),
                 checkPreset(logLines),
                 checkCustom(logLines),
+                checkBrowserAccel(logLines),
                 checkAudioBuffering(logLines),
                 checkDrop(logLines),
                 checkRenderLag(logLines),

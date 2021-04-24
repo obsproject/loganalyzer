@@ -27,6 +27,17 @@ def checkSources(lower, higher, lines):
     return res, violation
 
 
+def checkBrowserAccel(lines):
+    disabled = search('Browser Hardware Acceleration: false', lines)
+    blacklisted = search('[obs-browser]: Blacklisted device detected, disabling browser source hardware acceleration', lines)
+    if (len(disabled) > 0 and len(blacklisted) == 0):
+        return [LEVEL_WARNING, "Browser Not Accelerated",
+                "Browser hardware acceleration is currently disabled. Enabling acceleration is highly recommended due to the improvements to performance and significantly lower CPU usage for browser sources. This can be enabled in Settings -> Advanced."]
+    elif (len(blacklisted) > 0):
+        return [LEVEL_INFO, "Browser Not Accelerated",
+                "Unfortunately, browser source hardware acceleration is not compatible with your system/graphics card. Because of this, browser sources will use extra CPU and may stutter. Try to use as few browser sources as possible."]
+
+
 def parseScenes(lines):
     ret = []
     hit = False
