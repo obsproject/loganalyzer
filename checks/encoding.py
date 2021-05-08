@@ -5,7 +5,8 @@ from .utils.utils import *
 def checkAttempt(lines):
     recordingStarts = search('== Recording Start ==', lines)
     streamingStarts = search('== Streaming Start ==', lines)
-    if (len(recordingStarts) + len(streamingStarts) == 0):
+    replaybufferStarts = search('== Replay Buffer Start ==', lines)
+    if (len(recordingStarts) + len(streamingStarts) + len(replaybufferStarts) == 0):
         return [LEVEL_INFO, "No Output Session",
                 "Your log contains no recording or streaming session. Results of this log analysis are limited. Please post a link to a clean log file. " + cleanLog]
 
