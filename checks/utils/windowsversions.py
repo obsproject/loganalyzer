@@ -83,9 +83,16 @@ win10versions = {
     },
     19042: {
         "release": 2009,
-        "name": "Windows 10 2009",
+        "name": "Windows 10 20H2",
         "date": datetime.date(2020, 10, 20)
     },
+    19043: {
+        "release": 2009,
+        "name": "Windows 10 21H1",
+        # Placeholder date. 21H1 is in Release Preview
+        # https://docs.microsoft.com/en-us/windows-insider/flight-hub/#windows-10-may-2021-update-21h1
+        "date": datetime.date(2021, 4, 28)
+    }
 }
 
 
