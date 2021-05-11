@@ -116,4 +116,4 @@ def checkEncoding(lines):
         else:
             severity = LEVEL_INFO
         return [severity, "{}% Encoder Overload".format(val),
-                """The encoder is skipping frames because of CPU overload. Read about <a href="https://obsproject.com/wiki/General-Performance-and-Encoding-Issues">General Performance and Encoding Issues</a>."""]
+                """Encoder overload may be related to your CPU or GPU being overloaded, depending on the encoder in question. If you are using a software encoder (x264) please see the <a href="https://obsproject.com/wiki/General-Performance-and-Encoding-Issues">CPU Overload Guide</a>. If you are using a hardware encoder (AMF, QSV/Quicksync, NVENC) please see the <a href="https://obsproject.com/wiki/GPU-overload-issues">GPU Overload Guide</a>."""]
