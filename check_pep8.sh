@@ -1,5 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
-# ignore long lines (prefer result text in sinle line)
-pycodestyle --ignore=E501,E722 .
+pycodestyle --config=setup.cfg .
