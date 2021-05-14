@@ -73,3 +73,10 @@ def checkDynamicBitrate(lines):
             return [LEVEL_WARNING, "Dynamic Bitrate",
                     """Dynamic Bitrate is enabled and a hardware encoder is potentially in use. This can cause issues with hardware encoders if bitrate changes happen too frequently, or drops too low. Should you experience bitrate dropping to zero, or no output even if OBS says its streaming, either change your Encoder to x264 or turn off Dynamic Bitrate in Settings -> Advanced -> Network."""]
     return None
+
+
+def checkStreamDelay(lines):
+    delayLines = search('second delay active', lines)
+    if (len(delayLines) > 0):
+        return [LEVEL_INFO, "Stream Delay", "Stream Delay may currently be active. This means that your stream is being delayed by a certain number of seconds. If this is not what you intended, please disable it in Settings -> Advanced -> Stream Delay."]
+    return None
