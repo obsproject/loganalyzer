@@ -12,7 +12,13 @@ macver_re = re.compile(r"""
 
 
 macversions = {
-    # So far, Big Sur versions have inconsequential minor versions, so just check major
+    "12": {
+        "name": "Monterey",
+        # Placeholder date, since Monterey is in Beta
+        # https://www.apple.com/macos/monterey-preview/
+        "date": datetime.date(2021, 6, 7),
+        "latest": True,
+    },
     "11": {
         "name": "Big Sur",
         "date": datetime.date(2020, 11, 12),
