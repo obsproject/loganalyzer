@@ -102,5 +102,5 @@ def checkObsVersion(lines):
             return [LEVEL_INFO, "Release Candidate OBS Version (%s)" % (html.escape(versionString)), """You are running a release candidate version of OBS. There is nothing wrong with this, but you may experience problems that you may not experience with fully released OBS versions. You are encouraged to upgrade to a released version of OBS as soon as one is available."""]
 
     if parse_version(versionString.replace('-modified', '')) < parse_version(CURRENT_VERSION):
-        return [LEVEL_WARNING, "Old Version",
-                """You are not running the latest version of OBS Studio. Please update by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
+        return [LEVEL_WARNING, "Old Version (%s)" % versionString,
+                """You are running an old version of OBS Studio (%s). Please update to version %s by going to Help -> Check for updates in OBS or by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it.""" % (versionString, CURRENT_VERSION)]
