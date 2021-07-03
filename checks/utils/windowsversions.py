@@ -79,17 +79,20 @@ win10versions = {
     19041: {
         "release": 2004,
         "name": "Windows 10 2004",
-        "date": datetime.date(2020, 5, 27)
+        "date": datetime.date(2020, 5, 27),
+        "EoS": datetime.date(2021, 12, 14),
     },
     19042: {
         "release": 2009,
         "name": "Windows 10 20H2",
-        "date": datetime.date(2020, 10, 20)
+        "date": datetime.date(2020, 10, 20),
+        "EoS": datetime.date(2022, 5, 10),
     },
     19043: {
         "release": 2009,
         "name": "Windows 10 21H1",
-        "date": datetime.date(2021, 5, 18)
+        "date": datetime.date(2021, 5, 18),
+        "EoS": datetime.date(2022, 12, 13),
     }
 }
 
