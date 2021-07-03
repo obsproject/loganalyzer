@@ -272,9 +272,14 @@ def checkWindowsVer(lines):
 
     # This is such a hack, but it's unclear how to do this better
     if verinfo["version"] == "10.0" and verinfo["release"] == 0:
-        msg = "You are running an unknown Windows 10 release (build %d), which means you are probably using an Insider build. Some checks that are applicable only to specific Windows versions will not be performed. Also, because Insider builds are test versions, you may have problems that would not happen with release versions of Windows." % (
-            verinfo["build"])
-        return[LEVEL_WARNING, "Windows 10 Version Unknown", msg]
+        if verinfo["build"] >= 22000:
+            msg = "You are running Windows 11 Insider build %d. Some checks that are applicable only to specific Windows versions will not be performed. Also, because Insider builds are test versions, you may have problems that would not happen with release versions of Windows 10." % (
+                verinfo["build"])
+            return[LEVEL_WARNING, "Windows 11 Insider Build", msg]
+        else:
+            msg = "You are running an unknown Windows 10 release (build %d), which means you are probably using an Insider build. Some checks that are applicable only to specific Windows versions will not be performed. Also, because Insider builds are test versions, you may have problems that would not happen with release versions of Windows." % (
+                verinfo["build"])
+            return[LEVEL_WARNING, "Windows 10 Version Unknown", msg]
 
     if "EoS" in verinfo and datetime.date.today() > verinfo["EoS"]:
         wv = "%s (EOL)" % (html.escape(verinfo["name"]))
