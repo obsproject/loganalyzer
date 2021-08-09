@@ -11,6 +11,7 @@ from checks.graphics import *
 from checks.macos import *
 from checks.network import *
 from checks.sources import *
+from checks.wayland import *
 from checks.windows import *
 
 from checks.utils.fetchers import *
@@ -134,6 +135,7 @@ def doAnalysis(url=None, filename=None):
                 checkGPU(logLines),
                 checkRefreshes(logLines),
                 checkInit(logLines),
+                checkXWayland(logLines),
                 # checkElements(logLines),
                 checkNVENC(logLines),
                 check940(logLines),
