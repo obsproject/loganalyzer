@@ -135,7 +135,7 @@ def doAnalysis(url=None, filename=None):
                 checkGPU(logLines),
                 checkRefreshes(logLines),
                 checkInit(logLines),
-                checkXWayland(logLines),
+                checkWayland(logLines),
                 # checkElements(logLines),
                 checkNVENC(logLines),
                 check940(logLines),
