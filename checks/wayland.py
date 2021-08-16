@@ -14,7 +14,7 @@ def getWindowSystemLine(lines):
         return windowSystem[0]
 
 
-def checkXWayland(lines):
+def checkWayland(lines):
     isDistroNix = search('Distribution:', lines)
 
     if len(isDistroNix) <= 0:
@@ -27,6 +27,11 @@ def checkXWayland(lines):
     sessionType = sessionTypeLine.split()[3]
     if sessionType != 'wayland':
         return
+
+    distro = isDistroNix[0].split()
+    if distro[2] == '"Ubuntu"' and distro[3] == '"20.04"':
+        return [LEVEL_CRITICAL, "Ubuntu 20.04 under Wayland",
+                "Ubuntu 20.04 does not provide the needed dependencies for OBS to capture under Wayland.<br> So OBS is able to capture only under X11/Xorg."]
 
     windowSystemLine = getWindowSystemLine(lines)
     # If there is no Window System, OBS is running under Wayland
