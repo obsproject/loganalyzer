@@ -17,6 +17,15 @@ winver_re = re.compile(r"""
     """, re.VERBOSE)
 
 
+win11versions = {
+    22000: {
+        "release": 2009,
+        "name": "Windows 11",
+        "date": datetime.date(2021, 10, 5),
+    }
+}
+
+
 # I guess I'll call the Win10 sub-versions "releases", even though Microsoft
 # calls them "versions" because Win10 is also "Version 10.0".
 #
@@ -93,7 +102,14 @@ win10versions = {
         "name": "Windows 10 21H1",
         "date": datetime.date(2021, 5, 18),
         "EoS": datetime.date(2022, 12, 13),
-    }
+    },
+    # Placeholder date. 21H2 is in Release Preview
+    19044: {
+        "release": 2009,
+        "name": "Windows 10 21H2",
+        "date": datetime.date(2021, 10, 5),
+    },
+    **win11versions
 }
 
 
