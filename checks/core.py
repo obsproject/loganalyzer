@@ -49,13 +49,8 @@ def getOBSVersionLine(lines):
 
 def getOBSVersionString(lines):
     versionLine = getOBSVersionLine(lines)
-    if versionLine.split()[0] == 'OBS':
-        versionString = versionLine.split()[1]
-    elif versionLine.split()[2] == 'OBS':
-        versionString = versionLine.split()[3]
-    else:
-        versionString = versionLine.split()[2]
-    return versionString
+    versionString = versionLine[versionLine.find("OBS"):]
+    return versionString.split()[1]
 
 
 obsver_re = re.compile(r"""
