@@ -121,7 +121,7 @@ def checkEncoding(lines):
             severity = LEVEL_WARNING
         else:
             severity = LEVEL_INFO
-        if ((hasx264 + hasAMD + hasQSV + hasNVENC + hasAPPLE) > 1):
+        if (hasx264 > 0 and (hasAMD + hasQSV + hasNVENC + hasAPPLE) > 0):
             return [severity, "{}% Encoder Overload".format(val),
                     """Encoder overload may be related to your CPU or GPU being overloaded, depending on the encoder in question. If you are using a software encoder (x264) please see the <a href="https://obsproject.com/wiki/General-Performance-and-Encoding-Issues">CPU Overload Guide</a>. If you are using a hardware encoder (AMF, QSV/Quicksync, NVENC) please see the <a href="https://obsproject.com/wiki/GPU-overload-issues">GPU Overload Guide</a>."""]
         elif (hasx264 > 0):
