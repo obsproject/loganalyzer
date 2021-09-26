@@ -24,12 +24,12 @@ def checkWayland(lines):
     if not sessionTypeLine:
         return
 
-    sessionType = sessionTypeLine.split()[3]
-    if sessionType != 'wayland':
+    isWayland = sessionTypeLine[sessionTypeLine.find('wayland'):]
+    if isWayland != 'wayland':
         return
 
-    distro = isDistroNix[0].split()
-    if distro[2] == '"Ubuntu"' and distro[3] == '"20.04"':
+    distro = isDistroNix[0][isDistroNix[0].find('"Ubuntu" "20.04"'):]
+    if distro == '"Ubuntu" "20.04"':
         return [LEVEL_CRITICAL, "Ubuntu 20.04 under Wayland",
                 "Ubuntu 20.04 does not provide the needed dependencies for OBS to capture under Wayland.<br> So OBS is able to capture only under X11/Xorg."]
 
