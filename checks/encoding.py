@@ -69,26 +69,33 @@ def checkNVENC(lines):
 
 
 def checkStreamSettingsNVENC(lines):
+    videoSettings = []
+    fps_num, fps_den = 0, 1
+    for i, s in enumerate(lines):
+        if "video settings reset:" in s:
+            videoSettings.append(i)
+    if (len(videoSettings) > 0):
+        for i in range(7):
+            chunks = lines[videoSettings[-1] + i].split()
+            if (chunks[-2] == 'fps:'):
+                fps_num, fps_den = (int(x) for x in chunks[-1].split('/'))
     streamingSessions = []
     for i, s in enumerate(lines):
         if "[NVENC encoder: 'streaming_h264'] settings:" in s:
             streamingSessions.append(i)
     if (len(streamingSessions) > 0):
         bitrate = 0
-        fps_num = 0
         width = 0
         height = 0
         for i in range(12):
             chunks = lines[streamingSessions[-1] + i].split()
             if (chunks[-2] == 'bitrate:'):
                 bitrate = float(chunks[-1])
-            elif (chunks[-2] == 'keyint:'):
-                fps_num = float(chunks[-1])
             elif (chunks[-2] == 'width:'):
                 width = float(chunks[-1])
             elif (chunks[-2] == 'height:'):
                 height = float(chunks[-1])
-        bitrateEstimate = (width * height * fps_num) / 20000
+        bitrateEstimate = (width * height * fps_num / fps_den) / 20000
         if (bitrate < bitrateEstimate):
             return [LEVEL_INFO, "Low Stream Bitrate",
                     "Your stream encoder is set to a video bitrate that is too low. This will lower picture quality especially in high motion scenes like fast paced games. Use the Auto-Config Wizard to adjust your settings to the optimum for your situation. It can be accessed from the Tools menu in OBS, and then just follow the on-screen directions."]
