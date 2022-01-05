@@ -148,6 +148,7 @@ def doAnalysis(url=None, filename=None):
                 checkAdmin(logLines),
                 checkImports(logLines),
                 check32bitOn64bit(logLines),
+                checkWindowsARM64EmulationStatus(logLines),
                 checkAttempt(logLines),
                 checkMP4(logLines),
                 checkPreset(logLines),
