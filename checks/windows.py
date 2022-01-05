@@ -335,3 +335,9 @@ def check32bitOn64bit(lines):
         # thx to secretply for the bugfix
         return [LEVEL_WARNING, "32-bit OBS on 64-bit Windows",
                 "You are running the 32 bit version of OBS on a 64 bit system. This will reduce performance and greatly increase the risk of crashes due to memory limitations. You should only use the 32 bit version if you have a capture device that lacks 64 bit drivers. Please run OBS using the 64-bit shortcut."]
+
+
+def checkWindowsARM64EmulationStatus(lines):
+    if (len(search('Windows ARM64: Running with x64 emulation', lines)) > 0):
+        return [LEVEL_WARNING, "x64 OBS on Windows ARM64",
+                "You are running the x64 version of OBS on an ARM64 Windows system. This will greatly reduce performance due to the mandatory use of emulation."]
