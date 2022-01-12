@@ -60,3 +60,9 @@ def checkMacVer(lines):
     msg = "You are running %s %s, which is not officially supported by Apple but is compatible with the most recent version of OBS. Updating to a more recent version of macOS is recommended to ensure that you are able to install future versions of OBS." % (mv, html.escape(verinfo["name"]))
     mv += " (OK)"
     return [LEVEL_INFO, mv, msg]
+
+
+def checkRosettaTranslationStatus(lines):
+    if (len(search('Rosetta translation used: true', lines)) > 0):
+        return [LEVEL_WARNING, "Intel OBS on Apple Silicon Mac",
+                "You are running the Intel version of OBS on an Apple Silicon Mac. You may get improved performance using the Apple Silicon version of OBS."]
