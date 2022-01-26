@@ -144,6 +144,7 @@ def doAnalysis(url=None, filename=None):
                 checkWifi(logLines),
                 checkBind(logLines),
                 checkWindowsVer(logLines),
+                checkWindowsARM64(logLines),
                 checkMacVer(logLines),
                 checkAdmin(logLines),
                 checkImports(logLines),
