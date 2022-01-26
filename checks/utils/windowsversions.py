@@ -12,7 +12,7 @@ winver_re = re.compile(r"""
         (release: \s+ (?P<release>\d|\w+); \s+)?
         revision: \s+ (?P<revision>\d+);
         \s+
-        (?P<bits>\d+)-bit
+        (?P<arm>ARM)?\s?(?P<bits>\d+)-bit
     \)
     """, re.VERBOSE)
 

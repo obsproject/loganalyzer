@@ -252,6 +252,7 @@ def getWindowsVersion(lines):
         "build": int(m.group("build")),
         "revision": int(m.group("revision")),
         "bits": int(m.group("bits")),
+        "arm": bool(m.group("arm")),
         "release": 0
     }
 
@@ -312,6 +313,14 @@ def checkWindowsVer(lines):
             html.escape(verinfo["name"]))
 
     return [LEVEL_INFO, wv, msg]
+
+
+def checkWindowsARM64(lines):
+    verinfo = getWindowsVersion(lines)
+    if verinfo:
+        if verinfo["arm"]:
+            return [LEVEL_INFO, "Windows ARM64",
+                    "You are running OBS Studio on an ARM64 Windows system."]
 
 
 def checkAdmin(lines):
