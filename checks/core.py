@@ -44,6 +44,8 @@ def getOBSVersionLine(lines):
         correctLine += 1
     if 'multiple instances' in versionLines[correctLine]:
         correctLine += 1
+    if 'windows from screen capture' in versionLines[correctLine]:
+        correctLine += 1
     return versionLines[correctLine]
 
 
