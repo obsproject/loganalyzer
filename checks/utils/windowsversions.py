@@ -17,11 +17,13 @@ winver_re = re.compile(r"""
     """, re.VERBOSE)
 
 
+# Ref: https://docs.microsoft.com/en-us/lifecycle/products/windows-11-home-and-pro-version-21h2
 win11versions = {
     22000: {
         "release": 2009,
-        "name": "Windows 11",
+        "name": "Windows 11 21H2",
         "date": datetime.date(2021, 10, 5),
+        "EoS": datetime.date(2023, 10, 10),
     }
 }
 
@@ -30,6 +32,8 @@ win11versions = {
 # calls them "versions" because Win10 is also "Version 10.0".
 #
 # We probably don't need all the info here, but it comes in handy
+#
+# Ref: https://docs.microsoft.com/en-us/lifecycle/products/windows-10-home-and-pro
 win10versions = {
     10240: {
         "release": 1507,
@@ -108,6 +112,7 @@ win10versions = {
         "release": 2009,
         "name": "Windows 10 21H2",
         "date": datetime.date(2021, 10, 5),
+        "EoS": datetime.date(2023, 6, 13),
     },
     **win11versions
 }

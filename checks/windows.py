@@ -86,7 +86,7 @@ def checkRefreshes(lines):
     if verinfo["version"] == "10.0" and "release" not in verinfo:
         return
 
-    # FINALLY fixed in WIn10/2004
+    # FINALLY fixed in Win10/2004
     if verinfo["version"] and verinfo["release"] >= 2004:
         return
 
@@ -272,8 +272,8 @@ def checkWindowsVer(lines):
 
     # This is such a hack, but it's unclear how to do this better
     if verinfo["version"] == "10.0" and verinfo["release"] == 0:
-        if verinfo["build"] >= 22000:
-            msg = "You are running Windows 11 Insider build %d. Some checks that are applicable only to specific Windows versions will not be performed. Also, because Insider builds are test versions, you may have problems that would not happen with release versions of Windows 10." % (
+        if verinfo["build"] > 22000:
+            msg = "You are running Windows 11 Insider build %d. Some checks that are applicable only to specific Windows versions will not be performed. Also, because Insider builds are test versions, you may have problems that would not happen with release versions of Windows 11." % (
                 verinfo["build"])
             return[LEVEL_WARNING, "Windows 11 Insider Build", msg]
         else:
