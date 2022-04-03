@@ -65,7 +65,7 @@ def checkVideoSettings(lines):
         fps = float(fps_num) / float(fps_den)
         if ((not ((1.77 < baseAspect) and (baseAspect < 1.7787))) or (not ((1.77 < outAspect) and (outAspect < 1.7787)))):
             res.append([LEVEL_WARNING, "Non-Standard Aspect Ratio",
-                        "Almost all modern streaming services and video platforms expect video in 16:9 aspect ratio. OBS is currently configured to record in an aspect ration that differs from that. You (or your viewers) will see black bars during playback. Go to Settings -> Video and change your Canvas Resolution to one that is 16:9."])
+                        "Almost all modern streaming services and video platforms expect video in 16:9 aspect ratio. OBS is currently configured to record in an aspect ratio that differs from that. You (or your viewers) will see black bars during playback. Go to Settings -> Video and change your Canvas Resolution to one that is 16:9."])
         if (fmt != 'NV12'):
             res.append([LEVEL_CRITICAL, "Wrong Color Format",
                         "Color Formats other than NV12 are primarily intended for recording, and are not recommended when streaming. Streaming may incur increased CPU usage due to color format conversion. You can change your Color Format in Settings -> Advanced."])
