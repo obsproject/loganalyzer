@@ -6,7 +6,7 @@ from .utils.macosversions import *
 
 
 def getMacVersionLine(lines):
-    isMac = search('OS Name: Mac OS X', lines)
+    isMac = search('OS Name: Mac OS X', lines) + search('OS Name: macOS', lines)
     macVersion = search('OS Version:', lines)
     if (len(isMac) > 0 and len(macVersion) > 0):
         return macVersion[0]
