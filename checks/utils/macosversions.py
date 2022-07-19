@@ -12,12 +12,17 @@ macver_re = re.compile(r"""
 
 
 macversions = {
+    "13": {
+        "name": "Ventura",
+        # Placeholder date, since Ventura is in Beta
+        # https://www.apple.com/macos/macos-ventura-preview/
+        "date": datetime.date(2022, 6, 6),
+        "latest": True
+    },
     "12": {
         "name": "Monterey",
-        # Placeholder date, since Monterey is in Beta
-        # https://www.apple.com/macos/monterey-preview/
-        "date": datetime.date(2021, 6, 7),
-        "latest": True,
+        "date": datetime.date(2021, 10, 25),
+        "latest": True
     },
     "11": {
         "name": "Big Sur",
