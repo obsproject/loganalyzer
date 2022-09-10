@@ -48,6 +48,13 @@ def checkNVIDIAdrivers(lines):
                 """The installed NVIDIA driver does not support NVENC features needed for optimized encoders. Consider updating your drivers by downloading the newest installer from<a href="https://www.nvidia.de/Download/index.aspx">NVIDIA's website</a>. """]
 
 
+def checkNVIDIAdriversEGL(lines):
+    if (len(search('Using EGL/X11', lines)) <= 0):
+        return
+    if (len(search('OpenGL loaded successfully, version 3.3.0 NVIDIA 390', lines)) > 0):
+        return [LEVEL_WARNING, "Old NVIDIA Drivers", "Legacy NVIDIA 390 drivers do not support window capture on EGL."]
+
+
 def checkVideoSettings(lines):
     videoSettings = []
     res = []

@@ -137,6 +137,7 @@ def doAnalysis(url=None, filename=None):
                 checkRefreshes(logLines),
                 checkInit(logLines),
                 checkWayland(logLines),
+                checkNVIDIAdriversEGL(logLines),
                 checkNVENC(logLines),
                 check940(logLines),
                 checkKiller(logLines),
