@@ -9,6 +9,7 @@ import_re = re.compile(r"""
     '\sdue\sto\spossible\simport\sconflicts
     """, re.VERBOSE)
 
+
 def checkImports(lines):
     conflicts = search('due to possible import conflicts', lines)
     if (len(conflicts) > 0):
@@ -20,5 +21,5 @@ def checkImports(lines):
 
         if append:
             append = "<br><br>Plugins affected:<ul>" + append + "</ul>"
-        return [LEVEL_CRITICAL, "Outdated Plugins (" + str(len(conflicts)) + ")",
-        """Some plugins need to be manually updated, as they do not work with this version of OBS. Check our <a href="https://obsproject.com/kb/obs-studio-28-plugin-compatibility">Plugin Compatibility Guide</a> for known updates & download links.""" + append]
+            return [LEVEL_CRITICAL, "Outdated Plugins (" + str(len(conflicts)) + ")",
+                    """Some plugins need to be manually updated, as they do not work with this version of OBS. Check our <a href="https://obsproject.com/kb/obs-studio-28-plugin-compatibility">Plugin Compatibility Guide</a> for known updates & download links.""" + append]
