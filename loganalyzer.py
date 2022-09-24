@@ -10,6 +10,7 @@ from checks.encoding import *
 from checks.graphics import *
 from checks.macos import *
 from checks.network import *
+from checks.plugins import *
 from checks.sources import *
 from checks.wayland import *
 from checks.windows import *
@@ -136,7 +137,6 @@ def doAnalysis(url=None, filename=None):
                 checkRefreshes(logLines),
                 checkInit(logLines),
                 checkWayland(logLines),
-                # checkElements(logLines),
                 checkNVENC(logLines),
                 check940(logLines),
                 checkKiller(logLines),
@@ -145,6 +145,7 @@ def doAnalysis(url=None, filename=None):
                 checkWindowsVer(logLines),
                 checkMacVer(logLines),
                 checkAdmin(logLines),
+                checkImports(logLines),
                 check32bitOn64bit(logLines),
                 checkAttempt(logLines),
                 checkMP4(logLines),
