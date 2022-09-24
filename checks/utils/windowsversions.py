@@ -22,8 +22,14 @@ win11versions = {
     22000: {
         "release": 2009,
         "name": "Windows 11 21H2",
-        "date": datetime.date(2021, 10, 5),
+        "date": datetime.date(2021, 10, 4),
         "EoS": datetime.date(2023, 10, 10),
+    },
+    22622: {
+        "release": 2009,
+        "name": "Windows 11 22H2",
+        "date": datetime.date(2022, 9, 20),
+        "EoS": datetime.date(2024, 10, 14),
     }
 }
 
@@ -107,11 +113,10 @@ win10versions = {
         "date": datetime.date(2021, 5, 18),
         "EoS": datetime.date(2022, 12, 13),
     },
-    # Placeholder date. 21H2 is in Release Preview
     19044: {
         "release": 2009,
         "name": "Windows 10 21H2",
-        "date": datetime.date(2021, 10, 5),
+        "date": datetime.date(2021, 11, 16),
         "EoS": datetime.date(2023, 6, 13),
     },
     **win11versions
