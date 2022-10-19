@@ -120,6 +120,12 @@ win10versions = {
         "date": datetime.date(2021, 11, 16),
         "EoS": datetime.date(2023, 6, 13),
     },
+    19045: {
+        "release": 2009,
+        "name": "Windows 10 22H2",
+        "date": datetime.date(2022, 10, 17),
+        "EoS": datetime.date(2024, 5, 14),
+    },
     **win11versions
 }
 
