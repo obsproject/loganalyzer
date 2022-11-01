@@ -9,11 +9,11 @@ on:
 jobs:
   analyze:
     name: "01 - Run Analyzer"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
       - name: Install dependencies
@@ -25,13 +25,13 @@ jobs:
           ./loganalyzer.py --url=https://obsproject.com/logs/tGzdILvSRDMSpulg
   ubuntu64:
     name: "02 - Code Format Check"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: always()
     needs: [analyze]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
       - name: Install dependencies
