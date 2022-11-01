@@ -14,9 +14,7 @@ macver_re = re.compile(r"""
 macversions = {
     "13": {
         "name": "Ventura",
-        # Placeholder date, since Ventura is in Beta
-        # https://www.apple.com/macos/macos-ventura-preview/
-        "date": datetime.date(2022, 6, 6),
+        "date": datetime.date(2022, 10, 24),
         "latest": True
     },
     "12": {
