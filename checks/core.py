@@ -32,9 +32,6 @@ def checkCPU(lines):
         if (('APU' in cpu[0]) or ('Pentium' in cpu[0]) or ('Celeron' in cpu[0])):
             return [LEVEL_CRITICAL, "Insufficient Hardware",
                     "Your system is below minimum specs for OBS to run and may be too underpowered to livestream. There are no recommended settings we can suggest, but try the Auto-Config Wizard in the Tools menu. You may need to upgrade or replace your computer for a better experience."]
-        elif ('i3' in cpu[0]):
-            return [LEVEL_INFO, "Insufficient Hardware",
-                    "Your system is below minimum specs for OBS to run and is too underpowered to livestream using software encoding. Livestreams and recordings may run more smoothly if you are using a hardware encoder like QuickSync, NVENC or AMF (via Settings -> Output)."]
 
 
 def getOBSVersionLine(lines):
