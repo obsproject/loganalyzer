@@ -39,11 +39,13 @@ macversions = {
     },
     "10.14": {
         "name": "Mojave",
-        "date": datetime.date(2018, 9, 24)
+        "date": datetime.date(2018, 9, 24),
+        "max": "27.2"
     },
     "10.13": {
         "name": "High Sierra",
-        "date": datetime.date(2017, 9, 25)
+        "date": datetime.date(2017, 9, 25),
+        "max": "27.2"
     },
     "10.12": {
         "name": "Sierra",
