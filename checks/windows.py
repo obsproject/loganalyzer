@@ -30,7 +30,7 @@ def checkGPU(lines):
         if (len(adapters) == 2 and ('Vega' in d3dAdapter[0])):
             return [LEVEL_CRITICAL, "Wrong GPU",
                     """Your Laptop has two GPUs. OBS is running on the weak integrated AMD Vega GPU. For better performance as well as game capture being available you should run OBS on the dedicated GPU. Check the <a href="https://obsproject.com/wiki/Laptop-Troubleshooting">Laptop Troubleshooting Guide</a>."""]
-        elif (len(adapters) == 1 and ('Intel' in adapters[0])):
+        elif (len(adapters) == 1 and ('Intel' in adapters[0]) and ('Arc' not in adapters[0])):
             return [LEVEL_WARNING, "Integrated GPU",
                     "OBS is running on an Intel iGPU. This hardware is generally not powerful enough to be used for both gaming and running obs. Situations where only sources from e.g. cameras and capture cards are used might work."]
 
