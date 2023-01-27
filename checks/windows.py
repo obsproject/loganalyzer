@@ -210,9 +210,14 @@ def checkGameMode(lines):
 
 
 def checkWin10Hags(lines):
+    d3dAdapter = search('Loading up D3D11', lines)
+    hagsMessage = """The Hardware-accelerated GPU scheduling ("HAGS") feature added with Windows 10 is currently known to cause performance and capture issues with OBS, games and overlay tools. It's an experimental feature and we recommend disabling it via <a href="ms-settings:display-advancedgraphics">this screen</a> or <a href="https://obsproject.com/wiki/How-to-disable-Windows-10-Hardware-GPU-Scheduler">these instructions</a>."""
     if search('Hardware GPU Scheduler: On', lines):
         return [LEVEL_CRITICAL, "Hardware-accelerated GPU Scheduler",
-                """The new Windows 10 Hardware-accelerated GPU scheduling ("HAGS") added with version 2004 is currently known to cause performance and capture issues with OBS, games and overlay tools. It's a new and experimental feature and we recommend disabling it via <a href="ms-settings:display-advancedgraphics">this screen</a> or <a href="https://obsproject.com/wiki/How-to-disable-Windows-10-Hardware-GPU-Scheduler">these instructions</a>."""]
+                hagsMessage]
+    elif search('Hardware GPU Scheduler: Probably On', lines) and ('NVIDIA' in d3dAdapter[0]):
+        return [LEVEL_CRITICAL, "Hardware-accelerated GPU Scheduler",
+                hagsMessage]
 
 
 def check940(lines):
