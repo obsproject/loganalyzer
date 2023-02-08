@@ -200,12 +200,12 @@ def checkGameMode(lines):
         return
 
     if search("Game Mode: On", lines) and verinfo["release"] < 1809:
-        return [LEVEL_WARNING, "Windows 10 Game Mode",
+        return [LEVEL_WARNING, "Windows Game Mode",
                 """In some versions of Windows 10 (prior to version 1809), the "Game Mode" feature interferes with OBS Studio's normal functionality by starving it of CPU and GPU resources. We recommend disabling it via <a href="https://obsproject.com/wiki/How-to-disable-Windows-10-Gaming-Features#game-mode">these instructions</a>."""]
 
     # else
     if search("Game Mode: Off", lines):
-        return [LEVEL_INFO, "Windows 10 Game Mode",
+        return [LEVEL_INFO, "Windows Game Mode",
                 """In Windows 10 versions 1809 and newer, we recommend that "Game Mode" be enabled for maximum gaming performance. Game Mode can be enabled via the Windows 10 "Settings" app, under Gaming > <a href="ms-settings:gaming-gamemode">Game Mode</a>."""]
 
 
