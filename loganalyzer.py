@@ -171,7 +171,8 @@ def doAnalysis(url=None, filename=None):
                 checkDynamicBitrate(logLines),
                 checkStreamDelay(logLines),
                 checkUnknownEncoder(logLines),
-                checkBrowserSource(logLines)
+                checkBrowserSource(logLines),
+                checkPluginList(logLines)
             ])
             messages.extend(checkVideoSettings(logLines))
             m = parseScenes(logLines)

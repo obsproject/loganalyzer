@@ -101,3 +101,14 @@ def checkObsVersion(lines):
     if parse_version(versionString.replace('-modified', '')) < parse_version(CURRENT_VERSION):
         return [LEVEL_WARNING, "Old Version (%s)" % versionString,
                 """You are running an old version of OBS Studio (%s). Please update to version %s by going to Help -> Check for updates in OBS or by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it.""" % (versionString, CURRENT_VERSION)]
+
+
+def checkOperatingSystem(lines):
+    firstSection = lines[:getSubSections(lines)[0]]
+    for s in firstSection:
+        if 'mac' in s:
+            return "mac"
+        elif 'windows' in s:
+            return "windows"
+        elif 'linux' in s:
+            return "linux"
