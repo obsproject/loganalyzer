@@ -46,4 +46,3 @@ def getPluginLine(lines):
         if 'Loaded Modules:' in s:
             pluginLinePos.append(i)
     return pluginLinePos
-    
