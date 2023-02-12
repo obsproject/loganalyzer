@@ -38,7 +38,7 @@ def getScenes(lines):
         if '- scene' in s:
             scenePos.append(i)
     return scenePos
-    
+
 
 def getPluginLine(lines):
     pluginLinePos = []
@@ -46,3 +46,4 @@ def getPluginLine(lines):
         if 'Loaded Modules:' in s:
             pluginLinePos.append(i)
     return pluginLinePos
+    

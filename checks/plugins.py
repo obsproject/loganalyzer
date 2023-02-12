@@ -26,7 +26,7 @@ def checkImports(lines):
 
 
 def checkPluginList(lines):
-    if (getPluginLine(lines)): 
+    if (getPluginLine(lines)):
         firstPartyPlugins = ['win-wasapi.dll', 'win-mf.dll', 'win-dshow.dll', 'win-capture.dll', 'vlc-video.dll', 'text-freetype2.dll', 'rtmp-services.dll', 'obs-x264.dll', 'obs-websocket.dll', 'obs-vst.dll', 'obs-transitions.dll', 'obs-text.dll', 'obs-qsv11.dll', 'obs-outputs.dll', 'obs-filters.dll', 'obs-ffmpeg.dll', 'obs-browser.dll', 'image-source.dll', 'frontend-tools.dll', 'decklink-output-ui.dll', 'decklink-captions.dll', 'coreaudio-encoder.dll', 'win-decklink.dll', 'decklink-ouput-ui.dll', 'enc-amf.dll']
         thirdPartyPlugins = []
         pluginStart = getPluginLine(lines)[0] + 1
@@ -40,7 +40,7 @@ def checkPluginList(lines):
             if(len(noNumbers[-1]) > 1):
                 thirdPartyPlugins.append(noNumbers[-1])
             x = x + 1
-        
+
         while (y < len(thirdPartyPlugins)):
             currentPlugin = thirdPartyPlugins[y]
             updatedPlugin = currentPlugin[:-1]
@@ -55,4 +55,4 @@ def checkPluginList(lines):
 
         if(len(pluginString) > 5):
             return [LEVEL_INFO, "Third-Party Plugins",
-                """You have the following third party plugins installed:<br><br><strong>""" + pluginString + "</strong>"]
+                    """You have the following third party plugins installed:<br><br><strong>""" + pluginString + "</strong>"]
