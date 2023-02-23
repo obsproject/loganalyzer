@@ -172,7 +172,7 @@ def doAnalysis(url=None, filename=None):
                 checkStreamDelay(logLines),
                 checkUnknownEncoder(logLines),
                 checkBrowserSource(logLines),
-                checkPluginList(logLines)
+                checkMonitoringDevice(logLines)
             ])
             messages.extend(checkVideoSettings(logLines))
             m = parseScenes(logLines)
