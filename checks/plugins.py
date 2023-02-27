@@ -36,7 +36,7 @@ def checkPluginList(lines):
         thirdPartyPlugins = []
 
         for s in pluginList:
-            if ('     ' in s):
+            if ('     ' in s and s.count(':') == 3):
                 pluginFormatter = s.split(' ')
                 pluginFormatter = pluginFormatter[-1].split('.')
                 thirdPartyPlugins.append(pluginFormatter[0])
