@@ -350,3 +350,26 @@ def checkWindowsARM64EmulationStatus(lines):
     if (len(search('Windows ARM64: Running with x64 emulation', lines)) > 0):
         return [LEVEL_WARNING, "x64 OBS on Windows ARM64",
                 "You are running the x64 version of OBS on an ARM64 Windows system. This will greatly reduce performance due to the mandatory use of emulation."]
+
+
+def getDshowLines(lines):
+    dshowPos = []
+    for i, s in enumerate(lines):
+        if 'DShow Device:' in s:
+            dshowPos.append(i)
+    return dshowPos
+
+
+def checkDshowInterference(lines):
+    if (getDshowLines(lines)):
+        dshowLines = getDshowLines(lines)
+        videoPaths = []
+
+        for i in dshowLines:
+            fixedPath = lines[i + 2][:-1]
+            fixedPath = fixedPath.split('\t', 1)[1]
+            videoPaths.append(fixedPath)
+
+        if (len(videoPaths) != len(set(videoPaths))):
+            return [LEVEL_WARNING, "Video Capture Device Interference",
+                    "You have multiple Video Capture Device sources pointed to the same device. This is known to cause issues such as Video Capture Device sources working intermittently or not working at all. Remove any duplicates and use the <strong>Add Existing</strong> option when adding the same Video Capture Device to new scenes."]
