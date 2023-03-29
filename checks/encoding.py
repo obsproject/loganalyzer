@@ -16,7 +16,8 @@ def checkMP4(lines):
     writtenFiles = search('Writing file ', lines)
     mp4 = search('.mp4', writtenFiles)
     mov = search('.mov', writtenFiles)
-    if (len(mp4) > 0 or len(mov) > 0):
+    fragmentedFlag = search('movflags=frag_keyframe+empty_moov+delay_moov', lines)
+    if (mp4 or mov) and not fragmentedFlag:
         return [LEVEL_CRITICAL, "MP4/MOV Recording",
                 "Record to FLV or MKV. If you record to MP4 or MOV and the recording is interrupted, the file will be corrupted and unrecoverable. <br><br>If you require MP4 files for some other purpose like editing, remux them afterwards by selecting File > Remux Recordings in the main OBS Studio window."]
 
