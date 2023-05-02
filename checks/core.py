@@ -40,6 +40,8 @@ def checkCPU(lines):
 def getOBSVersionLine(lines):
     versionLines = search('OBS', lines)
     correctLine = 0
+    if 'uploaded' in versionLines[correctLine]:
+        correctLine += 1
     if 'already running' in versionLines[correctLine]:
         correctLine += 1
     if 'multiple instances' in versionLines[correctLine]:
