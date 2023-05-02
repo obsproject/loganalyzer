@@ -42,7 +42,7 @@ def checkBind(lines):
                 """Binding to a manually chosen IP address is rarely needed. Go to Settings -> Advanced -> Network and set "Bind to IP" back to "Default"."""]
 
 
-nicspeed_re = re.compile(r"(?i)Interface: (?P<nicname>.+) \(ethernet, (?P<speed>\d+) mbps\)")
+nicspeed_re = re.compile(r"(?i)Interface: (?P<nicname>.+) \(ethernet, ((?P<speed>\d+)|((?P<downspeed>\d+)↓/(?P<upspeed>\d+)↑)) mbps\)")
 
 
 def checkNICSpeed(lines):
@@ -52,7 +52,10 @@ def checkNICSpeed(lines):
             m = nicspeed_re.search(i)
             if m:
                 nic = m.group("nicname")
-                speed = int(m.group("speed"))
+                if m.group("speed"):
+                    speed = int(m.group("speed"))
+                elif m.group("upspeed"):
+                    speed = int(m.group("upspeed"))
                 if speed < 1000:
                     if 'GbE' in nic or 'Gigabit' in nic:
                         return [LEVEL_WARNING, "Slow Network Connection", "Your gigabit-capable network card is only connecting at 100mbps. This may indicate a bad network cable or outdated router / switch which could be impacting network performance."]
