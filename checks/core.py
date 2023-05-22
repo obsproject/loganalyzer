@@ -14,6 +14,14 @@ def checkClassic(lines):
         return False, [LEVEL_NONE, "OBS Studio", "Nothing to say"]
 
 
+def checkCrash(lines):
+    if (len(search('Unhandled exception:', lines)) > 0):
+        return True, [LEVEL_CRITICAL, "Crash Log",
+                      """You have uploaded a crash log. The Log Analyzer does not yet process crash logs."""]
+    else:
+        return False, [LEVEL_NONE, "OBS Studio Log", "Nothing to say"]
+
+
 def checkDual(lines):
     if (len(search('Warning: OBS is already running!', lines)) > 0):
         return [LEVEL_CRITICAL, "Two Instances",

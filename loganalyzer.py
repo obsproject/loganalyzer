@@ -124,8 +124,9 @@ def doAnalysis(url=None, filename=None):
 
     if (success):
         classic, m = checkClassic(logLines)
+        crash, m = checkCrash(logLines)
         messages.append(m)
-        if (not classic):
+        if (not classic and not crash):
             messages.extend([
                 checkObsVersion(logLines),
                 checkDual(logLines),
