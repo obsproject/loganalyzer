@@ -218,6 +218,9 @@ def checkWin10Hags(lines):
     elif search('Hardware GPU Scheduler: Probably On', lines) and ('NVIDIA' in d3dAdapter[0]):
         return [LEVEL_CRITICAL, "Hardware-accelerated GPU Scheduler",
                 hagsMessage]
+    elif search('Hardware-Accelerated GPU Scheduling enabled on adapter!', lines):
+        return [LEVEL_CRITICAL, "Hardware-accelerated GPU Scheduler",
+                hagsMessage]
 
 
 def check940(lines):
