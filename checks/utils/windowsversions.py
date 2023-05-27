@@ -17,7 +17,8 @@ winver_re = re.compile(r"""
     """, re.VERBOSE)
 
 
-# Ref: https://docs.microsoft.com/en-us/lifecycle/products/windows-11-home-and-pro-version-21h2
+# Ref: https://learn.microsoft.com/lifecycle/products/windows-11-home-and-pro
+#      https://learn.microsoft.com/windows/release-health/windows11-release-information
 win11versions = {
     22000: {
         "release": 2009,
@@ -25,12 +26,12 @@ win11versions = {
         "date": datetime.date(2021, 10, 4),
         "EoS": datetime.date(2023, 10, 10),
     },
-    # Note: 22622 is 22H2 but with additional features coming 2023
+    # Note: 22622 to 22624 and 22631 are 22H2 but with additional features coming 2023
     22621: {
         "release": 2009,
         "name": "Windows 11 22H2",
         "date": datetime.date(2022, 9, 20),
-        "EoS": datetime.date(2024, 10, 14),
+        "EoS": datetime.date(2024, 10, 8),
     }
 }
 
@@ -40,7 +41,8 @@ win11versions = {
 #
 # We probably don't need all the info here, but it comes in handy
 #
-# Ref: https://docs.microsoft.com/en-us/lifecycle/products/windows-10-home-and-pro
+# Ref: https://learn.microsoft.com/lifecycle/products/windows-10-home-and-pro
+#      https://learn.microsoft.com/windows/release-health/release-information
 win10versions = {
     10240: {
         "release": 1507,
@@ -123,8 +125,8 @@ win10versions = {
     19045: {
         "release": 2009,
         "name": "Windows 10 22H2",
-        "date": datetime.date(2022, 10, 17),
-        "EoS": datetime.date(2024, 5, 14),
+        "date": datetime.date(2022, 10, 18),
+        "EoS": datetime.date(2025, 10, 14),
     },
     **win11versions
 }
