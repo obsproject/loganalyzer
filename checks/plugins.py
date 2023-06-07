@@ -36,10 +36,11 @@ def checkPluginList(lines):
         thirdPartyPlugins = []
 
         for s in pluginList:
-            if ('     ' in s):
-                pluginFormatter = s.split(' ')
-                pluginFormatter = pluginFormatter[-1].split('.')
-                thirdPartyPlugins.append(pluginFormatter[0])
+            if '     ' in s:
+                timestamp, plugin = s.split(': ', 1)
+                plugin = plugin.rsplit('.', 1)[0]
+                plugin = plugin.strip()
+                thirdPartyPlugins.append(plugin)
 
         thirdPartyPlugins = set(thirdPartyPlugins).difference(commonPlugins)
         if (checkOperatingSystem(lines) == "windows"):
