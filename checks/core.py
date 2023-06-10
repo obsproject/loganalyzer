@@ -124,3 +124,9 @@ def checkOperatingSystem(lines):
             return "windows"
         elif 'linux' in s:
             return "linux"
+
+
+def checkPortableMode(lines):
+    if search('Portable mode: true', lines):
+        return [LEVEL_INFO, "Portable Mode",
+                """You are running OBS in Portable Mode. This means that OBS will store its settings with the executable. This is useful if you want to run OBS from a flash drive or other removable media."""]
