@@ -30,6 +30,12 @@ def checkKiller(lines):
                 """Killer's Firewall is known for it's poor performance and issues when trying to stream. Please download the driver pack from <a href="https://www.killernetworking.com/killersupport/driver-downloads/category/other-downloads">the vendor's page</a> , completely uninstall all Killer NIC items and install their Driver only package."""]
 
 
+def checkVantage(lines):
+    if (len(search('Lenovo Vantage / Legion Edge is installed.', lines)) > 0):
+        return [LEVEL_WARNING, "Lenovo Vantage",
+                """Lenovo Vantage / Legion Edge is installed and is known to cause connection issues while streaming. Open Lenovo Vantage and set the "Network Boost" feature to disabled when streaming with OBS."""]
+
+
 def checkWifi(lines):
     if (len(search('802.11', lines)) > 0):
         return [LEVEL_WARNING, "Wi-Fi Streaming",
