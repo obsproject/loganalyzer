@@ -179,7 +179,8 @@ def doAnalysis(url=None, filename=None):
                 checkMonitoringDevice(logLines),
                 checkPluginList(logLines),
                 checkVantage(logLines),
-                checkPortableMode(logLines)
+                checkPortableMode(logLines),
+                checkSafeMode(logLines)
             ])
             messages.extend(checkVideoSettings(logLines))
             m = parseScenes(logLines)

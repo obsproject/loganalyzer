@@ -130,3 +130,9 @@ def checkPortableMode(lines):
     if search('Portable mode: true', lines):
         return [LEVEL_INFO, "Portable Mode",
                 """You are running OBS in Portable Mode. This means that OBS will store its settings with the executable. This is useful if you want to run OBS from a flash drive or other removable media."""]
+
+
+def checkSafeMode(lines):
+    if search('Safe Mode enabled.', lines):
+        return [LEVEL_WARNING, "Safe Mode Enabled",
+                """You are running OBS in Safe Mode. Safe Mode disables third-party plugins and prevents scripts from running."""]
