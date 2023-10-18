@@ -14,6 +14,19 @@ def getWindowSystemLine(lines):
         return windowSystem[0]
 
 
+def checkSnapPackage(lines):
+    isDistroNix = search('Distribution:', lines)
+
+    if len(isDistroNix) <= 0:
+        return
+
+    distro = isDistroNix[0].split()
+    # Snap Package logs "Ubuntu Core" as distro, so it gets split halfway
+    if distro[2] == '"Ubuntu' and distro[3] == 'Core"':
+        return [LEVEL_WARNING, "Snap Package",
+                "You are using the Snap Package. This is a community-supported modified build of OBS Studio; please file issues on the <a href=\"https://github.com/snapcrafters/obs-studio/issues\">Snapcrafters GitHub</a>.<br><br>OBS may be unable to assist with issues arising out of the usage of this package. We recommend following our <a href=\"https://obsproject.com/download#linux\">Install Instructions</a> instead."]
+
+
 def checkWayland(lines):
     isDistroNix = search('Distribution:', lines)
     isFlatpak = search('Flatpak Runtime:', lines)
