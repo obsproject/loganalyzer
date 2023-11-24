@@ -134,5 +134,18 @@ def checkPortableMode(lines):
 
 def checkSafeMode(lines):
     if search('Safe Mode enabled.', lines):
-        return [LEVEL_WARNING, "Safe Mode Enabled",
-                """You are running OBS in Safe Mode. Safe Mode disables third-party plugins and prevents scripts from running."""]
+        modulesNotLoaded = search('not on safe list', lines)
+        moduleNames = []
+
+        for line in modulesNotLoaded:
+            found = re.search(r"'([^']+)'", line)
+            if found:
+                moduleNames.append(found.group(1))
+
+        if moduleNames:
+            modulesNotLoadedString = "<br>\n<ul>\n<li>" + "</li>\n<li>".join(moduleNames) + "</li>\n</ul>"
+            return [LEVEL_WARNING, "Safe Mode Enabled (" + str(len(moduleNames)) + ")",
+                    """You are running OBS in Safe Mode. Safe Mode disables third-party plugins and prevents scripts from running. The following modules were not loaded:""" + modulesNotLoadedString]
+        else:
+            return [LEVEL_WARNING, "Safe Mode Enabled",
+                    """You are running OBS in Safe Mode. Safe Mode disables third-party plugins and prevents scripts from running."""]
