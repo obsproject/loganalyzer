@@ -34,7 +34,7 @@ win11versions = {
         "EoS": datetime.date(2024, 10, 8),
     },
     22631: {
-        "release": "23H2",
+        "release": 2009,
         "name": "Windows 11 23H2",
         "date": datetime.date(2023, 10, 31),
         "EoS": datetime.date(2025, 11, 11),
