@@ -131,16 +131,16 @@ def checkEncoding(lines):
             severity = LEVEL_INFO
         if (hasx264 > 0 and (hasAMD + hasQSV + hasNVENC + hasAPPLE) > 0):
             return [severity, "{}% Encoder Overload".format(val),
-                    """Encoder overload may be related to your CPU or GPU being overloaded, depending on the encoder in question. If you are using a software encoder (x264) please see the <a href="https://obsproject.com/wiki/General-Performance-and-Encoding-Issues">CPU Overload Guide</a>. If you are using a hardware encoder (AMF, QSV/Quicksync, NVENC) please see the <a href="https://obsproject.com/wiki/GPU-overload-issues">GPU Overload Guide</a>."""]
+                    """Encoder overload may be related to your CPU or GPU being overloaded, depending on the encoder in question. If you are using a software encoder (x264) please see the <a href="https://obsproject.com/kb/encoding-performance-troubleshooting">CPU Overload Guide</a>. If you are using a hardware encoder (AMF, QSV/Quicksync, NVENC) please see the <a href="https://obsproject.com/kb/encoding-performance-troubleshooting">GPU Overload Guide</a>."""]
         elif (hasx264 > 0):
             return [severity, "{}% CPU Encoder Overload".format(val),
-                    """The encoder is skipping frames because of CPU overload. Read about <a href="https://obsproject.com/wiki/General-Performance-and-Encoding-Issues">General Performance and Encoding Issues</a>."""]
+                    """The encoder is skipping frames because of CPU overload. Read about <a href="https://obsproject.com/kb/encoding-performance-troubleshooting">General Performance and Encoding Issues</a>."""]
         elif ((hasNVENC + hasAMD + hasQSV + hasAPPLE) > 0):
             return [severity, "{}% GPU Encoder Overload".format(val),
-                    """The encoder is skipping frames because of GPU overload. Read about troubleshooting tips in our <a href="https://obsproject.com/wiki/GPU-overload-issues">GPU Overload Guide</a>."""]
+                    """The encoder is skipping frames because of GPU overload. Read about troubleshooting tips in our <a href="https://obsproject.com/kb/encoding-performance-troubleshooting">GPU Overload Guide</a>."""]
         else:
             return [severity, "{}% Encoder Overload".format(val),
-                    """Encoder overload may be related to your CPU or GPU being overloaded, depending on the encoder in question. If you are using a software encoder (x264) please see the <a href="https://obsproject.com/wiki/General-Performance-and-Encoding-Issues">CPU Overload Guide</a>. If you are using a hardware encoder (AMF, QSV/Quicksync, NVENC) please see the <a href="https://obsproject.com/wiki/GPU-overload-issues">GPU Overload Guide</a>."""]
+                    """Encoder overload may be related to your CPU or GPU being overloaded, depending on the encoder in question. If you are using a software encoder (x264) please see the <a href="https://obsproject.com/kb/encoding-performance-troubleshooting">CPU Overload Guide</a>. If you are using a hardware encoder (AMF, QSV/Quicksync, NVENC) please see the <a href="https://obsproject.com/kb/encoding-performance-troubleshooting">GPU Overload Guide</a>."""]
 
 
 unknownenc_re = re.compile(r"Encoder\sID\s'(?P<name>.+)'\snot\sfound")
