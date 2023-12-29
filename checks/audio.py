@@ -37,7 +37,7 @@ def checkAudioBuffering(lines):
         for line, index in maxBuffering:
             if (len(lines) > index):
                 m = audiobuf_re.search(lines[index + 1].replace('\r', ''))
-                if m.group("source"):
+                if m and m.group("source"):
                     append += "<br><br>Source affected (potential cause):<strong>" + m.group("source") + "</strong>"
                     break
         return [LEVEL_CRITICAL, "Max Audio Buffering",
