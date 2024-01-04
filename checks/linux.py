@@ -75,3 +75,33 @@ def checkWayland(lines):
             """Window and Display Captures are available via <a href='https://wiki.archlinux.org/title/XDG_Desktop_Portal'>XDG Desktop Portal</a><br>.
             Please note that the availability of captures and specific features depends on your Desktop Environment's implementation of these portals.<br><br>
             Global Keyboard Shortcuts are not currently available under Wayland."""]
+
+
+def checkX11Captures(lines):
+    isDistroNix = search('Distribution:', lines)
+    isFlatpak = search('Flatpak Runtime:', lines)
+
+    if (len(isDistroNix) <= 0) and (len(isFlatpak) <= 0):
+        return
+
+    sessionTypeLine = getSessionTypeLine(lines)
+    if not sessionTypeLine:
+        return
+
+    sessionType = sessionTypeLine.split()[3]
+    if sessionType != 'x11':
+        return
+
+    # obsolete PW sources
+    hasPipewireCaptureDesktop = search('pipewire-desktop-capture-source', lines)
+    hasPipewireCaptureWindow = search('pipewire-window-capture-source', lines)
+    # unified PW source
+    hasPipewireCaptureScreen = search('pipewire-screen-capture-source', lines)
+
+    if (len(hasPipewireCaptureDesktop) > 0) or (len(hasPipewireCaptureWindow) > 0) or (len(hasPipewireCaptureScreen) > 0):
+        return [LEVEL_WARNING, "PipeWire capture on X11",
+                """Most Desktop Environments do not implement the PipeWire capture portals on X11. This can result in being unable to pick a window or display, or the selected source will stay empty.<br><br>
+                We generally recommend using \"Window Capture (Xcomposite)\" on X11, as \"Display Capture (XSHM)\" can introduce bottlenecks depending on your setup."""]
+
+    return [LEVEL_INFO, "X11",
+            "If you wish to capture a window or an entire display, captures are available via Xcomposite and XSHM respectively. We generally recommend sticking to \"Window Capture (Xcomposite)\" since \"Display Capture (XSHM)\" can introduce bottlenecks depending on your setup."]
