@@ -14,6 +14,14 @@ def getWindowSystemLine(lines):
         return windowSystem[0]
 
 
+def checkFlatpak(lines):
+    isFlatpak = search('Flatpak Runtime:', lines)
+
+    if len(isFlatpak) > 0:
+        return [LEVEL_INFO, "Flatpak",
+                "You are using the Flatpak. Plugins are available as Flatpak extensions, which you can find in your Distribution's Software Center or via <code>flatpak search com.obsproject.Studio</code>. Installation of external plugins is not supported."]
+
+
 def checkSnapPackage(lines):
     isDistroNix = search('Distribution:', lines)
 
