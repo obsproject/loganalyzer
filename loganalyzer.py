@@ -183,6 +183,7 @@ def doAnalysis(url=None, filename=None):
                 checkVantage(logLines),
                 checkPortableMode(logLines),
                 checkSafeMode(logLines),
+                checkDistro(logLines),
                 checkFlatpak(logLines),
                 checkSnapPackage(logLines),
                 checkX11Captures(logLines),
