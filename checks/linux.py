@@ -46,13 +46,16 @@ def checkWayland(lines):
         distro = isDistroNix[0].split()
         if distro[2] == '"Ubuntu"' and distro[3] == '"20.04"':
             return [LEVEL_CRITICAL, "Ubuntu 20.04 under Wayland",
-                    "Ubuntu 20.04 does not provide the needed dependencies for OBS to capture under Wayland.<br> So OBS is able to capture only under X11/Xorg."]
+                    "Ubuntu 20.04 does not provide the needed dependencies for OBS to capture under Wayland.<br> Capture will only function under X11/Xorg."]
 
     windowSystemLine = getWindowSystemLine(lines)
     # If there is no Window System, OBS is running under Wayland
-    if not windowSystemLine:
-        return
+    if windowSystemLine:
+        # If there is, OBS is running under XWayland
+        return [LEVEL_CRITICAL, "Running under XWayland",
+                "OBS is running under XWayland, which prevents OBS from being able to capture.<br>To fix that, you will need to run OBS with the following command in a terminal:<p><code>obs -platform wayland</code></p>"]
 
-    # If there is, OBS is running under XWayland
-    return [LEVEL_CRITICAL, "Running under XWayland",
-            "OBS is running under XWayland, which prevents OBS from being able to capture.<br>To fix that, you will need to run OBS with the following command in a terminal:<p><code>obs -platform wayland</code></p>"]
+    return [LEVEL_INFO, "Wayland",
+            """Window and Screen Captures are available via <a href='https://wiki.archlinux.org/title/XDG_Desktop_Portal'>XDG Desktop Portal</a><br>.
+            Please note that the availability of captures and specific features depends on your Desktop Environment's implementation of these portals.<br><br>
+            Global Keyboard Shortcuts are not currently available under Wayland."""]
