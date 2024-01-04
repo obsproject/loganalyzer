@@ -14,6 +14,19 @@ def getWindowSystemLine(lines):
         return windowSystem[0]
 
 
+def checkDistro(lines):
+    isDistroNix = search('Distribution:', lines)
+
+    if len(isDistroNix) <= 0:
+        return
+
+    distro = isDistroNix[0].split()
+    distro = distro[2:]
+    distro = ' '.join(distro)
+
+    return [LEVEL_INFO, distro, ""]
+
+
 def checkFlatpak(lines):
     isFlatpak = search('Flatpak Runtime:', lines)
 
