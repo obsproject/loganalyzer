@@ -75,3 +75,34 @@ def checkWayland(lines):
             """Window and Display Captures are available via <a href='https://wiki.archlinux.org/title/XDG_Desktop_Portal'>XDG Desktop Portal</a><br>.
             Please note that the availability of captures and specific features depends on your Desktop Environment's implementation of these portals.<br><br>
             Global Keyboard Shortcuts are not currently available under Wayland."""]
+
+
+def checkX11(lines):
+    isDistroNix = search('Distribution:', lines)
+    isFlatpak = search('Flatpak Runtime:', lines)
+
+    if (len(isDistroNix) <= 0) and (len(isFlatpak) <= 0):
+        return
+
+    sessionTypeLine = getSessionTypeLine(lines)
+    if not sessionTypeLine:
+        return
+
+    sessionType = sessionTypeLine.split()[3]
+    if sessionType != 'x11':
+        return
+
+    # obsolete PW sources
+    hasPipewireCaptureDesktop = search('pipewire-desktop-capture-source', lines)
+    hasPipewireCaptureWindow = search('pipewire-window-capture-source', lines)
+    # unified PW source
+    hasPipewireCaptureScreen = search('pipewire-screen-capture-source', lines)
+
+    if (len(hasPipewireCaptureDesktop) > 0) or (len(hasPipewireCaptureWindow) > 0) or (len(hasPipewireCaptureScreen) > 0):
+        return [LEVEL_WARNING, "PipeWire capture on X11",
+                """While technically possible, most Desktop Environments do not implement the PipeWire capture portals on X11. Your captures will therefore likely not work, i.e. you will be unable to pick a window or display, or the selected source will stay empty.<br><br>
+                We generally recommend using \"Window Capture (Xcomposite)\" on X11, as \"Display Capture (XSHM)\" can introduce bottlenecks depending on your setup.<br><br>
+                From a technical standpoint a Desktop Environment should not advertise the availability of these captures if they are not implemented. This behaviour can therefore be considered a bug in your Desktop Environment."""]
+
+    return [LEVEL_INFO, "X11",
+            "Window Capture is available via Xcomposite, while Display Capture is available via XSHM. We generally recommend sticking to \"Window Capture (Xcomposite)\" since \"Display Capture (XSHM)\" can introduce bottlenecks depending on your setup."]
