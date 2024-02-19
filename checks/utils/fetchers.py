@@ -94,7 +94,7 @@ def getLinesPaste(obslogText):
 
 def matchDiscord(url):
     return re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18,}/[0-9]{18,}/(?:[0-9\-\_]{19}|message).txt))", url)
+        r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18,}/[0-9]{18,}/(?:[0-9\-\_]{19}|message).txt(?:\?\S+\&)?))", url)
 
 
 def getRawDiscord(obslogId):
