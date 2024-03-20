@@ -9,19 +9,14 @@ from .utils.windowsversions import *
 
 
 def checkGPU(lines):
-    versionString = getOBSVersionString(lines)
-    if parse_version(versionString) < parse_version('23.2.1'):
-        adapters = search('Adapter 1', lines)
+    adapters = []
+    for i in range(3):
         try:
-            adapters.append(search('Adapter 2', lines)[0])
+            adapters.append(search(f"Adapter {i}", lines)[0])
+            print(adapters)
         except IndexError:
             pass
-    else:
-        adapters = search('Adapter 0', lines)
-        try:
-            adapters.append(search('Adapter 1', lines)[0])
-        except IndexError:
-            pass
+
     d3dAdapter = search('Loading up D3D11', lines)
     if (len(d3dAdapter) > 0):
         if (len(adapters) == 2 and ('Intel' in d3dAdapter[0]) and ('Arc' not in d3dAdapter[0])):
