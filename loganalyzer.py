@@ -173,6 +173,8 @@ def doAnalysis(url=None, filename=None):
                 checkWin10Hags(logLines),
                 checkNICSpeed(logLines),
                 checkDynamicBitrate(logLines),
+                checkNetworkOptimizations(logLines),
+                checkTCPPacing(logLines),
                 checkStreamDelay(logLines),
                 checkUnknownEncoder(logLines),
                 checkBrowserSource(logLines),
