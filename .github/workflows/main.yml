@@ -39,7 +39,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Annotate linting errors
-        uses: marian-code/python-lint-annotate@v2
+        uses: marian-code/python-lint-annotate@ffe24b32a33241b668ab6d34150d7d8e1ad744ec
         with:
           python-root-list: "."
           use-black: false
@@ -51,7 +51,7 @@ jobs:
           use-flake8: false
           use-vulture: false
           extra-pycodestyle-options: "--config=setup.cfg"
-          conda-python-version: "3.8"
+          python-version: "3.8"
       - name: Run pycodestyle
         # This is required because the annotate action doesn't trigger a failure
         run: |
