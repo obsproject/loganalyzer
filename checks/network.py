@@ -75,6 +75,20 @@ def checkDynamicBitrate(lines):
     return None
 
 
+def checkNetworkOptimizations(lines):
+    networkOptimizationLines = search('New socket loop enabled by user', lines)
+    if (len(networkOptimizationLines) > 0):
+        return [LEVEL_INFO, "Network Optimizations", "Network Optimizations are enabled. This option is disabled by default. It is only suggested to enable Network Optimizations if you are having issues streaming. The setting can be toggled in Settings -> Advanced -> Network."]
+    return None
+
+
+def checkTCPPacing(lines):
+    TCPPacingLines = search('Low latency mode enabled by user', lines)
+    if (len(TCPPacingLines) > 0):
+        return [LEVEL_INFO, "TCP Pacing", "TCP Pacing (Low Latency mode) is enabled. This option is disabled by default. It is only suggested to enable TCP Pacing if you are having issues streaming. The setting can be toggled in Settings -> Advanced -> Network."]
+    return None
+
+
 def checkStreamDelay(lines):
     delayLines = search('second delay active', lines)
     if (len(delayLines) > 0):
