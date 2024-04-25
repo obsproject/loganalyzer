@@ -47,18 +47,15 @@ def checkCPU(lines):
 
 def getOBSVersionLine(lines):
     versionLines = search('OBS', lines)
-    correctLine = 0
-    if 'uploaded' in versionLines[correctLine]:
-        correctLine += 1
-    if 'already running' in versionLines[correctLine]:
-        correctLine += 1
-    if 'multiple instances' in versionLines[correctLine]:
-        correctLine += 1
-    if 'windows from screen capture' in versionLines[correctLine]:
-        correctLine += 1
-    if 'Lenovo Vantage / Legion Edge is installed' in versionLines[correctLine]:
-        correctLine += 1
-    return versionLines[correctLine]
+    wrongLines = ('uploaded',
+                  'already running',
+                  'multiple instances',
+                  'windows from screen capture',
+                  'Lenovo Vantage / Legion Edge is installed')
+    for line in versionLines:
+        if not any(wrongLine in line for wrongLine in wrongLines):
+            return line
+    return versionLines[-1]
 
 
 def getOBSVersionString(lines):
