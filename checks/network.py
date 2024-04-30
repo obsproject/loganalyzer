@@ -5,7 +5,7 @@ from .utils.utils import *
 
 
 def checkDrop(lines):
-    drops = search('insufficient bandwidth', lines)
+    drops = searchExclude('insufficient bandwidth', lines, ['test_stream'])
     val = 0
     severity = 9000
     for drop in drops:
