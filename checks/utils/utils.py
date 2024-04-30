@@ -6,6 +6,10 @@ def search(term, lines):
     return [s for s in lines if term in s]
 
 
+def searchExclude(term, lines, exclude):
+    return [s for s in lines if term in s and not any(excludeTerm in s for excludeTerm in exclude)]
+
+
 def searchWithIndex(term, lines):
     return [[s, i] for i, s in enumerate(lines) if term in s]
 
