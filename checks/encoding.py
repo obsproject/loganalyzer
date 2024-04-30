@@ -3,6 +3,9 @@ from .utils.utils import *
 import re
 
 
+params_re = re.compile(r"\t(?P<key>\w+):\s*(?P<value>\S+)")
+
+
 def checkAttempt(lines):
     recordingStarts = search('== Recording Start ==', lines)
     streamingStarts = search('== Streaming Start ==', lines)
@@ -42,21 +45,46 @@ def checkCustom(lines):
                 """Custom FFMPEG output is in use. Only absolute professionals should use this. If you got your settings from a YouTube video advertising "Absolute best OBS settings" then we recommend using one of the presets in Simple output mode instead."""]
 
 
-def checkStreamSettingsX264(lines):
-    streamingSessions = []
-    for i, s in enumerate(lines):
-        if "[x264 encoder: 'simple_h264_stream'] settings:" in s:
-            streamingSessions.append(i)
+def checkStreamSettings(lines):
+    streamingSessions = searchWithIndex("stream'] settings:", lines)
+    if streamingSessions:
+        encode_params = {"bitrate": None,
+                         "height": None,
+                         "width": None,
+                         "fps_num": None,
+                         "fps_den": None,
+                         }
+        line = streamingSessions[-1][1]
+        match = params_re.search(lines[line + 1])
+        while match:
+            for key in encode_params:
+                if key in match.group("key"):
+                    try:
+                        encode_params[key] = float(match.group("value"))
+                    except (ValueError, OverflowError):
+                        pass
+            line += 1
+            try:
+                match = params_re.search(lines[line])
+            except IndexError:
+                match = False
 
-    if (len(streamingSessions) > 0):
-        bitrate = float(lines[streamingSessions[-1] + 2].split()[-1])
-        fps_num = float(lines[streamingSessions[-1] + 5].split()[-1])
-        fps_den = float(lines[streamingSessions[-1] + 6].split()[-1])
-        width = float(lines[streamingSessions[-1] + 7].split()[-1])
-        height = float(lines[streamingSessions[-1] + 8].split()[-1])
+        # If bitrate isn't listed in the encode parameters or isn't a number, don't perform the check
+        if encode_params["bitrate"] is None:
+            return
 
-        bitrateEstimate = (width * height * fps_num / fps_den) / 20000
-        if (bitrate < bitrateEstimate):
+        # If fps or resolution aren't listed in encode parameters or aren't a number, fetch them from the video settings
+        line = searchWithIndex("video settings reset:", lines[:line])[-1][1]
+        try:
+            if encode_params["height"] is None or encode_params["width"] is None:
+                encode_params["width"], encode_params["height"] = (int(_) for _ in (lines[line + 2].split()[-1]).split("x"))
+            if encode_params["fps_den"] is None or encode_params["fps_num"] is None:
+                encode_params["fps_num"], encode_params["fps_den"] = (int(_) for _ in (lines[line + 4].split()[-1]).split("/"))
+        except (ValueError, OverflowError):
+            return                             # If fetching them from the video settings fails, don't perform the check
+
+        bitrateEstimate = (encode_params["width"] * encode_params["height"] * encode_params["fps_num"] / encode_params["fps_den"]) / 20000
+        if (encode_params["bitrate"] < bitrateEstimate):
             return [LEVEL_INFO, "Low Stream Bitrate",
                     "Your stream encoder is set to a video bitrate that is too low. This will lower picture quality especially in high motion scenes like fast paced games. Use the Auto-Config Wizard to adjust your settings to the optimum for your situation. It can be accessed from the Tools menu in OBS, and then just follow the on-screen directions."]
 
@@ -67,39 +95,6 @@ def checkNVENC(lines):
         # TODO Check whether the user is on Windows before suggesting Windows-specific solutions
         return [LEVEL_WARNING, "NVENC Start Failure",
                 """The NVENC Encoder failed to start due of a variety of possible reasons. Make sure that Windows Game Bar and Windows Game DVR are disabled and that your GPU drivers are up to date. <br><br>You can perform a clean driver installation for your GPU by following the instructions at <a href="http://obsproject.com/forum/resources/performing-a-clean-gpu-driver-installation.65/"> Clean GPU driver installation</a>. <br>If this doesn't solve the issue, then it's possible your graphics card doesn't support NVENC. You can change to a different Encoder in Settings > Output."""]
-
-
-def checkStreamSettingsNVENC(lines):
-    videoSettings = []
-    fps_num, fps_den = 0, 1
-    for i, s in enumerate(lines):
-        if "video settings reset:" in s:
-            videoSettings.append(i)
-    if (len(videoSettings) > 0):
-        for i in range(7):
-            chunks = lines[videoSettings[-1] + i].split()
-            if (chunks[-2] == 'fps:'):
-                fps_num, fps_den = (int(x) for x in chunks[-1].split('/'))
-    streamingSessions = []
-    for i, s in enumerate(lines):
-        if "[NVENC encoder: 'streaming_h264'] settings:" in s:
-            streamingSessions.append(i)
-    if (len(streamingSessions) > 0):
-        bitrate = 0
-        width = 0
-        height = 0
-        for i in range(12):
-            chunks = lines[streamingSessions[-1] + i].split()
-            if (chunks[-2] == 'bitrate:'):
-                bitrate = float(chunks[-1])
-            elif (chunks[-2] == 'width:'):
-                width = float(chunks[-1])
-            elif (chunks[-2] == 'height:'):
-                height = float(chunks[-1])
-        bitrateEstimate = (width * height * fps_num / fps_den) / 20000
-        if (bitrate < bitrateEstimate):
-            return [LEVEL_INFO, "Low Stream Bitrate",
-                    "Your stream encoder is set to a video bitrate that is too low. This will lower picture quality especially in high motion scenes like fast paced games. Use the Auto-Config Wizard to adjust your settings to the optimum for your situation. It can be accessed from the Tools menu in OBS, and then just follow the on-screen directions."]
 
 
 def checkEncodeError(lines):
