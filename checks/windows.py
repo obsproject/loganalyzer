@@ -49,11 +49,14 @@ def getMonitorRefreshes(lines):
         m = refresh_re.search(rl)
 
         if m is not None:
-            if m.group("name") is not None:
-                output = m.group("name").strip() + " (" + str(int(m.group("output_num")) + 1) + ")"
-            else:
-                output = "Display " + m.group("output_num")
-            refresh = float(m.group("refresh"))
+            try:
+                if m.group("name") is not None:
+                    output = m.group("name").strip() + " (" + str(int(m.group("output_num")) + 1) + ")"
+                else:
+                    output = "Display " + m.group("output_num")
+                refresh = float(m.group("refresh"))
+            except (ValueError, OverflowError):
+                continue
 
             refreshes[output] = refresh
 
@@ -130,10 +133,13 @@ def getWasapiSampleRates(lines):
         m = sample_re.search(sl)
 
         if m is not None:
-            device = str(m.group('device'))
-            sample = int(m.group('sample'))
+            try:
+                device = str(m.group('device'))
+                sample = int(m.group('sample'))
 
-            samples[device] = sample
+                samples[device] = sample
+            except (ValueError, OverflowError):
+                continue
 
     return samples
 
@@ -144,7 +150,10 @@ def checkWasapiSamples(lines):
     for osl in obsSampleLines:
         m = samples_re.search(osl)
         if m is not None:
-            obsSample = int(m.group('samples'))
+            try:
+                obsSample = int(m.group('samples'))
+            except (ValueError, OverflowError):
+                return []
     samples = getWasapiSampleRates(lines)
 
     if len(samples) == 0:
@@ -245,14 +254,17 @@ def getWindowsVersion(lines):
     if not m:
         return
 
-    ver = {
-        "version": m.group("version"),
-        "build": int(m.group("build")),
-        "revision": int(m.group("revision")),
-        "bits": int(m.group("bits")),
-        "arm": bool(m.group("arm")),
-        "release": 0
-    }
+    try:
+        ver = {
+            "version": m.group("version"),
+            "build": int(m.group("build")),
+            "revision": int(m.group("revision")),
+            "bits": int(m.group("bits")),
+            "arm": bool(m.group("arm")),
+            "release": 0
+        }
+    except (ValueError, OverflowError):
+        return                          # Skips the windows version checks
 
     # Older naming/numbering/etc
     if ver["version"] in winversions:

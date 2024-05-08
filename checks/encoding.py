@@ -118,8 +118,11 @@ def checkEncoding(lines):
     val = 0
     severity = 9000
     for drop in drops:
-        v = float(drop[drop.find("(") + 1: drop.find(")")
-                       ].strip('%').replace(",", "."))
+        try:
+            v = float(drop[drop.find("(") + 1: drop.find(")")
+                           ].strip('%').replace(",", "."))
+        except (ValueError, OverflowError):
+            v = 0
         if (v > val):
             val = v
     if (val != 0):
