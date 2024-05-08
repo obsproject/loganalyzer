@@ -47,10 +47,13 @@ def checkMacVer(lines):
         return
 
     mv = "macOS %s.%s" % (html.escape(verinfo["major"]), html.escape(verinfo["minor"]))
-    if (int(verinfo["major"]) <= 10 and "max" in verinfo):
-        msg = "You are running %s %s, which is multiple versions out of date and no longer supported by Apple or recent OBS versions. We recommend updating to the latest macOS release to ensure continued security, functionality and compatibility." % (mv, html.escape(verinfo["name"]))
-        mv += " (EOL)"
-        return [LEVEL_WARNING, mv, msg]
+    try:
+        if (int(verinfo["major"]) <= 10 and "max" in verinfo):
+            msg = "You are running %s %s, which is multiple versions out of date and no longer supported by Apple or recent OBS versions. We recommend updating to the latest macOS release to ensure continued security, functionality and compatibility." % (mv, html.escape(verinfo["name"]))
+            mv += " (EOL)"
+            return [LEVEL_WARNING, mv, msg]
+    except (ValueError, OverflowError):
+        pass
 
     if "latest" in verinfo:
         msg = "You are running %s %s, which is currently supported by Apple and the most recent version of OBS." % (mv, html.escape(verinfo["name"]))

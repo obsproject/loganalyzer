@@ -49,7 +49,10 @@ def checkAudioBuffering(lines):
         for i in buffering:
             m = audiobuf_re.search(i)
             if m:
-                vals.append(int(m.group("total")))
+                try:
+                    vals.append(int(m.group("total")))
+                except (ValueError, OverflowError):
+                    pass
 
         if (max(vals) > 500):
             return [LEVEL_WARNING, "High Audio Buffering",

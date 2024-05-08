@@ -9,8 +9,11 @@ def checkDrop(lines):
     val = 0
     severity = 9000
     for drop in drops:
-        v = float(drop[drop.find("(") + 1: drop.find(")")
-                       ].strip('%').replace(",", "."))
+        try:
+            v = float(drop[drop.find("(") + 1: drop.find(")")
+                           ].strip('%').replace(",", "."))
+        except (ValueError, OverflowError):
+            v = 0
         if (v > val):
             val = v
     if (val != 0):
@@ -58,10 +61,13 @@ def checkNICSpeed(lines):
             m = nicspeed_re.search(i)
             if m:
                 nic = m.group("nicname")
-                if m.group("speed"):
-                    speed = int(m.group("speed"))
-                elif m.group("upspeed"):
-                    speed = int(m.group("upspeed"))
+                try:
+                    if m.group("speed"):
+                        speed = int(m.group("speed"))
+                    elif m.group("upspeed"):
+                        speed = int(m.group("upspeed"))
+                except (ValueError, OverflowError):
+                    speed = 1000
                 if speed < 1000:
                     if 'GbE' in nic or 'Gigabit' in nic:
                         return [LEVEL_WARNING, "Slow Network Connection", "Your gigabit-capable network card is only connecting at 100mbps. This may indicate a bad network cable or outdated router / switch which could be impacting network performance."]
