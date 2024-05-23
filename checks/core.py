@@ -51,7 +51,8 @@ def getOBSVersionLine(lines):
                   'already running',
                   'multiple instances',
                   'windows from screen capture',
-                  'Lenovo Vantage / Legion Edge is installed')
+                  'Lenovo Vantage / Legion Edge is installed',
+                  'com.obsproject')
     for line in versionLines:
         if not any(wrongLine in line for wrongLine in wrongLines):
             return line
