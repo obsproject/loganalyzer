@@ -187,6 +187,7 @@ def doAnalysis(url=None, filename=None):
                 checkFlatpak(logLines),
                 checkSnapPackage(logLines),
                 checkX11Captures(logLines),
+                checkDesktopEnvironment(logLines),
                 checkMacPermissions(logLines)
             ])
             messages.extend(checkVideoSettings(logLines))
