@@ -118,3 +118,19 @@ def checkX11Captures(lines):
 
     return [LEVEL_INFO, "X11",
             "If you wish to capture a window or an entire display, captures are available via Xcomposite and XSHM respectively. We generally recommend sticking to \"Window Capture (Xcomposite)\" since \"Display Capture (XSHM)\" can introduce bottlenecks depending on your setup."]
+
+
+def checkDesktopEnvironment(lines):
+    isDistroNix = search('Distribution:', lines)
+    isFlatpak = search('Flatpak Runtime:', lines)
+
+    if (len(isDistroNix) <= 0) and (len(isFlatpak) <= 0):
+        return
+
+    desktopEnvironmentLine = search('Desktop Environment:', lines)
+    desktopEnvironment = desktopEnvironmentLine[0].split()
+    desktopEnvironment = desktopEnvironment[3:]
+    desktopEnvironment = ' '.join(desktopEnvironment)
+
+    if (len(desktopEnvironment) > 0):
+        return [LEVEL_INFO, desktopEnvironment, '']
