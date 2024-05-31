@@ -135,3 +135,26 @@ def checkDesktopEnvironment(lines):
 
     if (len(desktopEnvironment) > 0):
         return [LEVEL_INFO, desktopEnvironment, '']
+
+
+def checkMissingModules(lines):
+    isDistroNix = search('Distribution:', lines)
+
+    if (len(isDistroNix) <= 0):
+        return
+
+    modulesMissingList = []
+    modulesCheckList = ('obs-browser.so', 'obs-vlc.so', 'obs-websocket.so')
+
+    for module in modulesCheckList:
+        if not search(module, lines):
+            modulesMissingList.append(module)
+
+    if len(modulesMissingList):
+        modulesMissingString = str(modulesMissingList)
+        modulesMissingString = modulesMissingString.replace("', '", "</li><li>")
+        modulesMissingString = modulesMissingString[2:]
+        modulesMissingString = modulesMissingString[:-2]
+
+        return [LEVEL_INFO, "Missing Modules (" + str(len(modulesMissingList)) + ")",
+                """You are missing the following default modules:<br><ul><li>""" + modulesMissingString + "</li></ul>"]
