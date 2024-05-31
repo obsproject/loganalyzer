@@ -189,6 +189,7 @@ def doAnalysis(url=None, filename=None):
                 checkX11Captures(logLines),
                 checkDesktopEnvironment(logLines),
                 checkMissingModules(logLines),
+                checkLinuxVCam(logLines),
                 checkMacPermissions(logLines)
             ])
             messages.extend(checkVideoSettings(logLines))
