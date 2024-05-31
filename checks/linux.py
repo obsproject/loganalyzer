@@ -158,3 +158,19 @@ def checkMissingModules(lines):
 
         return [LEVEL_INFO, "Missing Modules (" + str(len(modulesMissingList)) + ")",
                 """You are missing the following default modules:<br><ul><li>""" + modulesMissingString + "</li></ul>"]
+
+
+def checkLinuxVCam(lines):
+    isDistroNix = search('Distribution:', lines)
+
+    if (len(isDistroNix) <= 0):
+        return
+
+    hasV4L2Module = search('v4l2loopback not installed', lines)
+
+    if len(hasV4L2Module) > 0:
+        return [LEVEL_INFO, "VCam not available",
+                """Using the Virtual Camera requires the <code>v4l2loopback</code> kernel module to be installed.<br>
+                If required, please refer to our <a href="https://github.com/obsproject/obs-studio/wiki/install-instructions#prerequisites-for-all-versions">Install Instructions</a> on how to install this on your distribution.<br>
+                If the module was not already loaded OBS will normally ask you for permission to load it when required. This requires a working <code>polkit</code> setup.<br>
+                You can also load the module manually using <code>modprobe v4l2loopback exclusive_caps=1 card_label='OBS Virtual Camera'</code>."""]
