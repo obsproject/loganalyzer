@@ -157,3 +157,18 @@ def checkMissingModules(lines):
 
         return [LEVEL_INFO, "Missing Modules (" + str(len(modulesMissingList)) + ")",
                 """You are missing the following default modules:<br><ul><li>""" + modulesMissingString + "</li></ul>"]
+
+
+def checkLinuxVCam(lines):
+    isDistroNix = search('Distribution:', lines)
+    isFlatpak = search('Flatpak Runtime:', lines)
+
+    if (len(isDistroNix) <= 0) and (len(isFlatpak) <= 0):
+        return
+
+    hasV4L2Module = search('v4l2loopback not installed', lines)
+
+    if len(hasV4L2Module) > 0:
+        return [LEVEL_INFO, "Virtual Camera not available",
+                """Using the Virtual Camera requires the <code>v4l2loopback</code> kernel module to be installed.<br>
+                If required, please refer to our <a href="https://github.com/obsproject/obs-studio/wiki/install-instructions#prerequisites-for-all-versions">Install Instructions</a> on how to install this on your distribution."""]
