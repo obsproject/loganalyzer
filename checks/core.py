@@ -46,16 +46,10 @@ def checkCPU(lines):
 
 
 def getOBSVersionLine(lines):
+    versionPattern = re.compile(r': OBS \d+\.\d+\.\d+')
     versionLines = search('OBS', lines)
-    wrongLines = ('uploaded',
-                  'already running',
-                  'multiple instances',
-                  'windows from screen capture',
-                  'Lenovo Vantage / Legion Edge is installed',
-                  'com.obsproject',
-                  'OBSBasic')
     for line in versionLines:
-        if not any(wrongLine in line for wrongLine in wrongLines):
+        if versionPattern.search(line):
             return line
     return versionLines[-1]
 
