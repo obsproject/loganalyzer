@@ -189,10 +189,14 @@ def doAnalysis(url=None, filename=None):
             messages.extend(checkVideoSettings(logLines))
             m = parseScenes(logLines)
             # TODO Verify .extend() can be used for parseScenes
+            seenMessages = set()
             for sublist in m:
                 if sublist is not None:
                     for item in sublist:
-                        messages.append(item)
+                        itemTuple = tuple(item)
+                        if itemTuple not in seenMessages:
+                            messages.append(item)
+                            seenMessages.add(itemTuple)
     else:
         messages.append([LEVEL_CRITICAL, "NO LOG",
                          "URL or file doesn't contain a log."])
