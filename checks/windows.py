@@ -9,6 +9,8 @@ from .utils.windowsversions import *
 
 
 def checkGPU(lines):
+    def getAdapterName(adapterString):
+        return adapterString.split(': ')[-1].strip()
     adapters = []
     for i in range(3):
         try:
@@ -20,9 +22,13 @@ def checkGPU(lines):
     d3dAdapter = search('Loading up D3D11', lines)
     if (len(d3dAdapter) > 0):
         if (len(adapters) == 2 and ('Intel' in d3dAdapter[0]) and ('Arc' not in d3dAdapter[0])):
+            if getAdapterName(adapters[0]) == getAdapterName(adapters[1]):
+                return None
             return [LEVEL_CRITICAL, "Wrong GPU",
                     """Your Laptop has two GPUs. OBS is running on the weak integrated Intel GPU. For better performance as well as game capture being available you should run OBS on the dedicated GPU. Check the <a href="https://obsproject.com/wiki/Laptop-Troubleshooting">Laptop Troubleshooting Guide</a>."""]
         if (len(adapters) == 2 and ('Vega' in d3dAdapter[0])):
+            if getAdapterName(adapters[0]) == getAdapterName(adapters[1]):
+                return None
             return [LEVEL_CRITICAL, "Wrong GPU",
                     """Your Laptop has two GPUs. OBS is running on the weak integrated AMD Vega GPU. For better performance as well as game capture being available you should run OBS on the dedicated GPU. Check the <a href="https://obsproject.com/wiki/Laptop-Troubleshooting">Laptop Troubleshooting Guide</a>."""]
         elif (len(adapters) == 1 and ('Intel' in adapters[0]) and ('Arc' not in adapters[0])):
