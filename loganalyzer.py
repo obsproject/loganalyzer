@@ -148,6 +148,7 @@ def doAnalysis(url=None, filename=None):
                 checkWindowsARM64(logLines),
                 checkMacVer(logLines),
                 checkAdmin(logLines),
+                checkGCAdmin(logLines),
                 checkImports(logLines),
                 check32bitOn64bit(logLines),
                 checkWindowsARM64EmulationStatus(logLines),
