@@ -157,7 +157,6 @@ def doAnalysis(url=None, filename=None):
                 checkPreset(logLines),
                 checkCustom(logLines),
                 checkBrowserAccel(logLines),
-                checkAudioBuffering(logLines),
                 checkDrop(logLines),
                 checkRenderLag(logLines),
                 checkEncodeError(logLines),
