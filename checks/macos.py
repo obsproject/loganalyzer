@@ -73,7 +73,7 @@ def checkRosettaTranslationStatus(lines):
 
 def checkMacPermissions(lines):
     macPerms = search('[macOS] Permission for', lines)
-    deniedPermissions = []
+    deniedPermissions = set()
 
     for line in macPerms:
         if 'denied' in line:
@@ -88,7 +88,7 @@ def checkMacPermissions(lines):
                 }.get(permissionName)
 
                 if permissionDescription:
-                    deniedPermissions.append(permissionDescription)
+                    deniedPermissions.add(permissionDescription)
 
     if deniedPermissions:
         deniedPermissionsString = "<br>\n<ul>\n<li>" + "</li>\n<li>".join(deniedPermissions) + "</li>\n</ul>"
