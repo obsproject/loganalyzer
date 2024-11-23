@@ -41,9 +41,7 @@ def checkSnapPackage(lines):
     if len(isDistroNix) <= 0:
         return
 
-    distro = isDistroNix[0].split()
-    # Snap Package logs "Ubuntu Core" as distro, so it gets split halfway
-    if distro[2] == '"Ubuntu' and distro[3] == 'Core"':
+    if '"Ubuntu Core"' in isDistroNix[0]:
         return [LEVEL_WARNING, "Snap Package",
                 "You are using the Snap Package. This is a community-supported modified build of OBS Studio; please file issues on the <a href=\"https://github.com/snapcrafters/obs-studio/issues\">Snapcrafters GitHub</a>.<br><br>OBS may be unable to assist with issues arising out of the usage of this package. We recommend following our <a href=\"https://obsproject.com/download#linux\">Install Instructions</a> instead."]
 
@@ -59,13 +57,11 @@ def checkWayland(lines):
     if not sessionTypeLine:
         return
 
-    sessionType = sessionTypeLine.split()[3]
-    if sessionType != 'wayland':
+    if 'wayland' not in sessionTypeLine:
         return
 
     if len(isDistroNix) > 0:
-        distro = isDistroNix[0].split()
-        if distro[2] == '"Ubuntu"' and distro[3] == '"20.04"':
+        if '"Ubuntu" "20.04"' in isDistroNix[0]:
             return [LEVEL_CRITICAL, "Ubuntu 20.04 under Wayland",
                     "Ubuntu 20.04 does not provide the needed dependencies for OBS to capture under Wayland.<br> Capture will only function under X11/Xorg."]
 
@@ -101,8 +97,7 @@ def checkX11Captures(lines):
     if not sessionTypeLine:
         return
 
-    sessionType = sessionTypeLine.split()[3]
-    if sessionType != 'x11':
+    if 'x11' not in sessionTypeLine:
         return
 
     # obsolete PW sources
@@ -129,8 +124,12 @@ def checkDesktopEnvironment(lines):
 
     desktopEnvironmentLine = search('Desktop Environment:', lines)
     desktopEnvironment = desktopEnvironmentLine[0].split()
-    desktopEnvironment = desktopEnvironment[3:]
-    desktopEnvironment = ' '.join(desktopEnvironment)
+
+    if (len(desktopEnvironment) > 3):
+        desktopEnvironment = desktopEnvironment[3:]
+        desktopEnvironment = ' '.join(desktopEnvironment)
+    else:
+        desktopEnvironment = ''
 
     if (len(desktopEnvironment) > 0):
         return [LEVEL_INFO, desktopEnvironment, '']
@@ -151,12 +150,12 @@ def checkMissingModules(lines):
 
     if len(modulesMissingList):
         modulesMissingString = str(modulesMissingList)
+        modulesMissingString = modulesMissingString.replace("['", "<ul><li>")
         modulesMissingString = modulesMissingString.replace("', '", "</li><li>")
-        modulesMissingString = modulesMissingString[2:]
-        modulesMissingString = modulesMissingString[:-2]
+        modulesMissingString = modulesMissingString.replace("']", "</li></ul>")
 
         return [LEVEL_INFO, "Missing Modules (" + str(len(modulesMissingList)) + ")",
-                """You are missing the following default modules:<br><ul><li>""" + modulesMissingString + "</li></ul>"]
+                """You are missing the following default modules:<br>""" + modulesMissingString]
 
 
 def checkLinuxVCam(lines):
