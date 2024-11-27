@@ -184,7 +184,8 @@ def doAnalysis(url=None, filename=None):
                 checkPortableMode(logLines),
                 checkSafeMode(logLines),
                 checkSnapPackage(logLines),
-                checkMacPermissions(logLines)
+                checkMacPermissions(logLines),
+                checkServiceRecommendations(logLines)
             ])
             messages.extend(checkVideoSettings(logLines))
             m = parseScenes(logLines)
