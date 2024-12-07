@@ -40,8 +40,8 @@ def checkAudioBuffering(lines):
                 if m and m.group("source"):
                     append += "<br><br>Source affected (potential cause):<strong>" + m.group("source") + "</strong>"
                     break
-        return [LEVEL_CRITICAL, "Max Audio Buffering",
-                "Audio buffering hit the maximum value. This is an indicator of very high system load, will affect stream latency, and may even cause individual audio sources to stop working. Keep an eye on CPU usage especially, and close background programs if needed. <br><br>Occasionally, this can be caused by incorrect device timestamps. Restart OBS to reset buffering." + append]
+        return [LEVEL_INFO, "Max Audio Buffering",
+                "Audio buffering hit the maximum value. This can be an indicator of very high system load and may affect stream latency or cause individual audio sources to stop working. Keep an eye on CPU usage especially, and close background programs if needed. <br><br>Occasionally, this can be caused by incorrect device timestamps. Restart OBS to reset buffering." + append]
 
     buffering = search('total audio buffering is now', lines)
     vals = [0, ]
@@ -55,7 +55,7 @@ def checkAudioBuffering(lines):
                     pass
 
         if (max(vals) > 500):
-            return [LEVEL_WARNING, "High Audio Buffering",
-                    "Audio buffering reached values above 500ms. This is an indicator of very high system load and will affect stream latency. Keep an eye on CPU usage especially, and close background programs if needed. Restart OBS to reset buffering."]
+            return [LEVEL_INFO, "High Audio Buffering",
+                    "Audio buffering reached values above 500ms. This is an indicator of very high system load and may affect stream latency. Keep an eye on CPU usage especially, and close background programs if needed. Restart OBS to reset buffering."]
 
     return None
