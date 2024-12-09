@@ -347,6 +347,18 @@ def checkAdmin(lines):
                 "OBS is not running as Administrator. This can lead to OBS not being able to Game Capture certain games. If you are not running into issues, you can ignore this."]
 
 
+gc_admin_re = re.compile(r"could not open process: (?P<executable>.*)$")
+
+
+def checkGCAdmin(lines):
+    error_lines = search("could not open process:", lines)
+    gc_error_lines = search("game-capture", error_lines)           # Makes sure the error comes from a game capture, in case.
+    if gc_error_lines:
+        exe_list = set([gc_admin_re.search(line).group("executable").strip() for line in gc_error_lines])
+        return [LEVEL_INFO, "Game Capture Permissions",
+                "OBS might need to be run as Administrator to properly capture the following games with game capture:<br>\n<ul>\n<li>" + "</li>\n<li>".join(exe_list) + "</li>\n</ul>"]
+
+
 def check32bitOn64bit(lines):
     winVersion = search('Windows Version', lines)
     obsVersion = getOBSVersionLine(lines)
