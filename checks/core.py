@@ -142,16 +142,3 @@ def checkSafeMode(lines):
         else:
             return [LEVEL_WARNING, "Safe Mode Enabled",
                     """You are running OBS in Safe Mode. Safe Mode disables third-party plugins and prevents scripts from running."""]
-
-
-def checkSnapPackage(lines):
-    isDistroNix = search('Distribution:', lines)
-
-    if len(isDistroNix) <= 0:
-        return
-
-    distro = isDistroNix[0].split()
-    # Snap Package logs "Ubuntu Core" as distro, so it gets split halfway
-    if distro[2] == '"Ubuntu' and distro[3] == 'Core"':
-        return [LEVEL_WARNING, "Snap Package",
-                "You are using the Snap Package. This is a community-supported modified build of OBS Studio; please file issues on the <a href=\"https://github.com/snapcrafters/obs-studio/issues\">Snapcrafters GitHub</a>.<br><br>OBS may be unable to assist with issues arising out of the usage of this package and therefore recommends following our <a href=\"https://obsproject.com/download#linux\">Install Instructions</a>."]
