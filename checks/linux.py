@@ -80,10 +80,7 @@ def checkWayland(lines):
                 <a href='https://wiki.archlinux.org/title/XDG_Desktop_Portal'>XDG Desktop Portal</a><br>
                 Note that the availability of Window and/or Display capture depends on your Desktop Environment's implementation of these portals."""]
 
-    return [LEVEL_INFO, "Wayland",
-            """Window and Display Captures are available via <a href='https://wiki.archlinux.org/title/XDG_Desktop_Portal'>XDG Desktop Portal</a><br>.
-            Please note that the availability of captures and specific features depends on your Desktop Environment's implementation of these portals.<br><br>
-            Global Keyboard Shortcuts are not currently available under Wayland."""]
+    return [LEVEL_INFO, "Wayland", ""]
 
 
 def checkX11Captures(lines):
@@ -111,8 +108,7 @@ def checkX11Captures(lines):
                 """Most Desktop Environments do not implement the PipeWire capture portals on X11. This can result in being unable to pick a window or display, or the selected source will stay empty.<br><br>
                 We generally recommend using \"Window Capture (Xcomposite)\" on X11, as \"Display Capture (XSHM)\" can introduce bottlenecks depending on your setup."""]
 
-    return [LEVEL_INFO, "X11",
-            "If you wish to capture a window or an entire display, captures are available via Xcomposite and XSHM respectively. We generally recommend sticking to \"Window Capture (Xcomposite)\" since \"Display Capture (XSHM)\" can introduce bottlenecks depending on your setup."]
+    return [LEVEL_INFO, "X11", ""]
 
 
 def checkDesktopEnvironment(lines):
