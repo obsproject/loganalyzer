@@ -3,7 +3,7 @@ from .utils.utils import *
 
 
 def checkInit(lines):
-    if (len(search('Failed to initialize video', lines)) > 0):
+    if search('Failed to initialize video', lines):
         return [LEVEL_CRITICAL, "Initialize Failed",
                 "Failed to initialize video. Your GPU may not be supported, or your graphics drivers may need to be updated."]
 
@@ -40,21 +40,21 @@ def checkRenderLag(lines):
 
 
 def checkAMDdrivers(lines):
-    if (len(search('The AMF Runtime is very old and unsupported', lines)) > 0):
+    if search('The AMF Runtime is very old and unsupported', lines):
         return [LEVEL_WARNING, "AMD Drivers",
                 """The AMF Runtime is very old and unsupported. The AMF Encoder will no work properly or not show up at all. Consider updating your drivers by downloading the newest installer from <a href="https://support.amd.com/en-us/download">AMD's website</a>. """]
 
 
 def checkNVIDIAdrivers(lines):
-    if (len(search('[jim-nvenc] Current driver version does not support this NVENC version, please upgrade your driver', lines)) > 0):
+    if search('[jim-nvenc] Current driver version does not support this NVENC version, please upgrade your driver', lines):
         return [LEVEL_WARNING, "Old NVIDIA Drivers",
                 """The installed NVIDIA driver does not support NVENC features needed for optimized encoders. Consider updating your drivers by downloading the newest installer from <a href="https://www.nvidia.com/Download/index.aspx">NVIDIA's website</a>. """]
 
 
 def checkNVIDIAdriversEGL(lines):
-    if (len(search('Using EGL/X11', lines)) <= 0):
+    if not search('Using EGL/X11', lines):
         return
-    if (len(search('OpenGL loaded successfully, version 3.3.0 NVIDIA 390', lines)) > 0):
+    if search('OpenGL loaded successfully, version 3.3.0 NVIDIA 390', lines):
         return [LEVEL_WARNING, "Old NVIDIA Drivers", "Legacy NVIDIA 390 drivers do not support window capture on EGL."]
 
 
