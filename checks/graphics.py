@@ -46,7 +46,7 @@ def checkAMDdrivers(lines):
 
 
 def checkNVIDIAdrivers(lines):
-    if search('[jim-nvenc] Current driver version does not support this NVENC version, please upgrade your driver', lines):
+    if (search('[jim-nvenc] Current driver version does not support this NVENC version, please upgrade your driver', lines) or search('[NVENC] Test process failed: outdated_driver', lines)):
         return [LEVEL_WARNING, "Old NVIDIA Drivers",
                 """The installed NVIDIA driver does not support NVENC features needed for optimized encoders. Consider updating your drivers by downloading the newest installer from <a href="https://www.nvidia.com/Download/index.aspx">NVIDIA's website</a>. """]
 
