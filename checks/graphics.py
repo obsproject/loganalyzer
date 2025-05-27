@@ -66,10 +66,10 @@ def checkVideoSettings(lines):
             videoSettings.append(i)
     if (len(videoSettings) > 0):
         fmt = lines[videoSettings[-1] + 5].split()[-1]
-        yuv = lines[videoSettings[-1] + 6].split()[-1]
-        if 'Full' in yuv:
-            res.append([LEVEL_WARNING, "Wrong YUV Color Range",
-                        """Having the YUV Color range set to "Full" will cause playback issues in certain browsers and on various video platforms. Shadows, highlights and color will look off. In OBS, go to "Settings -> Advanced" and set "YUV Color Range" back to "Limited"."""])
+        colorRange = lines[videoSettings[-1] + 6].split()[-1]
+        if 'Full' in colorRange:
+            res.append([LEVEL_WARNING, "Wrong Color Range",
+                        """Having the Color Range set to "Full" will cause playback issues in certain browsers and on various video platforms. Shadows, highlights and color will look off. In OBS, go to "Settings -> Advanced" and set "Color Range" back to "Limited"."""])
         if (fmt != 'NV12' and fmt != 'P010'):
             res.append([LEVEL_CRITICAL, "Wrong Color Format",
                         "Color Formats other than NV12 and P010 are primarily intended for recording, and are not recommended when streaming. Streaming may incur increased CPU usage due to color format conversion. You can change your Color Format in Settings -> Advanced."])
