@@ -182,14 +182,12 @@ def doAnalysis(url=None, filename=None):
                 checkVantage(logLines),
                 checkPortableMode(logLines),
                 checkSafeMode(logLines),
-                checkDistro(logLines),
-                checkFlatpak(logLines),
                 checkSnapPackage(logLines),
                 checkX11Captures(logLines),
-                checkDesktopEnvironment(logLines),
                 checkMissingModules(logLines),
                 checkLinuxVCam(logLines),
-                checkMacPermissions(logLines)
+                checkMacPermissions(logLines),
+                listLinuxSystemInfo(logLines)
             ])
             messages.extend(checkVideoSettings(logLines))
             m = parseScenes(logLines)
