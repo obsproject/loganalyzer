@@ -35,7 +35,8 @@ macversions = {
     },
     "10.15": {
         "name": "Catalina",
-        "date": datetime.date(2019, 10, 7)
+        "date": datetime.date(2019, 10, 7),
+        "max": "29.0"
     },
     "10.14": {
         "name": "Mojave",
