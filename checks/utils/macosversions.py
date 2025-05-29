@@ -12,6 +12,11 @@ macver_re = re.compile(r"""
 
 
 macversions = {
+    "14": {
+        "name": "Sonoma",
+        "date": datetime.date(2023, 9, 26),
+        "latest": True
+    },
     "13": {
         "name": "Ventura",
         "date": datetime.date(2022, 10, 24),
