@@ -22,7 +22,7 @@ jobs:
           pip install -r requirements.txt
       - name: Run basic test
         run: |
-          ./loganalyzer.py --url=https://obsproject.com/logs/tGzdILvSRDMSpulg
+          ./loganalyzer.py --url=https://obsproject.com/analyzer/test_logfile.txt
   ubuntu64:
     name: "02 - Code Format Check"
     runs-on: ubuntu-22.04
