@@ -14,7 +14,7 @@ macver_re = re.compile(r"""
 macversions = {
     "15": {
         "name": "Sequoia",
-        "date": datetime.date(2023, 9, 16),
+        "date": datetime.date(2024, 9, 16),
         "latest": True
     },
     "14": {
