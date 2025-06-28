@@ -98,7 +98,7 @@ def doAnalysis(url=None, filename=None):
             messages.append(getDescription(logLines))
             success = True
         elif (obs):
-            obslogObject = getObslog(obs.groups()[-1])
+            obslogObject = getObslog(obs['obsLogURLRoot'], obs['obsLogURLFilename'])
             logLines = getLinesObslog(obslogObject)
             messages.append(getDescription(logLines))
             success = True
