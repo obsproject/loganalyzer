@@ -15,7 +15,6 @@ def checkGPU(lines):
     for i in range(3):
         try:
             adapters.append(search(f"Adapter {i}", lines)[0])
-            print(adapters)
         except IndexError:
             pass
 
