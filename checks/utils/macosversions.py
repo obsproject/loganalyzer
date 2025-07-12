@@ -35,13 +35,13 @@ macversions = {
     "11": {
         "name": "Big Sur",
         "date": datetime.date(2020, 11, 12),
-        "latest": True
+        "max": "31.0"
     },
     # Old versions of OBS read Big Sur as 10.16, so document it too
     "10.16": {
         "name": "Big Sur",
         "date": datetime.date(2020, 11, 12),
-        "latest": True
+        "max": "31.0"
     },
     "10.15": {
         "name": "Catalina",
