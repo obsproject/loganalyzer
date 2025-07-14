@@ -9,7 +9,7 @@ on:
 jobs:
   analyze:
     name: "01 - Run Analyzer"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Setup
@@ -25,7 +25,7 @@ jobs:
           ./loganalyzer.py --url=https://obsproject.com/analyzer/test_logfile.txt
   ubuntu64:
     name: "02 - Code Format Check"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: always()
     needs: [analyze]
     steps:
