@@ -51,7 +51,7 @@ jobs:
           use-flake8: false
           use-vulture: false
           extra-pycodestyle-options: "--config=setup.cfg"
-          python-version: "3.8"
+          python-version: "3.9"
       - name: Run pycodestyle
         # This is required because the annotate action doesn't trigger a failure
         run: |
