@@ -103,25 +103,19 @@ def checkStreamDelay(lines):
 
 
 def checkServiceRecommendations(lines):
-    maxBitrate = None
-    for i, line in enumerate(lines):
-        if "User is ignoring service bitrate limits." in line:
-            for j in range(i + 1, len(lines)):
-                if "video bitrate:" in lines[j]:
-                    maxBitrateMatch = re.search(r'video bitrate:\s+(\d+)', lines[j])
-                    if maxBitrateMatch:
-                        maxBitrate = int(maxBitrateMatch.group(1))
-                    break
-            break
+    ignoringStreams = searchWithIndex("User is ignoring service bitrate limits.", lines)
 
-    if maxBitrate is not None:
-        for i, line in enumerate(lines):
-            if "bitrate:" in line and "video bitrate:" not in line:
-                currentBitrateMatch = re.search(r'bitrate:\s+(\d+)', line)
-                if currentBitrateMatch:
-                    currentBitrate = int(currentBitrateMatch.group(1))
-                    if currentBitrate > maxBitrate:
-                        return [LEVEL_WARNING, "Max Video Bitrate Limit Exceeded",
-                                f"Current bitrate {currentBitrate}kbps exceeds max video bitrate limit {maxBitrate}kbps. "
-                                "This may result in the streaming service not displaying the video from your stream or rejecting it entirely."]
-    return None
+    for _, index in ignoringStreams:
+        try:
+            maxBitrate = int(re.search(r'video bitrate:\s+(\d+)', lines[index + 2]).group(1))
+
+            bitrateLines = searchExclude("bitrate:", lines[index + 4:], ["video bitrate", "audio bitrate"])
+            if bitrateLines and "channels" not in bitrateLines[0]:
+                currentBitrate = int(re.search(r'bitrate:\s+(\d+)', bitrateLines[0]).group(1))
+
+                if currentBitrate > maxBitrate:
+                    return [LEVEL_WARNING, "Max Video Bitrate Limit Exceeded",
+                            f"Current bitrate {currentBitrate}kbps exceeds max video bitrate limit {maxBitrate}kbps. "
+                            "This may result in the streaming service not displaying the video from your stream or rejecting it entirely."]
+        except ValueError:
+            pass
