@@ -103,25 +103,33 @@ def checkStreamDelay(lines):
 
 
 def checkServiceRecommendations(lines):
-    maxBitrate = None
-    for i, line in enumerate(lines):
-        if "User is ignoring service bitrate limits." in line:
-            for j in range(i + 1, len(lines)):
-                if "video bitrate:" in lines[j]:
-                    maxBitrateMatch = re.search(r'video bitrate:\s+(\d+)', lines[j])
-                    if maxBitrateMatch:
-                        maxBitrate = int(maxBitrateMatch.group(1))
-                    break
-            break
+    ignoringStreams = searchWithIndex("User is ignoring service bitrate limits.", lines)
 
-    if maxBitrate is not None:
-        for i, line in enumerate(lines):
-            if "bitrate:" in line and "video bitrate:" not in line:
-                currentBitrateMatch = re.search(r'bitrate:\s+(\d+)', line)
-                if currentBitrateMatch:
-                    currentBitrate = int(currentBitrateMatch.group(1))
+    for _, index in ignoringStreams[::-1]:  # Check last streams first
+
+        try:
+            maxBitrateRE = re.search(r'video bitrate:\s+(\d+)', lines[index + 2])
+            maxBitrate = int(maxBitrateRE.group(1)) if maxBitrateRE else float("nan")
+            # Guards against failed regex, nan to fail the comparison if so
+
+            attemptStart = searchWithIndex("channel_layout", lines[index:])
+            # This is the audio encoder line, always included after the video encoder
+            isMultitrack = searchWithIndex("Go live URL:", lines[index: index + attemptStart[0][1]]) if attemptStart else True
+            # True to skip this attempt if not attemptStart
+
+            if not isMultitrack:
+                # With enhanced broadcasting, the max recommended are irrelevant
+
+                bitrateLines = searchExclude("bitrate:", lines[index: index + attemptStart[0][1]], ["video bitrate", "audio bitrate", "aggregate"])
+                if bitrateLines and "channels" not in bitrateLines[0]:
+
+                    currentBitrateRE = re.search(r'bitrate:\s+(\d+)', bitrateLines[0])
+                    currentBitrate = int(currentBitrateRE.group(1)) if currentBitrateRE else float("nan")
+                    # Guards against failed regex, nan to fail the comparison if so
+
                     if currentBitrate > maxBitrate:
                         return [LEVEL_WARNING, "Max Video Bitrate Limit Exceeded",
                                 f"Current bitrate {currentBitrate}kbps exceeds max video bitrate limit {maxBitrate}kbps. "
                                 "This may result in the streaming service not displaying the video from your stream or rejecting it entirely."]
-    return None
+        except ValueError:
+            pass
