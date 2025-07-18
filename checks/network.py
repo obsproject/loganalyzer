@@ -103,7 +103,6 @@ def checkStreamDelay(lines):
 
 
 def checkServiceRecommendations(lines):
-    maxBitrate = None
     for i, line in enumerate(lines):
         if "User is ignoring service bitrate limits." in line:
             for j in range(i + 1, len(lines)):
@@ -111,17 +110,15 @@ def checkServiceRecommendations(lines):
                     maxBitrateMatch = re.search(r'video bitrate:\s+(\d+)', lines[j])
                     if maxBitrateMatch:
                         maxBitrate = int(maxBitrateMatch.group(1))
+                        for k in range(j + 1, len(lines)):
+                            if "bitrate:" in lines[k] and "video bitrate:" not in lines[k].lower() and "audio" not in lines[k].lower():
+                                currentBitrateMatch = re.search(r'bitrate:\s+(\d+)', lines[k])
+                                if currentBitrateMatch:
+                                    currentBitrate = int(currentBitrateMatch.group(1))
+                                    if currentBitrate > maxBitrate:
+                                        return [LEVEL_WARNING, "Max Video Bitrate Limit Exceeded",
+                                                f"Current bitrate {currentBitrate}kbps exceeds max video bitrate limit {maxBitrate}kbps. "
+                                                "This may result in the streaming service not displaying the video from your stream or rejecting it entirely."]
+                                break
                     break
-            break
-
-    if maxBitrate is not None:
-        for i, line in enumerate(lines):
-            if "bitrate:" in line and "video bitrate:" not in line:
-                currentBitrateMatch = re.search(r'bitrate:\s+(\d+)', line)
-                if currentBitrateMatch:
-                    currentBitrate = int(currentBitrateMatch.group(1))
-                    if currentBitrate > maxBitrate:
-                        return [LEVEL_WARNING, "Max Video Bitrate Limit Exceeded",
-                                f"Current bitrate {currentBitrate}kbps exceeds max video bitrate limit {maxBitrate}kbps. "
-                                "This may result in the streaming service not displaying the video from your stream or rejecting it entirely."]
     return None
