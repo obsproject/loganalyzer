@@ -24,7 +24,7 @@ def checkDrop(lines):
         else:
             severity = LEVEL_INFO
     return [severity, "{}% Dropped Frames".format(val),
-            """Your log contains streaming sessions with dropped frames. This can only be caused by a failure in your internet connection or your networking hardware. It is not caused by OBS. Follow the troubleshooting steps at: <a href="https://obsproject.com/wiki/Dropped-Frames-and-General-Connection-Issues">Dropped Frames and General Connection Issues</a>."""]
+            """Your log contains streaming sessions with dropped frames. This can only be caused by a failure in your internet connection or your networking hardware. It is not caused by OBS. Follow the troubleshooting steps at: <a href="https://obsproject.com/kb/stream-connection-troubleshooting">Dropped Frames and General Connection Issues</a>."""]
 
 
 def checkKiller(lines):
