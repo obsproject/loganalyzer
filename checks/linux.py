@@ -14,6 +14,34 @@ def getWindowSystemLine(lines):
         return windowSystem[0]
 
 
+def isWayland(lines):
+    if not (checkDistro(lines) or checkFlatpak(lines)):
+        return False
+
+    sessionTypeLine = getSessionTypeLine(lines)
+    if not sessionTypeLine:
+        return False
+
+    if 'wayland' not in sessionTypeLine:
+        return False
+
+    return True
+
+
+def isX11(lines):
+    if not (checkDistro(lines) or checkFlatpak(lines)):
+        return False
+
+    sessionTypeLine = getSessionTypeLine(lines)
+    if not sessionTypeLine:
+        return False
+
+    if 'x11' not in sessionTypeLine:
+        return False
+
+    return True
+
+
 def checkDistro(lines):
     isDistroNix = search('Distribution:', lines)
 
@@ -47,23 +75,13 @@ def checkSnapPackage(lines):
 
 
 def checkWayland(lines):
-    isDistroNix = search('Distribution:', lines)
-    isFlatpak = search('Flatpak Runtime:', lines)
-
-    if (len(isDistroNix) <= 0) and (len(isFlatpak) <= 0):
+    if not isWayland(lines):
         return
 
-    sessionTypeLine = getSessionTypeLine(lines)
-    if not sessionTypeLine:
-        return
-
-    if 'wayland' not in sessionTypeLine:
-        return
-
-    if len(isDistroNix) > 0:
-        if '"Ubuntu" "20.04"' in isDistroNix[0]:
-            return [LEVEL_CRITICAL, "Ubuntu 20.04 under Wayland",
-                    "Ubuntu 20.04 does not provide the needed dependencies for OBS to capture under Wayland.<br> Capture will only function under X11/Xorg."]
+    isDistroNix = checkDistro(lines)
+    if isDistroNix and ('"Ubuntu" "20.04"' in isDistroNix[1]):
+        return [LEVEL_CRITICAL, "Ubuntu 20.04 under Wayland",
+                "Ubuntu 20.04 does not provide the needed dependencies for OBS to capture under Wayland.<br> Capture will only function under X11/Xorg."]
 
     windowSystemLine = getWindowSystemLine(lines)
     # If there is no Window System, OBS is running under Wayland
@@ -80,21 +98,9 @@ def checkWayland(lines):
                 <a href='https://wiki.archlinux.org/title/XDG_Desktop_Portal'>XDG Desktop Portal</a><br>
                 Note that the availability of Window and/or Display capture depends on your Desktop Environment's implementation of these portals."""]
 
-    return [LEVEL_INFO, "Wayland", ""]
-
 
 def checkX11Captures(lines):
-    isDistroNix = search('Distribution:', lines)
-    isFlatpak = search('Flatpak Runtime:', lines)
-
-    if (len(isDistroNix) <= 0) and (len(isFlatpak) <= 0):
-        return
-
-    sessionTypeLine = getSessionTypeLine(lines)
-    if not sessionTypeLine:
-        return
-
-    if 'x11' not in sessionTypeLine:
+    if not isX11(lines):
         return
 
     # obsolete PW sources
@@ -108,8 +114,6 @@ def checkX11Captures(lines):
                 """Most Desktop Environments do not implement the PipeWire capture portals on X11. This can result in being unable to pick a window or display, or the selected source will stay empty.<br><br>
                 We generally recommend using \"Window Capture (Xcomposite)\" on X11, as \"Display Capture (XSHM)\" can introduce bottlenecks depending on your setup."""]
 
-    return [LEVEL_INFO, "X11", ""]
-
 
 def checkDesktopEnvironment(lines):
     isDistroNix = search('Distribution:', lines)
@@ -119,6 +123,10 @@ def checkDesktopEnvironment(lines):
         return
 
     desktopEnvironmentLine = search('Desktop Environment:', lines)
+
+    if not desktopEnvironmentLine:
+        return
+
     desktopEnvironment = desktopEnvironmentLine[0].split()
 
     if (len(desktopEnvironment) > 3):
@@ -167,3 +175,34 @@ def checkLinuxVCam(lines):
         return [LEVEL_INFO, "Virtual Camera not available",
                 """Using the Virtual Camera requires the <code>v4l2loopback</code> kernel module to be installed.<br>
                 If required, please refer to our <a href="https://github.com/obsproject/obs-studio/wiki/install-instructions#prerequisites-for-all-versions">Install Instructions</a> on how to install this on your distribution."""]
+
+
+def checkLinuxSystemInfo(lines):
+    if checkFlatpak(lines):
+        linuxDistroOrFlatpak = 'Flatpak'
+        linuxSystemInfoHelp = checkFlatpak(lines)[2] + '<br>'
+    elif checkDistro(lines):
+        linuxDistroOrFlatpak = 'Distribution: ' + checkDistro(lines)[1]
+        linuxSystemInfoHelp = ''
+    else:
+        # I have never seen this, but you never know
+        linuxDistroOrFlatpak = 'Distribution: ⚠️  None'
+        linuxSystemInfoHelp = 'No distribution detected. This can lead to undefined behaviour. Please consult your distribution\'s support channels on how to fix this.<br>'
+
+    if isX11(lines):
+        displayServer = 'X11'
+    elif isWayland(lines):
+        displayServer = 'Wayland'
+    else:
+        # can happen with misconfigured or virtual systems
+        displayServer = '⚠️  None'
+        linuxSystemInfoHelp += 'No Display Server detected. This can lead to undefined behaviour. Please consult your Desktop Environment\'s or Window Manager\'s support channels on how to fix this.<br>'
+
+    if checkDesktopEnvironment(lines):
+        desktopEnvironment = 'DE: ' + checkDesktopEnvironment(lines)[1]
+    else:
+        # can happen for some misconfigured tiling window managers
+        desktopEnvironment = 'DE: ⚠️  None'
+        linuxSystemInfoHelp += 'No Desktop Environment detected. This can lead to undefined behaviour. Please consult your Desktop Environment\'s or Window Manager\'s support channels on how to fix this.'
+
+    return [LEVEL_INFO, linuxDistroOrFlatpak + ' | ' + displayServer + ' | ' + desktopEnvironment, linuxSystemInfoHelp]
