@@ -27,12 +27,17 @@ def checkImports(lines):
 
 
 def checkPluginList(lines):
-    if (getLoadedModules(lines) and checkOperatingSystem(lines)):
-        commonPlugins = ['frontend-tools', 'vlc-video', 'obs-outputs', 'obs-vst', 'obs-ffmpeg', 'obs-browser', 'obs-transitions', 'decklink', 'decklink-captions', 'text-freetype2', 'decklink-output-ui', 'decklink-ouput-ui', 'aja', 'aja-output-ui', 'obs-x264', 'obs-websocket', 'obs-filters', 'image-source', 'rtmp-services', 'obs-webrtc', 'obs-nvenc', 'nv-filters', 'test-input']
-        windowsPlugins = ['win-wasapi', 'win-mf', 'win-dshow', 'win-capture', 'obs-text', 'obs-qsv11', 'win-decklink', 'enc-amf', 'coreaudio-encoder']
-        macPlugins = ['mac-virtualcam', 'mac-videotoolbox', 'mac-syphon', 'mac-capture', 'mac-avcapture', 'coreaudio-encoder', 'mac-avcapture-legacy']
-        linuxPlugins = ['obs-libfdk', 'linux-v4l2', 'linux-pulseaudio', 'linux-pipewire', 'linux-jack', 'linux-capture', 'linux-alsa', 'obs-qsv11']
-        pluginList = lines[(getLoadedModules(lines)[0] + 1):getPluginEnd(lines)]
+    moduleStart = getLoadedModules(lines)[0]
+    operatingSystem = checkOperatingSystem(lines)
+    if moduleStart and operatingSystem:
+
+        # When adding to those lists, please follow alphabetical order.
+        commonPlugins = ['aja', 'aja-output-ui', 'decklink', 'decklink-captions', 'decklink-ouput-ui', 'decklink-output-ui', 'frontend-tools', 'image-source', 'nv-filters', 'obs-browser', 'obs-ffmpeg', 'obs-filters', 'obs-nvenc', 'obs-outputs', 'obs-transitions', 'obs-vst', 'obs-webrtc', 'obs-websocket', 'obs-x264', 'rtmp-services', 'test-input', 'text-freetype2', 'vlc-video']
+        osPlugins = {"windows": ['coreaudio-encoder', 'enc-amf', 'obs-qsv11', 'obs-text', 'win-capture', 'win-decklink', 'win-dshow', 'win-mf', 'win-wasapi'],
+                     "mac": ['coreaudio-encoder', 'mac-avcapture', 'mac-avcapture-legacy', 'mac-capture', 'mac-syphon', 'mac-videotoolbox', 'mac-virtualcam'],
+                     "linux": ['linux-alsa', 'linux-capture', 'linux-jack', 'linux-pipewire', 'linux-pulseaudio', 'linux-v4l2', 'obs-libfdk', 'obs-qsv11']
+                     }
+        pluginList = lines[(moduleStart + 1):getPluginEnd(lines)]
         thirdPartyPlugins = []
 
         for s in pluginList:
@@ -42,21 +47,18 @@ def checkPluginList(lines):
                 plugin = plugin.strip()
                 thirdPartyPlugins.append(plugin)
 
+        disabledPlugins = search(", is disabled", lines[:moduleStart])
+        for line in disabledPlugins:
+            thirdPartyPlugins.append(line.split("'")[1] + " (disabled)")
+
         thirdPartyPlugins = set(thirdPartyPlugins).difference(commonPlugins)
-        if (checkOperatingSystem(lines) == "windows"):
-            thirdPartyPlugins = set(thirdPartyPlugins).difference(windowsPlugins)
-        elif (checkOperatingSystem(lines) == "mac"):
-            thirdPartyPlugins = set(thirdPartyPlugins).difference(macPlugins)
-        elif (checkOperatingSystem(lines) == "linux"):
-            thirdPartyPlugins = set(thirdPartyPlugins).difference(linuxPlugins)
+        if operatingSystem in osPlugins:
+            thirdPartyPlugins = set(thirdPartyPlugins).difference(osPlugins[operatingSystem])
         else:
             thirdPartyPlugins = []
 
-        pluginString = str(thirdPartyPlugins)
-        pluginString = pluginString.replace("', '", "<br><li>")
-        pluginString = pluginString[2:]
-        pluginString = pluginString[:-2]
+        pluginString = "<br><li>".join(str(plugin) for plugin in thirdPartyPlugins)
 
-        if (len(thirdPartyPlugins)):
-            return [LEVEL_INFO, "Third-Party Plugins (" + str(len(thirdPartyPlugins)) + ")",
-                    """You have the following third-party plugins installed:<br><ul><li>""" + pluginString + "</ul>"]
+        if thirdPartyPlugins:
+            return [LEVEL_INFO, f"Third-Party Plugins ({len(thirdPartyPlugins)})",
+                    f"""You have the following third-party plugins installed:<br><ul><li>{pluginString}</ul>"""]
