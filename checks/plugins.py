@@ -1,29 +1,24 @@
 from .vars import *
 from .utils.utils import *
 from .core import *
-import re
-
-import_re = re.compile(r"""
-    (?i)
-    \/
-    (?P<plugin>[^\/]+)
-    '\sdue\sto\spossible\simport\sconflicts
-    """, re.VERBOSE)
+import os.path
 
 
 def checkImports(lines):
-    conflicts = search('due to possible import conflicts', lines)
-    if (len(conflicts) > 0):
-        append = ""
-        for p in conflicts:
-            c = import_re.search(p)
-            if c and c.group("plugin"):
-                append += "<li>" + c.group("plugin").replace('.dll', '') + "</li>"
+    notLoaded = search("' not loaded", lines[:getLoadedModules(lines)[0]])
+    notLoaded += search("' compiled with newer libobs", lines[:getLoadedModules(lines)[0]])
+    notLoadedPlugins = []
 
-        if append:
-            append = "<br><br>Plugins affected:<ul>" + append + "</ul>"
-            return [LEVEL_CRITICAL, "Outdated Plugins (" + str(len(conflicts)) + ")",
-                    """Some plugins need to be manually updated, as they do not work with this version of OBS. Check our <a href="https://obsproject.com/kb/obs-studio-28-plugin-compatibility">Plugin Compatibility Guide</a> for known updates & download links.""" + append]
+    for line in notLoaded:
+        plugin = os.path.split(os.path.splitext(line.split("'")[1])[0])[1]
+        if plugin:
+            notLoadedPlugins.append(plugin)
+
+    pluginString = "<br><li>".join(str(plugin) for plugin in notLoadedPlugins)
+    if notLoadedPlugins:
+        pluginString = f"<br><br>Plugins affected:<br><ul><li>{pluginString}</ul>"
+        return [LEVEL_WARNING, f"Plugins Not Loaded ({len(notLoadedPlugins)})",
+                f"""Some plugins were not loaded. This can be the result of a version incompatibility between OBS and the plugin, or of a missing dependency.{pluginString}"""]
 
 
 def checkPluginList(lines):
