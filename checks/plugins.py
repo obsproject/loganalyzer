@@ -1,38 +1,36 @@
 from .vars import *
 from .utils.utils import *
 from .core import *
-import re
-
-import_re = re.compile(r"""
-    (?i)
-    \/
-    (?P<plugin>[^\/]+)
-    '\sdue\sto\spossible\simport\sconflicts
-    """, re.VERBOSE)
+import os.path
 
 
 def checkImports(lines):
-    conflicts = search('due to possible import conflicts', lines)
-    if (len(conflicts) > 0):
-        append = ""
-        for p in conflicts:
-            c = import_re.search(p)
-            if c and c.group("plugin"):
-                append += "<li>" + c.group("plugin").replace('.dll', '') + "</li>"
+    notLoaded = search("' not loaded", lines[:getLoadedModules(lines)[0]])
+    notLoaded += search("' compiled with newer libobs", lines[:getLoadedModules(lines)[0]])
+    notLoadedPlugins = []
 
-        if append:
-            append = "<br><br>Plugins affected:<ul>" + append + "</ul>"
-            return [LEVEL_CRITICAL, "Outdated Plugins (" + str(len(conflicts)) + ")",
-                    """Some plugins need to be manually updated, as they do not work with this version of OBS. Check our <a href="https://obsproject.com/kb/obs-studio-28-plugin-compatibility">Plugin Compatibility Guide</a> for known updates & download links.""" + append]
+    for line in notLoaded:
+        plugin = os.path.split(os.path.splitext(line.split("'")[1])[0])[1]
+        if plugin:
+            notLoadedPlugins.append(plugin)
+
+    pluginString = "<br><li>".join(str(plugin) for plugin in notLoadedPlugins)
+    if notLoadedPlugins:
+        pluginString = f"<br><br>Plugins affected:<br><ul><li>{pluginString}</ul>"
+        return [LEVEL_CRITICAL, f"Plugins Not Loaded ({len(notLoadedPlugins)})",
+                f"""Some plugins were not loaded. This can be the result of a version incompatibility between OBS and the plugin, or of a missing dependency.{pluginString}"""]
 
 
 def checkPluginList(lines):
-    if (getLoadedModules(lines) and checkOperatingSystem(lines)):
+    moduleStart = getLoadedModules(lines)[0]
+    operatingSystem = checkOperatingSystem(lines)
+    if moduleStart and operatingSystem:
         commonPlugins = ['frontend-tools', 'vlc-video', 'obs-outputs', 'obs-vst', 'obs-ffmpeg', 'obs-browser', 'obs-transitions', 'decklink', 'decklink-captions', 'text-freetype2', 'decklink-output-ui', 'decklink-ouput-ui', 'aja', 'aja-output-ui', 'obs-x264', 'obs-websocket', 'obs-filters', 'image-source', 'rtmp-services', 'obs-webrtc', 'obs-nvenc', 'nv-filters', 'test-input']
-        windowsPlugins = ['win-wasapi', 'win-mf', 'win-dshow', 'win-capture', 'obs-text', 'obs-qsv11', 'win-decklink', 'enc-amf', 'coreaudio-encoder']
-        macPlugins = ['mac-virtualcam', 'mac-videotoolbox', 'mac-syphon', 'mac-capture', 'mac-avcapture', 'coreaudio-encoder', 'mac-avcapture-legacy']
-        linuxPlugins = ['obs-libfdk', 'linux-v4l2', 'linux-pulseaudio', 'linux-pipewire', 'linux-jack', 'linux-capture', 'linux-alsa', 'obs-qsv11']
-        pluginList = lines[(getLoadedModules(lines)[0] + 1):getPluginEnd(lines)]
+        osPlugins = {"windows": ['win-wasapi', 'win-mf', 'win-dshow', 'win-capture', 'obs-text', 'obs-qsv11', 'win-decklink', 'enc-amf', 'coreaudio-encoder'],
+                     "mac": ['mac-virtualcam', 'mac-videotoolbox', 'mac-syphon', 'mac-capture', 'mac-avcapture', 'coreaudio-encoder', 'mac-avcapture-legacy'],
+                     "linux": ['obs-libfdk', 'linux-v4l2', 'linux-pulseaudio', 'linux-pipewire', 'linux-jack', 'linux-capture', 'linux-alsa', 'obs-qsv11']
+                     }
+        pluginList = lines[(moduleStart + 1):getPluginEnd(lines)]
         thirdPartyPlugins = []
 
         for s in pluginList:
@@ -42,21 +40,18 @@ def checkPluginList(lines):
                 plugin = plugin.strip()
                 thirdPartyPlugins.append(plugin)
 
+        disabledPlugins = search(", is disabled", lines[:moduleStart])
+        for line in disabledPlugins:
+            thirdPartyPlugins.append(line.split("'")[1] + " (disabled)")
+
         thirdPartyPlugins = set(thirdPartyPlugins).difference(commonPlugins)
-        if (checkOperatingSystem(lines) == "windows"):
-            thirdPartyPlugins = set(thirdPartyPlugins).difference(windowsPlugins)
-        elif (checkOperatingSystem(lines) == "mac"):
-            thirdPartyPlugins = set(thirdPartyPlugins).difference(macPlugins)
-        elif (checkOperatingSystem(lines) == "linux"):
-            thirdPartyPlugins = set(thirdPartyPlugins).difference(linuxPlugins)
+        if operatingSystem in osPlugins:
+            thirdPartyPlugins = set(thirdPartyPlugins).difference(osPlugins[operatingSystem])
         else:
             thirdPartyPlugins = []
 
-        pluginString = str(thirdPartyPlugins)
-        pluginString = pluginString.replace("', '", "<br><li>")
-        pluginString = pluginString[2:]
-        pluginString = pluginString[:-2]
+        pluginString = "<br><li>".join(str(plugin) for plugin in thirdPartyPlugins)
 
-        if (len(thirdPartyPlugins)):
-            return [LEVEL_INFO, "Third-Party Plugins (" + str(len(thirdPartyPlugins)) + ")",
-                    """You have the following third-party plugins installed:<br><ul><li>""" + pluginString + "</ul>"]
+        if thirdPartyPlugins:
+            return [LEVEL_INFO, f"Third-Party Plugins ({len(thirdPartyPlugins)})",
+                    f"""You have the following third-party plugins installed:<br><ul><li>{pluginString}</ul>"""]
