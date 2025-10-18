@@ -1,9 +1,9 @@
 import html
 import re
-from pkg_resources import parse_version
 
 from .vars import *
 from .utils.utils import *
+from .utils import obsversion
 
 
 def checkClassic(lines):
@@ -60,52 +60,49 @@ def getOBSVersionString(lines):
     return versionString.split()[1]
 
 
-obsver_re = re.compile(r"""
-    (?i)
-    (?P<ver_major>[0-9]+)
-    \.
-    (?P<ver_minor>[0-9]+)
-    \.
-    (?P<ver_micro>[0-9]+)
-    (
-        -
-        (?P<special> (?P<special_type> rc|beta) \d*)
-    )?
-    $
-    """, re.VERBOSE)
-
-
 def checkObsVersion(lines):
-    versionString = getOBSVersionString(lines)
+    version = obsversion.ObsVersion(getOBSVersionString(lines))
 
-    if parse_version(versionString) == parse_version('21.1.0'):
-        return [LEVEL_WARNING, "Broken Auto-Update",
-                """You are not running the latest version of OBS Studio. Automatic updates in version 21.1.0 are broken due to a bug. <br>Please update by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
+    if not version.parsed:
+        return [LEVEL_INFO, f"Unparseable OBS Version ({html.escape(version.string)})",
+                f"""Your OBS version identifies itself as '{html.escape(version.string)}', which cannot be parsed as a valid OBS version number."""]
 
-    m = obsver_re.search(versionString.replace('-modified', ''))
+    if version.modified:
+        return [LEVEL_INFO, f"Custom OBS Build ({html.escape(version.string)})",
+                f"""Your OBS version identifies itself as '{html.escape(version.string)}', which is not a released OBS version."""]
 
-    if m is None and re.match(r"(?:\d)+\.(?:\d)+\.(?:\d)+\+(?:[\d\w\-\.~\+])+", versionString):
-        return [LEVEL_INFO, "Unofficial OBS Build (%s)" % (html.escape(versionString)), """Your OBS version identifies itself as '%s', which is not an official build. <br>If you are on Linux, ensure you're using the PPA. If you cannot switch to the PPA, contact the maintainer of the package for any support issues.""" % (html.escape(versionString))]
-    if m is None and re.match(r"(?:\d)+\.(?:\d)+\.(?:\d\w)+(?:-caffeine)", versionString):
-        return [LEVEL_INFO, "Third party OBS Version (%s)" % (html.escape(versionString)), """Your OBS version identifies itself as '%s', which is made by a third party. Contact them for any support issues.""" % (html.escape(versionString))]
-    if m is None and re.match(r"(?:\d)+\.(?:\d)+\.(?:\d)+-(?:[\d-])*([a-z0-9]+)(?:-modified){0,1}", versionString):
-        return [LEVEL_INFO, "Custom OBS Build (%s)" % (html.escape(versionString)), """Your OBS version identifies itself as '%s', which is not a released OBS version.""" % (html.escape(versionString))]
-    if m is None:
-        return [LEVEL_INFO, "Unparseable OBS Version (%s)" % (html.escape(versionString)), """Your OBS version identifies itself as '%s', which cannot be parsed as a valid OBS version number.""" % (html.escape(versionString))]
+    if version.trail and 'caffeine' in version.trail:
+        return [LEVEL_INFO, f"Third party OBS Version ({html.escape(version.string)})",
+                f"""Your OBS version identifies itself as '{html.escape(version.string)}', which is made by a third party. Contact them for any support issues."""]
 
-    # Do we want these to check the version number and tell the user that a
-    # release version is actually available, if one is actually available?
-    # We can consider adding something like that later.
-    if m.group("special") is not None:
-        if m.group("special_type") == "beta":
-            return [LEVEL_INFO, "Beta OBS Version (%s)" % (html.escape(versionString)), """You are running a beta version of OBS. There is nothing wrong with this, but you may experience problems that you may not experience with fully released OBS versions. You are encouraged to upgrade to a released version of OBS as soon as one is available."""]
+    if version.trail:
+        if checkOperatingSystem(lines) == "linux":
+            return [LEVEL_INFO, f"Unofficial OBS Build ({html.escape(version.string)})",
+                    f"""Your OBS version identifies itself as '{html.escape(version.string)}', which is not an official build. <br> Only the PPA and the flatpak aare official releases. If you cannot or wish not switch to those, please contact the maintainer of your package for any support issues."""]
+        else:
+            return [LEVEL_INFO, f"Unofficial OBS Build ({html.escape(version.string)})",
+                    f"""Your OBS version identifies itself as '{html.escape(version.string)}', which is not an official build. <br> Please contact the maintainer of your release for any support issues."""]
 
-        if m.group("special_type") == "rc":
-            return [LEVEL_INFO, "Release Candidate OBS Version (%s)" % (html.escape(versionString)), """You are running a release candidate version of OBS. There is nothing wrong with this, but you may experience problems that you may not experience with fully released OBS versions. You are encouraged to upgrade to a released version of OBS as soon as one is available."""]
+    if version.beta:
+        if version.version.beta_type == version._beta_types["beta"]:
+            if version < CURRENT_VERSION:
+                return [LEVEL_WARNING, f"Outdated Beta OBS Version ({html.escape(version.string)})",
+                        f"""The beta version of OBS you are running is outdated. It is recommended you update to version {CURRENT_VERSION} by going to Help -> Check for updates in OBS or by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
+            else:
+                return [LEVEL_INFO, f"Beta OBS Version ({html.escape(version.string)})",
+                        f"""You are running a beta version of OBS. There is nothing wrong with this, but you may experience problems that you may not experience with fully released OBS versions. You are encouraged to upgrade to a released version of OBS as soon as one is available."""]
 
-    if parse_version(versionString.replace('-modified', '')) < parse_version(CURRENT_VERSION):
-        return [LEVEL_WARNING, "Old Version (%s)" % versionString,
-                """You are running an old version of OBS Studio (%s). Please update to version %s by going to Help -> Check for updates in OBS or by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it.""" % (versionString, CURRENT_VERSION)]
+        if version.version.beta_type == version._beta_types["rc"]:
+            if version < CURRENT_VERSION:
+                return [LEVEL_WARNING, f"Outdated Release Candidate OBS Version ({html.escape(version.string)})",
+                        f"""The release candidate version of OBS you are running is outdated. It is recommended you update to version {CURRENT_VERSION} by going to Help -> Check for updates in OBS or by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
+            else:
+                return [LEVEL_INFO, f"Release Candidate OBS Version ({html.escape(version.string)})",
+                        f"""You are running a release candidate version of OBS. There is nothing wrong with this, but you may experience problems that you may not experience with fully released OBS versions. You are encouraged to upgrade to a released version of OBS as soon as one is available."""]
+
+    if version < CURRENT_VERSION:
+        return [LEVEL_WARNING, f"Old Version ({html.escape(version.string)})",
+                f"""You are running an old version of OBS Studio ({html.escape(version.string)}). Please update to version {CURRENT_VERSION} by going to Help -> Check for updates in OBS or by downloading the latest installer from the <a href="https://obsproject.com/download">downloads page</a> and running it."""]
 
 
 def checkOperatingSystem(lines):

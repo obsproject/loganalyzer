@@ -1,5 +1,4 @@
 import html
-from pkg_resources import parse_version
 
 from .vars import *
 from .utils.utils import *
@@ -307,14 +306,6 @@ def checkWindowsVer(lines):
         msg = "You are running %s, which has not been supported by Microsoft since <strong>%s</strong>. We recommend updating to the latest Windows release to ensure continued security, functionality, and compatibility." % (
             html.escape(verinfo["name"]), verinfo["EoS"].strftime("%B %Y"))
         return [LEVEL_WARNING, wv, msg]
-
-    # special case for OBS 24.0.3 and earlier, which report Windows 10/1909
-    # as being Windows 10/1903
-    versionString = getOBSVersionString(lines)
-    if parse_version(versionString) <= parse_version("24.0.3"):
-        if verinfo["version"] == "10.0" and verinfo["release"] == 1903:
-            return [LEVEL_INFO, "Windows 10 1903/1909",
-                    "Due to a bug in OBS versions 24.0.3 and earlier, the exact release of Windows 10 you are using cannot be determined. You are using either release 1903, or release 1909. Fortunately, there were no major changes in behavior between Windows 10 release 1903 and Windows 10 release 1909, and instructions given here for release 1903 can also be used for release 1909, and vice versa."]
 
     # our windows version isn't out of support, so just say what version the user has and when
     # it actually does go out of support
