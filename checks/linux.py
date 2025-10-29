@@ -185,9 +185,7 @@ def checkLinuxSystemInfo(lines):
         linuxDistroOrFlatpak = 'Distribution: ' + checkDistro(lines)[1]
         linuxSystemInfoHelp = ''
     else:
-        # I have never seen this, but you never know
-        linuxDistroOrFlatpak = 'Distribution: ⚠️  None'
-        linuxSystemInfoHelp = 'No distribution detected. This can lead to undefined behaviour. Please consult your distribution\'s support channels on how to fix this.<br>'
+        return
 
     if isX11(lines):
         displayServer = 'X11'
