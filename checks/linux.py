@@ -178,6 +178,11 @@ def checkLinuxVCam(lines):
 
 
 def checkLinuxSystemInfo(lines):
+    hasDistro = search('Distribution:', lines)
+    hasFlatpak = search('Flatpak Runtime:', lines)
+    if (len(hasDistro) <= 0) and (len(hasFlatpak) <= 0):
+        return
+
     if checkFlatpak(lines):
         linuxDistroOrFlatpak = 'Flatpak'
         linuxSystemInfoHelp = checkFlatpak(lines)[2] + '<br>'
