@@ -51,8 +51,14 @@ def checkDistro(lines):
     distro = isDistroNix[0].split()
     distro = distro[2:]
     distro = ' '.join(distro)
+    distroHelp = ''
 
-    return [LEVEL_INFO, distro, ""]
+    # this is logged when the file can't be found at all
+    if distro == 'Missing /etc/os-release !':
+        distro = '(Missing)'
+        distroHelp = 'No distribution detected. This can lead to undefined behavior. Please consult your distribution\'s support channels on how to fix this.<br>'
+
+    return [LEVEL_INFO, distro, distroHelp]
 
 
 def checkFlatpak(lines):
@@ -178,12 +184,12 @@ def checkLinuxVCam(lines):
 
 
 def checkLinuxSystemInfo(lines):
-    if checkFlatpak(lines):
+    if flatpak := checkFlatpak(lines):
         linuxDistroOrFlatpak = 'Flatpak'
-        linuxSystemInfoHelp = checkFlatpak(lines)[2] + '<br>'
-    elif checkDistro(lines):
-        linuxDistroOrFlatpak = 'Distribution: ' + checkDistro(lines)[1]
-        linuxSystemInfoHelp = ''
+        linuxSystemInfoHelp = flatpak[2] + '<br>'
+    elif distro := checkDistro(lines):
+        linuxDistroOrFlatpak = 'Distribution: ' + distro[1]
+        linuxSystemInfoHelp = distro[2]
     else:
         return
 
@@ -194,13 +200,13 @@ def checkLinuxSystemInfo(lines):
     else:
         # can happen with misconfigured or virtual systems
         displayServer = '⚠️  None'
-        linuxSystemInfoHelp += 'No Display Server detected. This can lead to undefined behaviour. Please consult your Desktop Environment\'s or Window Manager\'s support channels on how to fix this.<br>'
+        linuxSystemInfoHelp += 'No Display Server detected. This can lead to undefined behavior. Please consult your Desktop Environment\'s or Window Manager\'s support channels on how to fix this.<br>'
 
     if checkDesktopEnvironment(lines):
         desktopEnvironment = 'DE: ' + checkDesktopEnvironment(lines)[1]
     else:
         # can happen for some misconfigured tiling window managers
         desktopEnvironment = 'DE: ⚠️  None'
-        linuxSystemInfoHelp += 'No Desktop Environment detected. This can lead to undefined behaviour. Please consult your Desktop Environment\'s or Window Manager\'s support channels on how to fix this.'
+        linuxSystemInfoHelp += 'No Desktop Environment detected. This can lead to undefined behavior. Please consult your Desktop Environment\'s or Window Manager\'s support channels on how to fix this.'
 
     return [LEVEL_INFO, linuxDistroOrFlatpak + ' | ' + displayServer + ' | ' + desktopEnvironment, linuxSystemInfoHelp]
