@@ -20,7 +20,7 @@ class ObsVersion():
                    None: 3}
 
     def __init__(self, version_string):
-        self.string = version_string
+        self.string = str(version_string)
         self.parsed = False
         self.version = self._VersionNum(self._nan, self._nan, self._nan, 3, 0)
         # NaN for false comparisons
