@@ -51,13 +51,13 @@ def getOBSVersionLine(lines):
     for line in versionLines:
         if versionPattern.search(line):
             return line
-    return versionLines[-1]
 
 
 def getOBSVersionString(lines):
     versionLine = getOBSVersionLine(lines)
-    versionString = versionLine[versionLine.find("OBS"):]
-    return versionString.split()[1]
+    if versionLine:
+        versionString = versionLine[versionLine.find("OBS"):]
+        return versionString.split()[1]
 
 
 def checkObsVersion(lines):
