@@ -8,7 +8,7 @@ from aiohttp import web
 import json
 import loganalyzer as analyze
 
-loop = asyncio.get_event_loop()
+loop = asyncio.new_event_loop()
 threadPool = futures.ThreadPoolExecutor(thread_name_prefix='loganalyzer: worker thread')
 app = web.Application()
 
@@ -195,6 +195,7 @@ def main():
         logging.info('Exiting application.')
         applicationTask.cancel()  # Shuts down the HTTP server
         threadPool.shutdown()  # Shuts down the running thread pool
+        loop.close()  # Close the event loop
 
 
 if __name__ == '__main__':
