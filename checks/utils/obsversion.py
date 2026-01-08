@@ -49,7 +49,7 @@ class ObsVersion():
         return self.string
 
     def __repr__(self):
-        return f"OBS version {self.string}{'' if self.parsed else' (unparseable)'}"
+        return f"OBS version {self.string}{'' if self.parsed else ' (unparseable)'}"
 
     def __eq__(self, other):
         try:
