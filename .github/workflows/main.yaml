@@ -15,7 +15,7 @@ jobs:
       - name: Setup
         uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: 3.13
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -33,7 +33,7 @@ jobs:
       - name: Setup
         uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: 3.13
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -51,7 +51,7 @@ jobs:
           use-flake8: false
           use-vulture: false
           extra-pycodestyle-options: "--config=setup.cfg"
-          python-version: "3.9"
+          python-version: "3.13"
       - name: Run pycodestyle
         # This is required because the annotate action doesn't trigger a failure
         run: |
