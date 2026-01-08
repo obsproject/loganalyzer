@@ -2,15 +2,10 @@
 
 import logging
 import argparse
-from concurrent import futures
+import concurrent.futures
 import asyncio
 from aiohttp import web
-import json
 import loganalyzer as analyze
-
-loop = asyncio.get_event_loop()
-threadPool = futures.ThreadPoolExecutor(thread_name_prefix='loganalyzer: worker thread')
-app = web.Application()
 
 with open("templates/index.html", "r") as f:  # Grab main HTML page
     htmlTemplate = f.read()
@@ -172,29 +167,29 @@ def sync_request_handler(request):
 
 async def request_handler(request):
     """Async request handler. Submits the incoming request to the thread pool to be handled."""
-    return (await loop.run_in_executor(None, sync_request_handler, request))  # Submits the request to a handler inside the threadpool
+    return await asyncio.to_thread(sync_request_handler, request)  # Submits the request to a handler inside the threadpool
+
+
+async def on_startup(app):
+    threadPool = concurrent.futures.ThreadPoolExecutor(thread_name_prefix='loganalyzer: worker thread')
+    loop = asyncio.get_running_loop()
+    loop.set_default_executor(threadPool)  # Set the default executor to our thread pool
 
 
 def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] [%(funcName)s] %(message)s")
     aiohttpLogger = logging.getLogger('aiohttp')
     aiohttpLogger.setLevel(logging.WARNING)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", default="localhost", type=str, help="address to bind to", dest='host')
     parser.add_argument("--port", default="8080", type=int, help="port to bind to", dest='port')
     flags = parser.parse_args()
 
-    loop.set_default_executor(threadPool)  # Set the default executor to our thread pool
-    app.add_routes([web.get('/', request_handler)])
-    applicationTask = loop.create_task(web._run_app(app, host=flags.host, port=flags.port, print=logging.info))
-    try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        logging.info('Exiting application.')
-        applicationTask.cancel()  # Shuts down the HTTP server
-        threadPool.shutdown()  # Shuts down the running thread pool
+    app = web.Application()
+    app.on_startup.append(on_startup)
+    app.router.add_get('/', request_handler)
+    web.run_app(app, host=flags.host, port=flags.port)
 
 
 if __name__ == '__main__':
