@@ -64,7 +64,11 @@ def checkDistro(lines):
 def checkFlatpak(lines):
     isFlatpak = search('Flatpak Runtime:', lines)
 
-    if len(isFlatpak) > 0:
+    if isFlatpak and ('org.kde.Platform' not in isFlatpak[0]) and ('org.freedesktop.Platform' not in isFlatpak[0]):
+        return [LEVEL_WARNING, "Unofficial Flatpak",
+                "You are using an unofficial Flatpak package. Please file issues with the packager.<br><br>OBS may be unable to assist with issues arising out of the usage of this package. We recommend following our <a href=\"https://obsproject.com/download#linux\">Install Instructions</a> instead."]
+
+    if isFlatpak:
         return [LEVEL_INFO, "Flatpak",
                 "You are using the Flatpak. Plugins are available as Flatpak extensions, which you can find in your Distribution's Software Center or via <code>flatpak search com.obsproject.Studio</code>. Installation of external plugins is not supported."]
 
