@@ -96,8 +96,9 @@ def checkWayland(lines):
         return [LEVEL_CRITICAL, "Running under XWayland",
                 "OBS is running under XWayland, which prevents OBS from being able to capture.<br>To fix that, you will need to run OBS with the following command in a terminal:<p><code>obs -platform wayland</code></p>"]
 
-    hasNoPipewireCapture = search('[pipewire] No capture', lines)
-    if len(hasNoPipewireCapture) > 0:
+    hasPipewirePortal = search('[pipewire]', lines)
+    hasNoPipewireCapture = search('[pipewire] No capture', hasPipewirePortal)
+    if not hasPipewirePortal or hasNoPipewireCapture:
         return [LEVEL_CRITICAL, "No PipeWire capture on Wayland",
                 """In order to capture displays or windows under Wayland, OBS requires the appropriate PipeWire capture portal for your Desktop Environment.<br><br>
                 An overview of available capture portals can be found on the Arch Linux Wiki:<br>
