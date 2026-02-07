@@ -56,7 +56,8 @@ def checkDistro(lines):
     # this is logged when the file can't be found at all
     if distro == 'Missing /etc/os-release !':
         distro = '(Missing)'
-        distroHelp = 'No distribution detected. This can lead to undefined behavior. Please consult your distribution\'s support channels on how to fix this.<br>'
+        distroHelp = 'No distribution detected. This can lead to undefined behavior. Please consult your distribution\'s support channels on how to fix this.'
+        return [LEVEL_WARNING, distro, distroHelp]
 
     return [LEVEL_INFO, distro, distroHelp]
 
@@ -64,7 +65,11 @@ def checkDistro(lines):
 def checkFlatpak(lines):
     isFlatpak = search('Flatpak Runtime:', lines)
 
-    if len(isFlatpak) > 0:
+    if isFlatpak and ('org.kde.Platform' not in isFlatpak[0]) and ('org.freedesktop.Platform' not in isFlatpak[0]):
+        return [LEVEL_WARNING, "Unofficial Flatpak",
+                "You are using an unofficial Flatpak package. Please file issues with the packager.<br><br>OBS may be unable to assist with issues arising out of the usage of this package. We recommend following our <a href=\"https://obsproject.com/download#linux\">Install Instructions</a> instead."]
+
+    if isFlatpak:
         return [LEVEL_INFO, "Flatpak",
                 "You are using the Flatpak. Plugins are available as Flatpak extensions, which you can find in your Distribution's Software Center or via <code>flatpak search com.obsproject.Studio</code>. Installation of external plugins is not supported."]
 
@@ -186,10 +191,12 @@ def checkLinuxVCam(lines):
 
 def checkLinuxSystemInfo(lines):
     if flatpak := checkFlatpak(lines):
-        linuxDistroOrFlatpak = 'Flatpak'
-        linuxSystemInfoHelp = flatpak[2] + '<br>'
+        logLevel = flatpak[0]
+        linuxDistroOrFlatpak = flatpak[1]
+        linuxSystemInfoHelp = flatpak[2]
     elif distro := checkDistro(lines):
-        linuxDistroOrFlatpak = 'Distribution: ' + distro[1]
+        logLevel = distro[0]
+        linuxDistroOrFlatpak = distro[1]
         linuxSystemInfoHelp = distro[2]
     else:
         return
@@ -200,14 +207,16 @@ def checkLinuxSystemInfo(lines):
         displayServer = 'Wayland'
     else:
         # can happen with misconfigured or virtual systems
-        displayServer = '⚠️  None'
-        linuxSystemInfoHelp += 'No Display Server detected. This can lead to undefined behavior. Please consult your Desktop Environment\'s or Window Manager\'s support channels on how to fix this.<br>'
+        logLevel = LEVEL_WARNING
+        displayServer = 'None'
+        linuxSystemInfoHelp += '<br>No Display Server detected. This can lead to undefined behavior. Please consult your Desktop Environment\'s or Window Manager\'s support channels on how to fix this.'
 
     if checkDesktopEnvironment(lines):
-        desktopEnvironment = 'DE: ' + checkDesktopEnvironment(lines)[1]
+        desktopEnvironment = checkDesktopEnvironment(lines)[1]
     else:
         # can happen for some misconfigured tiling window managers
-        desktopEnvironment = 'DE: ⚠️  None'
-        linuxSystemInfoHelp += 'No Desktop Environment detected. This can lead to undefined behavior. Please consult your Desktop Environment\'s or Window Manager\'s support channels on how to fix this.'
+        logLevel = LEVEL_WARNING
+        desktopEnvironment = 'None'
+        linuxSystemInfoHelp += '<br>No Desktop Environment detected. This can lead to undefined behavior. Please consult your Desktop Environment\'s or Window Manager\'s support channels on how to fix this.'
 
-    return [LEVEL_INFO, linuxDistroOrFlatpak + ' | ' + displayServer + ' | ' + desktopEnvironment, linuxSystemInfoHelp]
+    return [logLevel, linuxDistroOrFlatpak + ' | ' + displayServer + ' | ' + desktopEnvironment, linuxSystemInfoHelp]
