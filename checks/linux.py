@@ -57,6 +57,7 @@ def checkDistro(lines):
     if distro == 'Missing /etc/os-release !':
         distro = '(Missing)'
         distroHelp = 'No distribution detected. This can lead to undefined behavior. Please consult your distribution\'s support channels on how to fix this.<br>'
+        return [LEVEL_WARNING, distro, distroHelp]
 
     return [LEVEL_INFO, distro, distroHelp]
 
@@ -188,12 +189,12 @@ def checkLinuxVCam(lines):
 
 
 def checkLinuxSystemInfo(lines):
-    logLevel = LEVEL_INFO
     if flatpak := checkFlatpak(lines):
         logLevel = flatpak[0]
         linuxDistroOrFlatpak = flatpak[1]
         linuxSystemInfoHelp = flatpak[2] + '<br>'
     elif distro := checkDistro(lines):
+        logLevel = distro[0]
         linuxDistroOrFlatpak = 'Distribution: ' + distro[1]
         linuxSystemInfoHelp = distro[2]
     else:
@@ -205,14 +206,16 @@ def checkLinuxSystemInfo(lines):
         displayServer = 'Wayland'
     else:
         # can happen with misconfigured or virtual systems
-        displayServer = '⚠️  None'
+        logLevel = LEVEL_WARNING
+        displayServer = 'None'
         linuxSystemInfoHelp += 'No Display Server detected. This can lead to undefined behavior. Please consult your Desktop Environment\'s or Window Manager\'s support channels on how to fix this.<br>'
 
     if checkDesktopEnvironment(lines):
         desktopEnvironment = 'DE: ' + checkDesktopEnvironment(lines)[1]
     else:
         # can happen for some misconfigured tiling window managers
-        desktopEnvironment = 'DE: ⚠️  None'
+        logLevel = LEVEL_WARNING
+        desktopEnvironment = 'DE: None'
         linuxSystemInfoHelp += 'No Desktop Environment detected. This can lead to undefined behavior. Please consult your Desktop Environment\'s or Window Manager\'s support channels on how to fix this.'
 
     return [logLevel, linuxDistroOrFlatpak + ' | ' + displayServer + ' | ' + desktopEnvironment, linuxSystemInfoHelp]
