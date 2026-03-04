@@ -15,7 +15,7 @@ jobs:
       - name: Setup
         uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: '3.10'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -33,13 +33,13 @@ jobs:
       - name: Setup
         uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: '3.10'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Annotate linting errors
-        uses: marian-code/python-lint-annotate@ffe24b32a33241b668ab6d34150d7d8e1ad744ec
+        uses: marian-code/python-lint-annotate@ffff026d7d289bfdf5f149a510ebfefa4f9ae640
         with:
           python-root-list: "."
           use-black: false
@@ -51,7 +51,7 @@ jobs:
           use-flake8: false
           use-vulture: false
           extra-pycodestyle-options: "--config=setup.cfg"
-          python-version: "3.9"
+          python-version: '3.10'
       - name: Run pycodestyle
         # This is required because the annotate action doesn't trigger a failure
         run: |
