@@ -1,5 +1,6 @@
 from .vars import *
 from .utils.utils import *
+from .linux import checkFlatpak
 
 
 def checkInit(lines):
@@ -56,6 +57,15 @@ def checkNVIDIAdriversEGL(lines):
         return
     if search('OpenGL loaded successfully, version 3.3.0 NVIDIA 390', lines):
         return [LEVEL_WARNING, "Old NVIDIA Drivers", "Legacy NVIDIA 390 drivers do not support window capture on EGL."]
+
+
+def checkLLVMpipe(lines):
+    if search('OpenGL on adapter Mesa llvmpipe', lines):
+        helpText = "OBS is running on a software-emulated graphics pipeline. This is not supported as OBS requires access to a physical GPU. Please make sure your graphics drivers are up to date."
+
+        if checkFlatpak(lines):
+            helpText += "<br><br>If you are using an NVIDIA GPU, please reboot your PC, then run <code>flatpak update</code> from a terminal."
+        return [LEVEL_CRITICAL, "Software rendering", helpText]
 
 
 def checkVideoSettings(lines):

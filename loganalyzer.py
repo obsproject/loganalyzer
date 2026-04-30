@@ -189,7 +189,8 @@ def doAnalysis(url=None, filename=None):
                 checkLinuxVCam(logLines),
                 checkMacPermissions(logLines),
                 checkServiceRecommendations(logLines),
-                checkLinuxSystemInfo(logLines)
+                checkLinuxSystemInfo(logLines),
+                checkLLVMpipe(logLines)
             ])
             messages.extend(checkVideoSettings(logLines))
             m = parseScenes(logLines)
