@@ -40,7 +40,7 @@ macversions = {
     "12": {
         "name": "Monterey",
         "date": datetime.date(2021, 10, 25),
-        "latest": True
+        "max": "32.2"
     },
     "11": {
         "name": "Big Sur",
