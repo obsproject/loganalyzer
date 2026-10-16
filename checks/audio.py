@@ -1,3 +1,4 @@
+import html
 import re
 
 from .vars import *
@@ -38,7 +39,7 @@ def checkAudioBuffering(lines):
             if (len(lines) > index):
                 m = audiobuf_re.search(lines[index + 1].replace('\r', ''))
                 if m and m.group("source"):
-                    append += "<br><br>Source affected (potential cause):<strong>" + m.group("source") + "</strong>"
+                    append += "<br><br>Source affected (potential cause):<strong>" + html.escape(m.group("source")) + "</strong>"
                     break
         return [LEVEL_INFO, "Max Audio Buffering",
                 "Audio buffering hit the maximum value. This can be an indicator of very high system load and may affect stream latency or cause individual audio sources to stop working. Keep an eye on CPU usage especially, and close background programs if needed. <br><br>Occasionally, this can be caused by incorrect device timestamps. Restart OBS to reset buffering." + append]
