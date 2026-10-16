@@ -1,3 +1,5 @@
+import html
+
 from .vars import *
 from .utils.utils import *
 from .core import *
@@ -14,7 +16,7 @@ def checkImports(lines):
         if plugin:
             notLoadedPlugins.append(plugin)
 
-    pluginString = "<br><li>".join(str(plugin) for plugin in notLoadedPlugins)
+    pluginString = "<br><li>".join(html.escape(plugin) for plugin in notLoadedPlugins)
     if notLoadedPlugins:
         pluginString = f"<br><br>Plugins affected:<br><ul><li>{pluginString}</ul>"
         return [LEVEL_WARNING, f"Plugins Not Loaded ({len(notLoadedPlugins)})",
@@ -52,7 +54,7 @@ def checkPluginList(lines):
         else:
             thirdPartyPlugins = []
 
-        pluginString = "<br><li>".join(str(plugin) for plugin in thirdPartyPlugins)
+        pluginString = "<br><li>".join(html.escape(plugin) for plugin in thirdPartyPlugins)
 
         if thirdPartyPlugins:
             return [LEVEL_INFO, f"Third-Party Plugins ({len(thirdPartyPlugins)})",
