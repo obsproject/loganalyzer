@@ -130,7 +130,7 @@ def checkSafeMode(lines):
         for line in modulesNotLoaded:
             found = re.search(r"'([^']+)'", line)
             if found:
-                moduleNames.append(found.group(1))
+                moduleNames.append(html.escape(found.group(1)))
 
         if moduleNames:
             modulesNotLoadedString = "<br>\n<ul>\n<li>" + "</li>\n<li>".join(moduleNames) + "</li>\n</ul>"
