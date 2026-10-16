@@ -104,7 +104,7 @@ def checkRefreshes(lines):
     if len(r) > 1:
         rfrshs = "<br>"
         for output, hz in refreshes.items():
-            rfrshs += "<br>" + output + ": <strong>" + str(int(hz)) + "</strong>Hz"
+            rfrshs += "<br>" + html.escape(output) + ": <strong>" + str(int(hz)) + "</strong>Hz"
         return [LEVEL_WARNING, "Mismatched Refresh Rates",
                 "The version of Windows you are running has a limitation which causes performance issues in hardware accelerated applications (such as games) if multiple monitors with different refresh rates are present. Your system's monitors have " + str(len(r)) + """ different refresh rates, so you are affected by this limitation. <br><br>To fix this issue, we recommend updating to the Windows 10 May 2020 Update. Follow <a href="https://blogs.windows.com/windowsexperience/2020/05/27/how-to-get-the-windows-10-may-2020-update/">these instructions</a> if you're not sure how to update.""" + rfrshs]
     return
@@ -174,7 +174,7 @@ def checkWasapiSamples(lines):
         if obsSample != "":
             smpls += "<br>OBS Sample Rate: <strong>" + str(obsSample) + "</strong> Hz"
         for d, hz in samples.items():
-            smpls += "<br>" + d + ": <strong>" + str(hz) + "</strong> Hz"
+            smpls += "<br>" + html.escape(d) + ": <strong>" + str(hz) + "</strong> Hz"
         return [LEVEL_WARNING, "Mismatched Sample Rates",
                 "At least one of your audio devices has a sample rate that doesn't match the rest. This can result in audio drift over time or sound distortion. Check your audio devices in Windows settings (both Playback and Recording) and ensure the Default Format (under Advanced) is consistent. 48000 Hz is recommended." + smpls]
 
@@ -350,7 +350,7 @@ def checkGCAdmin(lines):
     error_lines = search("could not open process:", lines)
     gc_error_lines = search("game-capture", error_lines)           # Makes sure the error comes from a game capture, in case.
     if gc_error_lines:
-        exe_list = set([gc_admin_re.search(line).group("executable").strip() for line in gc_error_lines])
+        exe_list = set([html.escape(gc_admin_re.search(line).group("executable").strip()) for line in gc_error_lines])
         return [LEVEL_INFO, "Game Capture Permissions",
                 "Game Capture was unable to capture the following applications. This may be solved by running OBS as an Administrator:<br>\n<ul>\n<li>"
                 + "</li>\n<li>".join(exe_list)
