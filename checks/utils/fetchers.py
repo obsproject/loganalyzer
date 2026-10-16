@@ -8,7 +8,7 @@ import re
 
 def matchGist(url):
     return re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)((anonymous|[A-Za-z0-9-]{1,39})/)?([a-z0-9]{32}))", url)
+        r"(?i)^\b((?:https?:(?:/{1,3}gist\.github\.com)/)((anonymous|[A-Za-z0-9-]{1,39})/)?([a-z0-9]{32}))$", url)
 
 
 def getGist(inputUrl):
@@ -35,7 +35,7 @@ def getDescriptionGist(gistObject):
 
 def matchHaste(url):
     return re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))", url)
+        r"(?i)^\b((?:https?:(?:/{1,3}(www\.)?hastebin\.com)/)([a-z0-9]{10}))$", url)
 
 
 def getHaste(hasteId):
@@ -58,7 +58,7 @@ def getDescription(lines):
 
 def matchObs(url):
     return re.match(
-        r"(?i)\b(?P<obsLogURL>(?P<obsLogURLRoot>https?:(?:/{1,3}(?:www\.)?obsproject\.com)/(analyzer|logs))/(?P<obsLogURLFilename>.{16}))", url)
+        r"(?i)^\b(?P<obsLogURL>(?P<obsLogURLRoot>https?:(?:/{1,3}(?:www\.)?obsproject\.com)/(analyzer|logs))/(?P<obsLogURLFilename>.{16}))$", url)
 
 
 def getObslog(obsURL, obslogId):
@@ -75,7 +75,7 @@ def getLinesObslog(obslogText):
 
 def matchPastebin(url):
     return re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}(www\.)?pastebin\.com/))(?:raw/)?(.{8}))", url)
+        r"(?i)^\b((?:https?:(?:/{1,3}(www\.)?pastebin\.com/))(?:raw/)?(.{8}))$", url)
 
 
 def getRawPaste(obslogId):
@@ -93,7 +93,7 @@ def getLinesPaste(obslogText):
 
 def matchDiscord(url):
     return re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18,}/[0-9]{18,}/(?:[0-9\-\_]{19}|message).txt(?:\?\S+\&)?))", url)
+        r"(?i)^\b((?:https?:(?:/{1,3}cdn\.discordapp\.com)/)(attachments/)([0-9]{18,}/[0-9]{18,}/(?:[0-9\-\_]{19}|message).txt(?:\?\S+\&)?))$", url)
 
 
 def getRawDiscord(obslogId):
