@@ -1,3 +1,5 @@
+import html
+
 from .vars import *
 from .utils.utils import *
 
@@ -42,7 +44,15 @@ def isX11(lines):
     return True
 
 
+def isUbuntu2004(line):
+    if any(distro in line for distro in ['"Ubuntu" "20.04"', html.escape('"Ubuntu" "20.04"')]):
+        return True
+    else:
+        return False
+
+
 def checkDistro(lines):
+    """The distro log line is escaped before adding to the returned list. Take care when comparing against this value."""
     isDistroNix = search('Distribution:', lines)
 
     if len(isDistroNix) <= 0:
@@ -59,7 +69,7 @@ def checkDistro(lines):
         distroHelp = 'No distribution detected. This can lead to undefined behavior. Please consult your distribution\'s support channels on how to fix this.'
         return [LEVEL_WARNING, distro, distroHelp]
 
-    return [LEVEL_INFO, distro, distroHelp]
+    return [LEVEL_INFO, html.escape(distro), distroHelp]
 
 
 def checkFlatpak(lines):
@@ -90,7 +100,7 @@ def checkWayland(lines):
         return
 
     isDistroNix = checkDistro(lines)
-    if isDistroNix and ('"Ubuntu" "20.04"' in isDistroNix[1]):
+    if isDistroNix and isUbuntu2004(isDistroNix[1]):
         return [LEVEL_CRITICAL, "Ubuntu 20.04 under Wayland",
                 "Ubuntu 20.04 does not provide the needed dependencies for OBS to capture under Wayland.<br> Capture will only function under X11/Xorg."]
 
@@ -148,7 +158,7 @@ def checkDesktopEnvironment(lines):
         desktopEnvironment = ''
 
     if (len(desktopEnvironment) > 0):
-        return [LEVEL_INFO, desktopEnvironment, '']
+        return [LEVEL_INFO, html.escape(desktopEnvironment), '']
 
 
 def checkMissingModules(lines):
