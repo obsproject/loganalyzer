@@ -1,3 +1,4 @@
+import html
 import requests
 import re
 
@@ -23,7 +24,7 @@ def getLinesGist(gistObject):
 
 
 def getDescriptionGist(gistObject):
-    desc = gistObject['description']
+    desc = html.escape(gistObject['description'])
     if (desc == "" or desc is None):
         desc = gistObject['id']
     return [0, "DESCRIPTION", desc]
@@ -49,7 +50,7 @@ def getLinesHaste(hasteObject):
 
 
 def getDescription(lines):
-    return [0, "DESCRIPTION", lines[0]]
+    return [0, "DESCRIPTION", html.escape(lines[0])]
 
 
 # obsproject.com
