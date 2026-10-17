@@ -8,7 +8,7 @@ import re
 
 def matchGist(url):
     return re.match(
-        r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)(anonymous/)?([a-z0-9]{32}))", url)
+        r"(?i)\b((?:https?:(?:/{1,3}gist\.github\.com)/)((anonymous|[A-Za-z0-9-]{1,39})/)?([a-z0-9]{32}))", url)
 
 
 def getGist(inputUrl):
