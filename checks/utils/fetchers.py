@@ -24,7 +24,7 @@ def getLinesGist(gistObject):
 
 def getDescriptionGist(gistObject):
     desc = gistObject['description']
-    if (desc == ""):
+    if (desc == "" or desc is None):
         desc = gistObject['id']
     return [0, "DESCRIPTION", desc]
 
