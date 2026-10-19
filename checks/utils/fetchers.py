@@ -15,7 +15,7 @@ def matchGist(url):
 def getGist(inputUrl):
     API_URL = "https://api.github.com"
     gistId = inputUrl
-    return requests.get('{0}/gists/{1}'.format(API_URL, gistId)).json()
+    return requests.get('{0}/gists/{1}'.format(API_URL, gistId), timeout=5).json()
 
 
 def getLinesGist(gistObject):
@@ -41,7 +41,7 @@ def matchHaste(url):
 
 def getHaste(hasteId):
     API_URL = "https://hastebin.com"
-    return requests.get('{0}/documents/{1}'.format(API_URL, hasteId)).json()
+    return requests.get('{0}/documents/{1}'.format(API_URL, hasteId), timeout=5).json()
 
 
 def getLinesHaste(hasteObject):
@@ -63,7 +63,7 @@ def matchObs(url):
 
 
 def getObslog(obsURL, obslogId):
-    return requests.get('{0}/{1}'.format(obsURL, obslogId)).text
+    return requests.get('{0}/{1}'.format(obsURL, obslogId), timeout=5).text
 
 
 def getLinesObslog(obslogText):
@@ -81,7 +81,7 @@ def matchPastebin(url):
 
 def getRawPaste(obslogId):
     API_URL = "https://pastebin.com/raw"
-    return requests.get('{0}/{1}'.format(API_URL, obslogId)).text
+    return requests.get('{0}/{1}'.format(API_URL, obslogId), timeout=5).text
 
 
 def getLinesPaste(obslogText):
@@ -99,7 +99,7 @@ def matchDiscord(url):
 
 def getRawDiscord(obslogId):
     API_URL = "https://cdn.discordapp.com/attachments"
-    resp = requests.get('{0}/{1}'.format(API_URL, obslogId))
+    resp = requests.get('{0}/{1}'.format(API_URL, obslogId), timeout=5)
     if resp.status_code == 200:
         return resp.text
     return ""
