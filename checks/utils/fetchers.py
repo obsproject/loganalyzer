@@ -59,7 +59,7 @@ def getDescription(lines):
 
 def matchObs(url):
     return re.match(
-        r"(?i)^\b(?P<obsLogURL>(?P<obsLogURLRoot>https?:(?:/{1,3}(?:www\.)?obsproject\.com)/(analyzer|logs))/(?P<obsLogURLFilename>.{16}))$", url)
+        r"(?i)^\b(?P<obsLogURL>(?P<obsLogURLRoot>https?:(?:/{1,3}(?:www\.)?obsproject\.com)/(analyzer|logs))/(?P<obsLogURLFilename>[A-Za-z0-9_-]{16}))$", url)
 
 
 def getObslog(obsURL, obslogId):
