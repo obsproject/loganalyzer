@@ -44,13 +44,6 @@ def isX11(lines):
     return True
 
 
-def isUbuntu2004(line):
-    if any(distro in line for distro in ['"Ubuntu" "20.04"', html.escape('"Ubuntu" "20.04"')]):
-        return True
-    else:
-        return False
-
-
 def checkDistro(lines):
     """The distro log line is escaped before adding to the returned list. Take care when comparing against this value."""
     isDistroNix = search('Distribution:', lines)
@@ -60,7 +53,7 @@ def checkDistro(lines):
 
     distro = isDistroNix[0].split()
     distro = distro[2:]
-    distro = ' '.join(distro)
+    distro = ' '.join(distro).replace('"', '')
     distroHelp = ''
 
     # this is logged when the file can't be found at all
@@ -100,7 +93,7 @@ def checkWayland(lines):
         return
 
     isDistroNix = checkDistro(lines)
-    if isDistroNix and isUbuntu2004(isDistroNix[1]):
+    if isDistroNix and isDistroNix[1] == 'Ubuntu 20.04':
         return [LEVEL_CRITICAL, "Ubuntu 20.04 under Wayland",
                 "Ubuntu 20.04 does not provide the needed dependencies for OBS to capture under Wayland.<br> Capture will only function under X11/Xorg."]
 
