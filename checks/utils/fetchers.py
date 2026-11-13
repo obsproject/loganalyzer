@@ -113,7 +113,7 @@ def getLinesDiscord(obslogText):
 # local file
 def getLinesLocal(filename):
     try:
-        with open(filename, "r") as f:
+        with open(filename, "r", encoding="utf-8") as f:
             return f.readlines()
     except:
         return
