@@ -58,11 +58,11 @@ def checkMacVer(lines):
     if "latest" in verinfo:
         msg = "You are running %s %s, which is currently supported by Apple and the most recent version of OBS." % (mv, html.escape(verinfo["name"]))
         mv += " (OK)"
-        return [LEVEL_INFO, mv, msg]
+        return [LEVEL_SYSTEM, mv, msg]
 
     msg = "You are running %s %s, which is not officially supported by Apple but is compatible with the most recent version of OBS. Updating to a more recent version of macOS is recommended to ensure that you are able to install future versions of OBS." % (mv, html.escape(verinfo["name"]))
     mv += " (OK)"
-    return [LEVEL_INFO, mv, msg]
+    return [LEVEL_SYSTEM, mv, msg]
 
 
 def checkRosettaTranslationStatus(lines):

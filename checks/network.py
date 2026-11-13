@@ -29,7 +29,7 @@ def checkDrop(lines):
 
 def checkKiller(lines):
     if (len(search('Interface: Killer', lines)) > 0):
-        return [LEVEL_INFO, "Killer NIC",
+        return [LEVEL_SYSTEM, "Killer NIC",
                 """Killer's Software Suite is known for its poor performance and issues when trying to stream. Please download the package from <a href="https://www.intel.com/content/www/us/en/download/19779/intel-killer-performance-suite.html">the vendor's page</a> , completely uninstall all Killer NIC items and run the installer, choosing to only install the Hardware Drivers."""]
 
 

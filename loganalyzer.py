@@ -12,6 +12,7 @@ from checks.macos import *
 from checks.network import *
 from checks.plugins import *
 from checks.sources import *
+from checks.system import *
 from checks.linux import *
 from checks.windows import *
 
@@ -34,6 +35,7 @@ def getSummary(messages):
     critical = []
     warning = []
     info = []
+    system = []
     for i in messages:
         if (i[0] == LEVEL_CRITICAL):
             critical.append(i[1])
@@ -41,9 +43,12 @@ def getSummary(messages):
             warning.append(i[1])
         elif (i[0] == LEVEL_INFO):
             info.append(i[1])
+        elif (i[0] == LEVEL_SYSTEM):
+            system.append(i[1])
     summary += "{}Critical: {}\n".format(RED, ", ".join(critical))
     summary += "{}Warning:  {}\n".format(YELLOW, ", ".join(warning))
     summary += "{}Info:     {}\n".format(CYAN, ", ".join(info))
+    summary += "{}System:   {}\n".format(BLUE, ", ".join(system))
     return summary
 
 
@@ -70,6 +75,13 @@ def getResults(messages):
     for i in messages:
         if (i[0] == 1):
             results += "\n{}{}\n".format(CYAN, i[1])
+            results += textOutput(i[2])
+
+    results += "{} \n".format(RESET)
+    results += "\nSystem:"
+    for i in messages:
+        if (i[0] == 5):
+            results += "\n{}{}\n".format(BLUE, i[1])
             results += textOutput(i[2])
 
     results += "{} \n".format(RESET)
@@ -128,6 +140,9 @@ def doAnalysis(url=None, filename=None):
         messages.append(m)
         if (not classic and not crash):
             messages.extend([
+                checkCPUInfo(logLines),
+                checkGPUInfo(logLines),
+                checkRAMInfo(logLines),
                 checkObsVersion(logLines),
                 checkDual(logLines),
                 checkAutoconfig(logLines),
