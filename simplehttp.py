@@ -24,6 +24,7 @@ def getSummaryHTML(messages):
     critical = ""
     warning = ""
     info = ""
+    system = ""
     for i in messages:
         if (i[0] == 3):
             critical = critical + """<p><a href="#""" + \
@@ -37,13 +38,19 @@ def getSummaryHTML(messages):
             info = info + """<p><a href="#""" + \
                 i[1] + """"><button type="button" class="btn btn-info">""" + \
                 i[1] + "</button></a></p>\n"
+        elif (i[0] == 5):
+            system = system + """<p><a href="#""" + \
+                i[1] + """"><button type="button" class="btn btn-secondary">""" + \
+                i[1] + "</button></a></p>\n"
     if (len(critical) == 0):
         critical = "No critical issues."
     if (len(warning) == 0):
         warning = "No warnings."
     if (len(info) == 0):
         info = "-"
-    return critical, warning, info
+    if (len(system) == 0):
+        system = "-"
+    return critical, warning, info, system
 
 
 def getDetailsHTML(messages):
@@ -70,6 +77,13 @@ def getDetailsHTML(messages):
                                           severity='Info',
                                           title=i[1],
                                           text=i[2])
+    for i in messages:
+        if (i[0] == 5):
+            res = res + htmlDetail.format(anchor=i[1],
+                                          sev='secondary',
+                                          severity='System',
+                                          title=i[1],
+                                          text=i[2])
     return res
 
 
@@ -85,7 +99,7 @@ def getDescr(messages):
 def genFullHtmlResponse(url):
     """Runs an analysis and returns a full HTML page with the response."""
     msgs = analyze.doAnalysis(url=url)
-    crit, warn, info = getSummaryHTML(msgs)
+    crit, warn, info, system = getSummaryHTML(msgs)
     details = getDetailsHTML(msgs)
     response = htmlTemplate.format(ph=url,
                                    description="""<a href="{}">{}</a>""".format(
@@ -93,6 +107,7 @@ def genFullHtmlResponse(url):
                                    summary_critical=crit,
                                    summary_warning=warn,
                                    summary_info=info,
+                                   summary_system=system,
                                    details=details)
     return response
 
@@ -105,6 +120,7 @@ def genEmptyHtmlResponse():
                                         summary_critical=no_log,
                                         summary_warning=no_log,
                                         summary_info=no_log,
+                                        summary_system=no_log,
                                         details="""<p class="text-warning">""" + no_log + """</p>""")
     return response_body
 
@@ -116,6 +132,7 @@ def genJsonResponse(url, detailed):
     critical = []
     warning = []
     info = []
+    system = []
     for i in msgs:
         entry = i[1]
         if detailed:
@@ -126,7 +143,9 @@ def genJsonResponse(url, detailed):
             warning.append(entry)
         elif (i[0] == 1):
             info.append(entry)
-    return {"critical": critical, "warning": warning, "info": info}
+        elif (i[0] == 5):
+            system.append(entry)
+    return {"critical": critical, "warning": warning, "info": info, "system": system}
 
 
 def sync_request_handler(request):

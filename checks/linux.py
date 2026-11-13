@@ -62,7 +62,7 @@ def checkDistro(lines):
         distroHelp = 'No distribution detected. This can lead to undefined behavior. Please consult your distribution\'s support channels on how to fix this.'
         return [LEVEL_WARNING, distro, distroHelp]
 
-    return [LEVEL_INFO, html.escape(distro), distroHelp]
+    return [LEVEL_SYSTEM, html.escape(distro), distroHelp]
 
 
 def checkFlatpak(lines):
@@ -73,7 +73,7 @@ def checkFlatpak(lines):
                 "You are using an unofficial Flatpak package. Please file issues with the packager.<br><br>OBS may be unable to assist with issues arising out of the usage of this package. We recommend following our <a href=\"https://obsproject.com/download#linux\">Install Instructions</a> instead."]
 
     if isFlatpak:
-        return [LEVEL_INFO, "Flatpak",
+        return [LEVEL_SYSTEM, "Flatpak",
                 "You are using the Flatpak. Plugins are available as Flatpak extensions, which you can find in your Distribution's Software Center or via <code>flatpak search com.obsproject.Studio</code>. Installation of external plugins is not supported."]
 
 

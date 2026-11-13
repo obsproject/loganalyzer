@@ -213,7 +213,7 @@ def checkGameMode(lines):
 
     # else
     if search("Game Mode: Off", lines):
-        return [LEVEL_INFO, "Windows Game Mode",
+        return [LEVEL_SYSTEM, "Windows Game Mode",
                 """In Windows 10 versions 1809 and newer, we recommend that "Game Mode" be enabled for maximum gaming performance. Game Mode can be enabled via the Windows 10 "Settings" app, under Gaming > <a href="ms-settings:gaming-gamemode">Game Mode</a>."""]
 
 
@@ -221,13 +221,13 @@ def checkWin10Hags(lines):
     d3dAdapter = search('Loading up D3D11', lines)
     hagsMessage = """The Hardware-accelerated GPU scheduling ("HAGS") feature added with Windows 10 is currently known to cause performance and capture issues with OBS, games and overlay tools. If you are having issues with performance or OBS freezing, we recommend disabling it via <a href="ms-settings:display-advancedgraphics">this screen</a> or <a href="https://obsproject.com/kb/hags">these instructions</a> as a troubleshooting step."""
     if search('Hardware GPU Scheduler: On', lines):
-        return [LEVEL_INFO, "Hardware-accelerated GPU Scheduler",
+        return [LEVEL_SYSTEM, "Hardware-accelerated GPU Scheduler",
                 hagsMessage]
     elif search('Hardware GPU Scheduler: Probably On', lines) and ('NVIDIA' in d3dAdapter[0]):
-        return [LEVEL_INFO, "Hardware-accelerated GPU Scheduler",
+        return [LEVEL_SYSTEM, "Hardware-accelerated GPU Scheduler",
                 hagsMessage]
     elif search('Hardware-Accelerated GPU Scheduling enabled on adapter!', lines):
-        return [LEVEL_INFO, "Hardware-accelerated GPU Scheduler",
+        return [LEVEL_SYSTEM, "Hardware-accelerated GPU Scheduler",
                 hagsMessage]
 
 
@@ -318,14 +318,14 @@ def checkWindowsVer(lines):
         msg = "You are running %s, for which Microsoft has not yet announced an end of life date." % (
             html.escape(verinfo["name"]))
 
-    return [LEVEL_INFO, wv, msg]
+    return [LEVEL_SYSTEM, wv, msg]
 
 
 def checkWindowsARM64(lines):
     verinfo = getWindowsVersion(lines)
     if verinfo:
         if verinfo["arm"]:
-            return [LEVEL_INFO, "Windows ARM64",
+            return [LEVEL_SYSTEM, "Windows ARM64",
                     "You are running OBS Studio on an ARM64 Windows system."]
 
 
